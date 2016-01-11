@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include <QObject>
 #include <QDebug>
+#include <QFileDialog>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -11,7 +12,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QObject::connect(
         ui->pushButton, SIGNAL(clicked(bool)),
-        this,           SLOT(TestSlot())
+        this,           SLOT(TestSlot(bool))
         );
 }
 
@@ -20,7 +21,9 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::TestSlot()
+void MainWindow::TestSlot(bool var)
 {
-    qWarning() << "Done yaknow";
+    QString folder = QFileDialog::getExistingDirectory();
+
+    qWarning() << folder;
 }

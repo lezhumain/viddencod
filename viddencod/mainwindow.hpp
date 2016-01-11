@@ -16,7 +16,7 @@ class MainWindow : public QMainWindow
         ~MainWindow();
 
     private slots:
-        void TestSlot();
+        void TestSlot(bool var);
 
     private:
         Ui::MainWindow *ui;

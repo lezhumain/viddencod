@@ -69,3 +69,28 @@ DEFINES += __STDC_CONSTANT_MACROS
 # FFMPEG: END OF CONFIGURATION
 # ##############################################################################
 
+
+win32: LIBS += -L$$PWD/../../ffmpeg_lib_win32/ -lavcodec
+
+INCLUDEPATH += $$PWD/../../ffmpeg_lib_win32
+DEPENDPATH += $$PWD/../../ffmpeg_lib_win32
+
+in32: LIBS += -L$$PWD/../../ffmpeg_lib_win32/ -lavdevice
+
+INCLUDEPATH += $$PWD/../../ffmpeg_lib_win32
+DEPENDPATH += $$PWD/../../ffmpeg_lib_win32
+
+win32: LIBS += -L$$PWD/../../ffmpeg_lib_win32/ -lavfilter
+
+INCLUDEPATH += $$PWD/../../ffmpeg_lib_win32
+DEPENDPATH += $$PWD/../../ffmpeg_lib_win32
+
+win32: LIBS += -L$$PWD/../../ffmpeg_lib_win32/ -lavformat
+
+INCLUDEPATH += $$PWD/../../ffmpeg_lib_win32
+DEPENDPATH += $$PWD/../../ffmpeg_lib_win32
+
+win32: LIBS += -L$$PWD/../../ffmpeg_lib_win32/ -lavutil
+
+INCLUDEPATH += $$PWD/../../ffmpeg_lib_win32
+DEPENDPATH += $$PWD/../../ffmpeg_lib_win32

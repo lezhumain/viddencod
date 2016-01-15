@@ -425,7 +425,7 @@ bool QVideoEncoder::convertImage(const QImage &img)
    }
    if(img.format()!=QImage::Format_RGB32	&& img.format() != QImage::Format_ARGB32)
    {
-      printf("Wrong image format\n");
+      printf("Wrong image format 1\n");
       return false;
    }
 
@@ -517,10 +517,11 @@ bool QVideoEncoder::convertImage_sws(const QImage &img)
       printf("Wrong image size!\n");
       return false;
    }
+   QImage::Format format = img.format();
    if(img.format()!=QImage::Format_RGB32	&& img.format() != QImage::Format_ARGB32)
    {
-      printf("Wrong image format\n");
-      return false;
+        printf("Wrong image format 2\n");
+        return false;
    }
 
    img_convert_ctx = ffmpeg::sws_getCachedContext(img_convert_ctx,getWidth(),getHeight(),ffmpeg::PIX_FMT_BGRA,getWidth(),getHeight(),ffmpeg::PIX_FMT_YUV420P,SWS_BICUBIC, NULL, NULL, NULL);

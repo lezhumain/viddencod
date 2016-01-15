@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>600</width>
-    <height>400</height>
+    <height>444</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -135,6 +135,7 @@
     <addaction name="actionLoad_video"/>
     <addaction name="actionSave_synthetic_video"/>
     <addaction name="actionSave_synthetic_variable_frame_rate_video"/>
+    <addaction name="actionEncode_video"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuVideo"/>
@@ -166,6 +167,11 @@
   <action name="actionSave_synthetic_variable_frame_rate_video">
    <property name="text">
     <string>Save synthetic variable frame rate video</string>
+   </property>
+  </action>
+  <action name="actionEncode_video">
+   <property name="text">
+    <string>Encode video</string>
    </property>
   </action>
  </widget>

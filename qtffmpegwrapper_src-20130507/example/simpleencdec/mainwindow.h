@@ -23,11 +23,13 @@ THIS SOFTWARE IS PROVIDED BY COPYRIGHT HOLDERS ``AS IS'' AND ANY EXPRESS OR IMPL
 #include "QVideoDecoder.h"
 
 
-namespace Ui {
+namespace Ui
+{
 	 class MainWindow;
 }
 
-class MainWindow : public QMainWindow {
+class MainWindow : public QMainWindow
+{
 	 Q_OBJECT
 public:
 	 MainWindow(QWidget *parent = 0);
@@ -51,11 +53,13 @@ protected:
 	 void nextFrame();
 
 	 // Encoder demo
-	 void GenerateSyntheticVideo(QString filename,bool vfr=false);
+     void GenerateSyntheticVideo(QString filename,bool vfr = false);
+     void GenerateEncodedVideo(QList<QImage> &images, QString filename, bool vfr = false);
 
 
 private:
 	 Ui::MainWindow *ui;
+     QList<QImage> getAllFrames();
 
 
 
@@ -67,6 +71,7 @@ private slots:
 	 void on_actionLoad_video_triggered();
 	 void on_actionQuit_triggered();
 	 void on_actionSave_synthetic_variable_frame_rate_video_triggered();
+     void on_actionEncode_video_triggered();
 };
 
 #endif // MAINWINDOW_H

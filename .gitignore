@@ -2,3 +2,4 @@ build*
 *.autosave
 *.pro.user.0c14d04
 *.user.orig
+*test.avi

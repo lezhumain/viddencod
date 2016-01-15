@@ -19,7 +19,7 @@ THIS SOFTWARE IS PROVIDED BY COPYRIGHT HOLDERS ``AS IS'' AND ANY EXPRESS OR IMPL
 #include <QMessageBox>
 #include <QPainter>
 #include <QDebug>
-
+#include <QTime>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -82,7 +82,7 @@ void MainWindow::image2Pixmap(QImage &img,QPixmap &pixmap)
 void MainWindow::on_actionLoad_video_triggered()
 {
     // Prompt a video to load
-   QString fileName = QFileDialog::getOpenFileName(this, "Load Video",QString(),"Video (*.avi *.asf *.mpg *.wmv)");
+   QString fileName = QFileDialog::getOpenFileName(this, "Load Video",QString(),"Video (*.avi *.mp4 *.asf *.mpg *.wmv)");
    if(!fileName.isNull())
    {
       loadVideo(fileName);
@@ -154,7 +154,14 @@ void MainWindow::displayFrame()
 
 QList<QImage> MainWindow::getAllFrames()
 {
-    int maxFrames = 500;
+    short frameRate = 25;
+    int lengthMs = decoder.getVideoLengthMs();
+    qWarning() << "length" << lengthMs ;
+
+    int maxFrames = lengthMs * frameRate / 1000; // not working
+    maxFrames = maxFrames < 0 ? 50000 : maxFrames;
+    qWarning() << "maxframes" << maxFrames ;
+//    int maxFrames = 500;
     QList<QImage> listIm;
 
     for(int i = 0; i < maxFrames; ++i)
@@ -168,18 +175,27 @@ QList<QImage> MainWindow::getAllFrames()
            return listIm;
         }
         listIm.append(img);
-        nextFrame();
+
+        if(!nextFrame() || i == 1290000)
+        {
+            qWarning() << "Current frame:" << eframeNumbern << "[i =" << i << "]";
+            break;
+        }
     }
 
     return listIm;
 }
 
-void MainWindow::nextFrame()
+bool MainWindow::nextFrame()
 {
    if(!decoder.seekNextFrame())
    {
-      QMessageBox::critical(this,"Error","seekNextFrame failed");
+//      QMessageBox::critical(this,"Error","seekNextFrame failed");
+       qWarning() << "seekNextFrame failed";
+       return false;
    }
+
+   return true;
 }
 
 /**
@@ -284,9 +300,22 @@ void MainWindow::on_actionSave_synthetic_variable_frame_rate_video_triggered()
 
 void MainWindow::on_actionEncode_video_triggered()
 {
+    int secElapsed;
+    QTime start = QTime::currentTime();
+    start.start();
+
     QList<QImage> listImg = getAllFrames();
 
     GenerateEncodedVideo(listImg, "../../../test.avi");
+
+    secElapsed = start.elapsed() / 1000.;
+    QTime test(0, 0, secElapsed, 0);
+    short nbFrames = listImg.length();
+
+    QString msg = "Encoded " + QString::number(nbFrames) + " frames at " + QString::number(nbFrames / secElapsed) + "f/s (Total Time: " + test.toString("mm:ss,zzz") + ").";
+
+    printf(msg.toStdString().c_str());
+    qWarning() << msg;
 }
 
 //void MainWindow::on_actionSave_synthetic_video_triggered()

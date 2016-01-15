@@ -50,7 +50,7 @@ protected:
 	 void loadVideo(QString fileName);
 	 void errLoadVideo();
 	 bool checkVideoLoadOk();
-	 void nextFrame();
+     bool nextFrame();
 
 	 // Encoder demo
      void GenerateSyntheticVideo(QString filename,bool vfr = false);

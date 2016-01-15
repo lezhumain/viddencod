@@ -331,10 +331,10 @@ int QVideoEncoder::encodeImage_p(const QImage &img,bool custompts, unsigned pts)
 **/
 bool QVideoEncoder::isSizeValid()
 {
-   if(getWidth()%8)
-      return false;
-   if(getHeight()%8)
-      return false;
+//   if(getWidth()%8)
+//      return false;
+//   if(getHeight()%8)
+//      return false;
    return true;
 }
 

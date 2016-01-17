@@ -115,11 +115,12 @@ bool QVideoDecoder::openFile(QString filename)
 
    LastLastFrameTime=INT_MIN;       // Last last must be small to handle the seek well
    LastFrameTime=0;
+
    LastLastFrameNumber=INT_MIN;
    LastFrameNumber=0;
+
    DesiredFrameTime=DesiredFrameNumber=0;
    LastFrameOk=false;
-
 
    // Open video file
    if(av_open_input_file(&pFormatCtx, filename.toStdString().c_str(), NULL, 0, NULL)!=0)
@@ -135,11 +136,13 @@ bool QVideoDecoder::openFile(QString filename)
    // Find the first video stream
    videoStream=-1;
    for(unsigned i=0; i<pFormatCtx->nb_streams; i++)
+   {
        if(pFormatCtx->streams[i]->codec->codec_type==ffmpeg::AVMEDIA_TYPE_VIDEO)
        {
            videoStream=i;
            break;
        }
+   }
    if(videoStream==-1)
        return false; // Didn't find a video stream
 
@@ -200,16 +203,12 @@ bool QVideoDecoder::decodeSeekFrame(int after)
    if(!ok)
       return false;
 
-   //printf("decodeSeekFrame. after: %d. LLT: %d. LT: %d. LLF: %d. LF: %d. LastFrameOk: %d.\n",after,LastLastFrameTime,LastFrameTime,LastLastFrameNumber,LastFrameNumber,(int)LastFrameOk);
-
-
+   printf("decodeSeekFrame. after: %d. LLT: %d. LT: %d. LLF: %d. LF: %d. LastFrameOk: %d.\n",after,LastLastFrameTime,LastFrameTime,LastLastFrameNumber,LastFrameNumber,(int)LastFrameOk);
 
    // If the last decoded frame satisfies the time condition we return it
-   //if( after!=-1 && ( LastDataInvalid==false && after>=LastLastFrameTime && after <= LastFrameTime))
    if( after!=-1 && ( LastFrameOk==true && after>=LastLastFrameNumber && after <= LastFrameNumber))
    {
       // This is the frame we want to return
-
       // Compute desired frame time
       ffmpeg::AVRational millisecondbase = {1, 1000};
       DesiredFrameTime = ffmpeg::av_rescale_q(after,pFormatCtx->streams[videoStream]->time_base,millisecondbase);
@@ -247,14 +246,10 @@ bool QVideoDecoder::decodeSeekFrame(int after)
          //else
          //   printf("P\n");
 
-
-         /*printf("codecctx time base: num: %d den: %d\n",pCodecCtx->time_base.num,pCodecCtx->time_base.den);
+         printf("codecctx time base: num: %d den: %d\n",pCodecCtx->time_base.num,pCodecCtx->time_base.den);
          printf("formatctx time base: num: %d den: %d\n",pFormatCtx->streams[videoStream]->time_base.num,pFormatCtx->streams[videoStream]->time_base.den);
-         printf("pts: %ld\n",pts);
-         printf("dts: %ld\n",dts);*/
-
-
-
+         //printf("pts: %ld\n",pts);
+         //printf("dts: %ld\n",dts);
 
          // Did we get a video frame?
          if(frameFinished)
@@ -385,9 +380,11 @@ bool QVideoDecoder::seekFrame(int64_t frame)
    return true;
 }
 
-
-
-bool QVideoDecoder::getFrame(QImage&img,int *effectiveframenumber,int *effectiveframetime,int *desiredframenumber,int *desiredframetime)
+bool QVideoDecoder::getFrame(QImage &img,
+                             int *effectiveframenumber,
+                             int *effectiveframetime,
+                             int *desiredframenumber,
+                             int *desiredframetime)
 {
    img = LastFrame;
 
@@ -519,11 +516,9 @@ int QVideoDecoder::getVideoLengthMs()
    if(!isOk())
       return -1;
 
-
    int secs = pFormatCtx->duration / AV_TIME_BASE;
    int us = pFormatCtx->duration % AV_TIME_BASE;
    int l = secs*1000 + us/1000;
-
 
    dumpFormat(pFormatCtx,videoStream,"test video",0);
 

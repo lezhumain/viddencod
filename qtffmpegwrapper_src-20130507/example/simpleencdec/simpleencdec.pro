@@ -13,9 +13,10 @@ SOURCES += main.cpp \
 HEADERS += mainwindow.h \
 	 cio.h
 
+
 FORMS += mainwindow.ui
 RESOURCES += resource.qrc
-DEFINES += DEVELMODE
+DEFINES += DEVELMODE QT_DISABLE_DEPRECATED_BEFORE=0
 
 # ##############################################################################
 # ##############################################################################

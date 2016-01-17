@@ -33,7 +33,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ConsoleInit();
     printf("Starting up\n");
-
 }
 
 MainWindow::~MainWindow()
@@ -44,7 +43,8 @@ MainWindow::~MainWindow()
 void MainWindow::changeEvent(QEvent *e)
 {
     QMainWindow::changeEvent(e);
-    switch (e->type()) {
+    switch (e->type())
+    {
     case QEvent::LanguageChange:
         ui->retranslateUi(this);
         break;
@@ -100,6 +100,8 @@ void MainWindow::loadVideo(QString fileName)
       return;
    }
 
+
+
    // Get a new frame
    nextFrame();
    // Display a frame
@@ -147,7 +149,10 @@ void MainWindow::displayFrame()
    ui->labelVideoFrame->setPixmap(p);
 
    // Display the video size
-   ui->labelVideoInfo->setText(QString("Size %2 ms. Display: #%3 @ %4 ms.").arg(decoder.getVideoLengthMs()).arg(en).arg(et));
+   ui->labelVideoInfo->setText(QString("Size %2 ms. Display: #%3 @ %4 ms.").
+                               arg(decoder.getVideoLengthMs()).
+                               arg(en).
+                               arg(et));
 
 }
 

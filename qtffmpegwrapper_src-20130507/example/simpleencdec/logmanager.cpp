@@ -6,9 +6,9 @@
 LogManager* LogManager::_instance;
 LogManager::LogManager()
 {
-    _logFile = new QFile();
+    _logFile = new QFile("C:\\User\\lucdef\\Desktop\\log.txt");
     _mutex = new QMutex();
-    _logFile->open();
+    _logFile->open(QIODevice.Append);
 
 }
 LogManager::~LogManager()

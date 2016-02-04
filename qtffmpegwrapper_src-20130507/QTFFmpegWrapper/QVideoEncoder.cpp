@@ -110,7 +110,7 @@ bool QVideoEncoder::createFile(QString fileName,unsigned width,unsigned height,u
    pCodecCtx->pix_fmt = ffmpeg::PIX_FMT_YUV420P;
 
 
-   avcodec_thread_init(pCodecCtx, 10);
+   avcodec_thread_init(pCodecCtx, 1);
 
    //if (c->codec_id == CODEC_ID_MPEG2VIDEO)
    //{

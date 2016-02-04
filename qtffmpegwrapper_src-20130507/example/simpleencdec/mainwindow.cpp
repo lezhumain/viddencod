@@ -36,8 +36,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ConsoleInit();
 
-    _videoPlayer.SetVideoDec(_videoPlayer.GetVideoDecoder());
-
     printf("Starting up\n");
 }
 
@@ -95,8 +93,8 @@ void MainWindow::on_actionLoad_video_triggered()
 **/
 void MainWindow::loadVideo(QString fileName)
 {
-   _videoPlayer.GetVideoDecoder().openFile(fileName);
-   if(_videoPlayer.GetVideoDecoder().isOk()==false)
+   _videoPlayer.GetVideoDecoder()->openFile(fileName);
+   if(_videoPlayer.GetVideoDecoder()->isOk()==false)
    {
       QMessageBox::critical(this,"Error","Error loading the video");
       return;
@@ -116,7 +114,7 @@ void MainWindow::errLoadVideo()
 }
 bool MainWindow::checkVideoLoadOk()
 {
-   if(_videoPlayer.GetVideoDecoder().isOk()==false)
+   if(_videoPlayer.GetVideoDecoder()->isOk()==false)
    {
       errLoadVideo();
       return false;
@@ -137,7 +135,7 @@ void MainWindow::displayFrame()
 
    // Decode a frame
    int et,en;
-   if(!_videoPlayer.GetVideoDecoder().getFrame(img,&en,&et))
+   if(!_videoPlayer.GetVideoDecoder()->getFrame(img,&en,&et))
    {
       QMessageBox::critical(this,"Error","Error decoding the frame");
       return;
@@ -151,7 +149,7 @@ void MainWindow::displayFrame()
 
    // Display the video size
    ui->labelVideoInfo->setText(QString("Size %2 ms. Display: #%3 @ %4 ms.").
-                               arg(_videoPlayer.GetVideoDecoder().getVideoLengthMs()).
+                               arg(_videoPlayer.GetVideoDecoder()->getVideoLengthMs()).
                                arg(en).
                                arg(et));
 
@@ -160,7 +158,7 @@ void MainWindow::displayFrame()
 QList<QImage> MainWindow::getAllFrames()
 {
     short frameRate = 25;
-    int lengthMs = _videoPlayer.GetVideoDecoder().getVideoLengthMs();
+    int lengthMs = _videoPlayer.GetVideoDecoder()->getVideoLengthMs();
     qWarning() << "length" << lengthMs ;
 
     int maxFrames = lengthMs * frameRate / 1000; // not working
@@ -173,7 +171,7 @@ QList<QImage> MainWindow::getAllFrames()
     {
         QImage img;
         int eframeNumbern, frameTime;
-        if(!_videoPlayer.GetVideoDecoder().getFrame(img,&eframeNumbern,&frameTime))
+        if(!_videoPlayer.GetVideoDecoder()->getFrame(img,&eframeNumbern,&frameTime))
         {
            QMessageBox::critical(this,"Error","Error decoding the frame");
            listIm.clear();
@@ -193,7 +191,7 @@ QList<QImage> MainWindow::getAllFrames()
 
 bool MainWindow::nextFrame()
 {
-   if(!_videoPlayer.GetVideoDecoder().seekNextFrame())
+   if(!_videoPlayer.GetVideoDecoder()->seekNextFrame())
    {
 //      QMessageBox::critical(this,"Error","seekNextFrame failed");
        qWarning() << "seekNextFrame failed";
@@ -229,7 +227,7 @@ void MainWindow::on_pushButtonSeekFrame_clicked()
    }
 
    // Seek to the desired frame
-   if(!_videoPlayer.GetVideoDecoder().seekFrame(frame))
+   if(!_videoPlayer.GetVideoDecoder()->seekFrame(frame))
    {
       QMessageBox::critical(this,"Error","Seek failed");
       return;
@@ -256,7 +254,7 @@ void MainWindow::on_pushButtonSeekMillisecond_clicked()
    }
 
    // Seek to the desired frame
-   if(!_videoPlayer.GetVideoDecoder().seekMs(ms))
+   if(!_videoPlayer.GetVideoDecoder()->seekMs(ms))
    {
       QMessageBox::critical(this,"Error","Seek failed");
       return;
@@ -419,7 +417,7 @@ void MainWindow::GenerateSyntheticVideo(QString filename, bool vfr)
 int MainWindow::GenerateEncodedVideo(QString filename,bool vfr)
 {
     short frameRate = 25;
-    int lengthMs = _videoPlayer.GetVideoDecoder().getVideoLengthMs();
+    int lengthMs = _videoPlayer.GetVideoDecoder()->getVideoLengthMs();
     qWarning() << "length" << lengthMs ;
 
     int maxFrames = lengthMs * frameRate / 1000; // not working
@@ -448,7 +446,7 @@ int MainWindow::GenerateEncodedVideo(QString filename,bool vfr)
     {
         QImage frame;
         int eframeNumbern, frameTime;
-        if(!_videoPlayer.GetVideoDecoder().getFrame(frame,&eframeNumbern,&frameTime))
+        if(!_videoPlayer.GetVideoDecoder()->getFrame(frame,&eframeNumbern,&frameTime))
         {
            QMessageBox::critical(this,"Error","Error decoding the frame");
            return -1;

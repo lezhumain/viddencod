@@ -113,6 +113,10 @@ void MainWindow::errLoadVideo()
 {
    QMessageBox::critical(this,"Error","Load a video first");
 }
+///
+/// \brief Permet de connaitre l'état de la video
+/// \return false si il y a une erreur dans le chargement de la vidéo
+///
 bool MainWindow::checkVideoLoadOk()
 {
    if(decoder.isOk()==false)

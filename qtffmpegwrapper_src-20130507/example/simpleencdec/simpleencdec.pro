@@ -8,10 +8,12 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
 	 mainwindow.cpp \
-	 cio.cpp
+	 cio.cpp \
+    logmanager.cpp
 
 HEADERS += mainwindow.h \
-	 cio.h
+	 cio.h \
+    logmanager.hpp
 
 FORMS += mainwindow.ui
 RESOURCES += resource.qrc

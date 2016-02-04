@@ -70,9 +70,9 @@ class QVideoDecoder
       virtual bool seekMs(int ts);
       virtual bool seekFrame(int64_t frame);
       virtual int getVideoLengthMs();
-
-
       virtual bool isOk();
+
+      ffmpeg::AVFormatContext* getAVFormatContext();
 };
 
 #endif // __QVIDEODECODER_H

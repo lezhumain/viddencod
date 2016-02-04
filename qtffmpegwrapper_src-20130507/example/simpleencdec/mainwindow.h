@@ -18,10 +18,7 @@ THIS SOFTWARE IS PROVIDED BY COPYRIGHT HOLDERS ``AS IS'' AND ANY EXPRESS OR IMPL
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-
-#include "QVideoEncoder.h"
-#include "QVideoDecoder.h"
-
+#include "qvideoapi.h"
 
 namespace Ui
 {
@@ -35,9 +32,9 @@ public:
 	 MainWindow(QWidget *parent = 0);
 	 ~MainWindow();
 
-protected:
-	 QVideoDecoder decoder;
 
+protected:
+     QVideoAPI _videoPlayer;
 
 	 void changeEvent(QEvent *e);
 

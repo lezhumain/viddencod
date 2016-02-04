@@ -54,6 +54,11 @@ QVideoDecoder::~QVideoDecoder()
    close();
 }
 
+ffmpeg::AVFormatContext* QVideoDecoder::getAVFormatContext()
+{
+    return pFormatCtx;
+}
+
 void QVideoDecoder::InitVars()
 {
    ok=false;
@@ -187,6 +192,8 @@ bool QVideoDecoder::isOk()
    return ok;
 }
 
+
+
 /**
    Decodes the video stream until the first frame with number larger or equal than 'after' is found.
 
@@ -211,6 +218,8 @@ bool QVideoDecoder::decodeSeekFrame(int after)
       // This is the frame we want to return
       // Compute desired frame time
       ffmpeg::AVRational millisecondbase = {1, 1000};
+
+      //ffmpeg::AVRational framerate = av_guess_frame_rate(pFormatCtx, , NULL);
       DesiredFrameTime = ffmpeg::av_rescale_q(after,pFormatCtx->streams[videoStream]->time_base,millisecondbase);
 
       //printf("Returning already available frame %d @ %d. DesiredFrameTime: %d\n",LastFrameNumber,LastFrameTime,DesiredFrameTime);
@@ -313,10 +322,9 @@ bool QVideoDecoder::decodeSeekFrame(int after)
    return done;   // done indicates whether or not we found a frame
 }
 
+
 /**
    \brief Decodes the next frame in the video stream
-
-
 **/
 bool QVideoDecoder::seekNextFrame()
 {

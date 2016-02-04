@@ -240,7 +240,6 @@ int QVideoEncoder::encodeImagePts(const QImage &img,unsigned pts)
    return encodeImage_p(img,true,pts);
 }
 
-
 /******************************************************************************
 * INTERNAL   INTERNAL   INTERNAL   INTERNAL   INTERNAL   INTERNAL   INTERNAL
 ******************************************************************************/

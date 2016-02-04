@@ -8,10 +8,12 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
 	 mainwindow.cpp \
-	 cio.cpp
+	 cio.cpp \
+    qvideoapi.cpp
 
 HEADERS += mainwindow.h \
-	 cio.h
+	 cio.h \
+    qvideoapi.h
 
 
 FORMS += mainwindow.ui
@@ -59,7 +61,7 @@ LIBS += -lavutil \
 	 -lswscale
 
 # Add the path
-LIBS += -L$$FFMPEG_LIBRARY_PATH
+LIBS += -L$$PWD/$$FFMPEG_LIBRARY_PATH
 INCLUDEPATH += QVideoEncoder
 INCLUDEPATH += $$FFMPEG_INCLUDE_PATH
 
@@ -70,28 +72,9 @@ DEFINES += __STDC_CONSTANT_MACROS
 # FFMPEG: END OF CONFIGURATION
 # ##############################################################################
 
+win32: LIBS += -lavcodec -lavfilter -lavdevice -lavformat -lavutil
 
-win32: LIBS += -L$$PWD/../../ffmpeg_lib_win32/ -lavcodec
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/$$FFMPEG_LIBRARY_PATH -lavcodec -lavfilter -lavdevice -lavformat -lavutil
 
-INCLUDEPATH += $$PWD/../../ffmpeg_lib_win32
-DEPENDPATH += $$PWD/../../ffmpeg_lib_win32
-
-in32: LIBS += -L$$PWD/../../ffmpeg_lib_win32/ -lavdevice
-
-INCLUDEPATH += $$PWD/../../ffmpeg_lib_win32
-DEPENDPATH += $$PWD/../../ffmpeg_lib_win32
-
-win32: LIBS += -L$$PWD/../../ffmpeg_lib_win32/ -lavfilter
-
-INCLUDEPATH += $$PWD/../../ffmpeg_lib_win32
-DEPENDPATH += $$PWD/../../ffmpeg_lib_win32
-
-win32: LIBS += -L$$PWD/../../ffmpeg_lib_win32/ -lavformat
-
-INCLUDEPATH += $$PWD/../../ffmpeg_lib_win32
-DEPENDPATH += $$PWD/../../ffmpeg_lib_win32
-
-win32: LIBS += -L$$PWD/../../ffmpeg_lib_win32/ -lavutil
-
-INCLUDEPATH += $$PWD/../../ffmpeg_lib_win32
-DEPENDPATH += $$PWD/../../ffmpeg_lib_win32
+INCLUDEPATH += $$PWD/$$FFMPEG_LIBRARY_PATH
+DEPENDPATH += $$PWD/$$FFMPEG_LIBRARY_PATH

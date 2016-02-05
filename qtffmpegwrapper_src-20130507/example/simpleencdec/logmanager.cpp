@@ -3,50 +3,53 @@
 #include <qfile.h>
 #include <QDate>
 #include <qmutex.h>
+#include <qtextstream.h>
 LogManager* LogManager::_instance;
 LogManager::LogManager()
 {
     _logFile = new QFile("C:\\User\\lucdef\\Desktop\\log.txt");
     _mutex = new QMutex();
-    _logFile->open(QIODevice.Append);
+    _logFile->open(QIODevice::Append);
 
 }
 LogManager::~LogManager()
 {
     _logFile->close();
     delete _logFile;
-    delete QMutex();
+    delete _mutex;
     delete _instance;
 }
-bool log(int idThread,QString message,QString criticite)
+bool LogManager::log(int idThread,QString message,QString criticite)
 {
     QDate date;
+    bool isFlush;
+    _mutex->lock();
+    QTextStream txtStream(_logFile);
     QString dateString = date.currentDate().toString("dd/mm/yyyy");
     QString messageLog = criticite+" "+dateString+" "+idThread+" "+message;
-    try
-    {
-        _logFile->append(messageLog);
-        return true;
-    }
-    catch()
-    {
-        return false;
-    }
+
+
+        txtStream<<messageLog<<endl;
+         isFlush = _logFile->flush();
+         _mutex->unlock();
+
+        return isFlush;
+
 }
-bool logInfo(int idThread,QString message)
+bool LogManager::LogInfo(int idThread,QString message)
 {
     QString criticite ="[INFO]";
-    this.log(idThread,message,criticite);
+    return this->log(idThread,message,criticite);
 }
-bool logWarning(int idThread,QString message)
+bool LogManager::LogWarning(int idThread,QString message)
 {
     QString criticite ="[WARNING]";
-    this.log(idThread,message,criticite);
+    return this->log(idThread,message,criticite);
 }
-bool logError(int idThread,QString message)
+bool LogManager::LogError(int idThread,QString message)
 {
     QString criticite ="[ERROR]";
-    this.log(idThread,message,criticite);
+    return this->log(idThread,message,criticite);
 }
 void LogManager::Kill()
 {

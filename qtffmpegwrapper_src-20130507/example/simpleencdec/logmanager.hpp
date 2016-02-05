@@ -1,5 +1,5 @@
 #pragma once
-class Qstring;
+class QString;
 class QFile;
 class QMutex;
 

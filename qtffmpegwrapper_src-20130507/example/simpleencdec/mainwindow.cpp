@@ -46,12 +46,13 @@ MainWindow::~MainWindow()
 void MainWindow::changeEvent(QEvent *e)
 {
     QMainWindow::changeEvent(e);
-    switch (e->type()) {
-    case QEvent::LanguageChange:
-        ui->retranslateUi(this);
-        break;
-    default:
-        break;
+    switch (e->type())
+    {
+        case QEvent::LanguageChange:
+            ui->retranslateUi(this);
+            break;
+        default:
+            break;
     }
 }
 
@@ -303,6 +304,9 @@ void MainWindow::on_actionEncode_video_triggered()
 {
     int secElapsed;
 
+
+    qWarning() << "\t\tHERE0";
+
     if(!checkVideoLoadOk())
     {
        on_actionLoad_video_triggered();
@@ -421,6 +425,10 @@ void MainWindow::GenerateSyntheticVideo(QString filename, bool vfr)
 int MainWindow::GenerateEncodedVideo(QString filename,bool vfr)
 {
     short frameRate = 25;
+
+    qWarning() << "\t\tHERE1";
+
+
     int lengthMs = decoder.getVideoLengthMs();
     qWarning() << "length" << lengthMs ;
 
@@ -438,7 +446,7 @@ int MainWindow::GenerateEncodedVideo(QString filename,bool vfr)
     QImage frame;
 
     // Create the encoder
-    QVideoEncoder encoder;
+    QVideoEncoderTest encoder;
 
     // Generate a few hundred frames
     int size = 0;
@@ -446,6 +454,10 @@ int MainWindow::GenerateEncodedVideo(QString filename,bool vfr)
     unsigned pts = 0;
 
     int i = 0;
+    //ffmpeg::AVCodec *codec = encoder.GetCodec();
+    ffmpeg::AVCodecContext *codecCTX = encoder.GetCodecCTX();
+//    return 0;
+
     for(; i < maxFrames; ++i)
     {
         QImage frame;
@@ -464,7 +476,19 @@ int MainWindow::GenerateEncodedVideo(QString filename,bool vfr)
                 encoder.createFile(filename,width,height,bitrate,gop,fps);        // Fixed frame rate
              else
                 encoder.createFile(filename,width,height,bitrate*1000/fps,gop,1000);  // For variable frame rates: set the time base to e.g. 1ms (1000fps),
-        }                                                                             // and correct the bitrate according to the expected average frame rate (fps)
+        }                                                                         // and correct the bitrate according to the expected average frame rate (fps)
+        else if(i == 1)
+        {
+            ffmpeg::AVCodecContext *codecCTX = encoder.GetCodecCTX();
+            ffmpeg::AVCodec *codec1 = codecCTX->codec,
+                            *codec2 = encoder.GetCodec();
+
+            //codecCTX->pix_fmt = ffmpeg::PIX_FMT_RGBA;
+
+            //            if(codecCTX != 0x0)
+            //              qWarning() << codecCTX->codec->name;
+        }
+
 
 
         // handle
@@ -526,7 +550,7 @@ void MainWindow::GenerateEncodedVideo(QList<QImage> &images, QString filename,bo
     QImage frame;
 
     // Create the encoder
-    QVideoEncoder encoder;
+    QVideoEncoderTest encoder;
     if(!vfr)
        encoder.createFile(filename,width,height,bitrate,gop,fps);        // Fixed frame rate
     else
@@ -538,6 +562,7 @@ void MainWindow::GenerateEncodedVideo(QList<QImage> &images, QString filename,bo
     int size=0;
     int maxframe=images.length();
     unsigned pts=0;
+
     for(unsigned i=0;i<maxframe;i++)
     {
         // Display the frame, and processes events to allow for screen redraw

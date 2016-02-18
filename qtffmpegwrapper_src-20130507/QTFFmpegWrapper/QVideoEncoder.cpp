@@ -71,7 +71,8 @@ bool QVideoEncoder::createFile(QString fileName,unsigned width,unsigned height,u
       return false;
    }
 
-   pOutputFormat = ffmpeg::av_guess_format(NULL, fileName.toStdString().c_str(), NULL);
+//   pOutputFormat = ffmpeg::av_guess_format(NULL, fileName.toStdString().c_str(), NULL);
+   pOutputFormat = ffmpeg::av_guess_format("h264", NULL, NULL);
    if (!pOutputFormat) {
       printf("Could not deduce output format from file extension: using MPEG.\n");
       pOutputFormat = ffmpeg::av_guess_format("mpeg", NULL, NULL);
@@ -108,6 +109,7 @@ bool QVideoEncoder::createFile(QString fileName,unsigned width,unsigned height,u
    pCodecCtx->time_base.num = 1;
    pCodecCtx->gop_size = Gop;
    pCodecCtx->pix_fmt = ffmpeg::PIX_FMT_YUV420P;
+
 
 
    avcodec_thread_init(pCodecCtx, 10);

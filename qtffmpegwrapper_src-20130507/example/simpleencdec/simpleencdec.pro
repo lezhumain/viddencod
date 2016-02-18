@@ -8,10 +8,14 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
 	 mainwindow.cpp \
-	 cio.cpp
+	 cio.cpp \
+    qvideoencodertest.cpp \
+    fifo.cpp
 
 HEADERS += mainwindow.h \
-	 cio.h
+	 cio.h \
+    qvideoencodertest.hpp \
+    fifo.hpp
 
 FORMS += mainwindow.ui
 RESOURCES += resource.qrc

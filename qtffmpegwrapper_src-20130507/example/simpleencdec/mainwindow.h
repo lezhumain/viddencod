@@ -19,7 +19,8 @@ THIS SOFTWARE IS PROVIDED BY COPYRIGHT HOLDERS ``AS IS'' AND ANY EXPRESS OR IMPL
 
 #include <QMainWindow>
 
-#include "QVideoEncoder.h"
+//#include "QVideoEncoder.h"
+#include "QVideoEncoderTest.hpp"
 #include "QVideoDecoder.h"
 
 

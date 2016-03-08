@@ -480,8 +480,7 @@ int MainWindow::GenerateEncodedVideo(QString filename,bool vfr)
         else if(i == 1)
         {
             ffmpeg::AVCodecContext *codecCTX = encoder.GetCodecCTX();
-            ffmpeg::AVCodec *codec1 = codecCTX->codec,
-                            *codec2 = encoder.GetCodec();
+            ffmpeg::AVCodec *codec2 = encoder.GetCodec();
 
             //codecCTX->pix_fmt = ffmpeg::PIX_FMT_RGBA;
 

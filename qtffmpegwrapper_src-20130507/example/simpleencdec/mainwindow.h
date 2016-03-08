@@ -55,6 +55,7 @@ protected:
 
 	 // Encoder demo
      void GenerateSyntheticVideo(QString filename,bool vfr = false);
+     void GenerateSyntheticAudio(QString filename,bool vfr = false);
      void GenerateEncodedVideo(QList<QImage> &images, QString filename, bool vfr = false);
      int GenerateEncodedVideo(QString filename, bool vfr = false);
 

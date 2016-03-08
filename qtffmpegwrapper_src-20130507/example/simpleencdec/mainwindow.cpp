@@ -23,6 +23,7 @@ THIS SOFTWARE IS PROVIDED BY COPYRIGHT HOLDERS ``AS IS'' AND ANY EXPRESS OR IMPL
 #include <QDateTime>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "qaudiodecoder.hpp"
 
 #include "cio.h"
 
@@ -602,5 +603,70 @@ void MainWindow::GenerateEncodedVideo(QList<QImage> &images, QString filename,bo
     printf("Done encoding.");
 }
 
+///
+/// \brief Generates an audio encoded with ? and black video
+/// \param int16_t list of video's audio frames
+/// \param filename the name of the created video
+/// \param vfr ???
+///
+void MainWindow::GenerateSyntheticAudio(QString filename, bool vfr)
+{
+//   int width=640;
+//   int height=480;
+//   int bitrate=1000000;
+//   int gop = 20;
+//   int fps = 25;
 
+//   // The image on which we draw the frames
+//   QImage frame(width,height,QImage::Format_RGB32);     // Only RGB32 is supported
 
+//   // A painter to help us draw
+//   QPainter painter(&frame);
+//   painter.setBrush(Qt::black);
+//   painter.setPen(Qt::black);
+
+//   // Create the encoder
+//   QAudioEncoder encoder;
+//   if(!vfr)
+//      encoder.createFile(filename,width,height,bitrate,gop,fps);        // Fixed frame rate
+//   else
+//      encoder.createFile(filename,width,height,bitrate*1000/fps,gop,1000);  // For variable frame rates: set the time base to e.g. 1ms (1000fps),
+//                                                                           // and correct the bitrate according to the expected average frame rate (fps)
+
+//   QEventLoop evt;      // we use an event loop to allow for paint events to show on-screen the generated video
+
+//   // Generate a few hundred frames
+//   int size=0;
+//   int maxframe=500;
+//   unsigned pts=0;
+//   for(unsigned i=0;i<maxframe;i++)
+//   {
+//      // Clear the frame
+//      painter.fillRect(frame.rect(),Qt::black);
+
+//      // Display the frame, and processes events to allow for screen redraw
+//      QPixmap p;
+//      image2Pixmap(frame,p);
+//      ui->labelVideoFrame->setPixmap(p);
+
+//      evt.processEvents();
+
+//      if(!vfr)
+//         size=encoder.encodeImage(frame);                      // Fixed frame rate
+//      else
+//      {
+//         // Variable frame rate: the pts of the first frame is 0,
+//         // subsequent frames slow down
+//         pts += sqrt(i);
+//         if(i==0)
+//            size=encoder.encodeImagePts(frame,0);
+//         else
+//            size=encoder.encodeImagePts(frame,pts);
+//      }
+
+//      printf("Encoded: %d\n",size);
+//   }
+
+//   encoder.close();
+
+}

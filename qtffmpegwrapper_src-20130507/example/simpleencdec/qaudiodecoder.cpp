@@ -318,8 +318,8 @@ bool QAudioDecoder::decodeSeekFrame(int after)
       {
          // Is this a packet from the audio stream -> decode audio frame
 
-         int frameFinished;
-         avcodec_decode_audio3(pCodecCtx,pAudioFrame,&frameFinished,&packet);
+         int frameSize;
+         avcodec_decode_audio3(pCodecCtx,pAudioFrame,&frameSize,&packet);
 
          //printf("used %d out of %d bytes\n",len,packet.size);
 
@@ -341,7 +341,7 @@ bool QAudioDecoder::decodeSeekFrame(int after)
 
 
          // Did we get a audio frame?
-         if(frameFinished)
+         if(frameSize > 0)
          {
             ffmpeg::AVRational millisecondbase = {1, 1000};
             int f = packet.dts;

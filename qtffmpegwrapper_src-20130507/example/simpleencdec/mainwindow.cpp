@@ -601,6 +601,3 @@ void MainWindow::GenerateEncodedVideo(QList<QImage> &images, QString filename,bo
     encoder.close();
     printf("Done encoding.");
 }
-
-
-

@@ -10,12 +10,14 @@ SOURCES += main.cpp \
 	 mainwindow.cpp \
 	 cio.cpp \
     qvideoencodertest.cpp \
-    fifo.cpp
+    fifo.cpp \
+    aactranscoder.cpp
 
 HEADERS += mainwindow.h \
 	 cio.h \
     qvideoencodertest.hpp \
-    fifo.hpp
+    fifo.hpp \
+    aactranscoder.hpp
 
 FORMS += mainwindow.ui
 RESOURCES += resource.qrc

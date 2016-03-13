@@ -408,7 +408,7 @@ void QVideoEncoder::freeFrame()
    }
    if(ppicture)
    {
-      av_free(ppicture);
+//      av_free(ppicture);
       ppicture=0;
    }
 }

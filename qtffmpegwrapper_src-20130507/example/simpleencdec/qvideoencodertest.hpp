@@ -1,6 +1,6 @@
 #ifndef QVIDEODECODERTEST_H
 #define QVIDEODECODERTEST_H
-#include "QVideoEncoder.h"
+#include "../../QTFFmpegWrapper/QVideoEncoder.h"
 
 class QVideoEncoderTest : public QVideoEncoder
 {

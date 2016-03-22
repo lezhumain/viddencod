@@ -13,7 +13,6 @@ Redistribution and use in source and binary forms, with or without modification,
 THIS SOFTWARE IS PROVIDED BY COPYRIGHT HOLDERS ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE FREEBSD PROJECT OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-
 #include <cmath>
 #include <QFileDialog>
 #include <QMessageBox>
@@ -23,9 +22,9 @@ THIS SOFTWARE IS PROVIDED BY COPYRIGHT HOLDERS ``AS IS'' AND ANY EXPRESS OR IMPL
 #include <QDateTime>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-
+#include "ffmpeg.h"
+#include "QVideoEncoderTest.hpp"
 #include "cio.h"
-
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -456,7 +455,6 @@ int MainWindow::GenerateEncodedVideo(QString filename,bool vfr)
     int i = 0;
     //ffmpeg::AVCodec *codec = encoder.GetCodec();
     ffmpeg::AVCodecContext *codecCTX = encoder.GetCodecCTX();
-//    return 0;
 
     for(; i < maxFrames; ++i)
     {
@@ -479,8 +477,8 @@ int MainWindow::GenerateEncodedVideo(QString filename,bool vfr)
         }                                                                         // and correct the bitrate according to the expected average frame rate (fps)
         else if(i == 1)
         {
-            ffmpeg::AVCodecContext *codecCTX = encoder.GetCodecCTX();
-            ffmpeg::AVCodec *codec2 = encoder.GetCodec();
+//            ffmpeg::AVCodecContext *codecCTX = encoder.GetCodecCTX();
+//            ffmpeg::AVCodec *codec2 = encoder.GetCodec();
 
             //codecCTX->pix_fmt = ffmpeg::PIX_FMT_RGBA;
 
@@ -488,18 +486,15 @@ int MainWindow::GenerateEncodedVideo(QString filename,bool vfr)
             //              qWarning() << codecCTX->codec->name;
         }
 
-
-
         // handle
         // Display the frame, and processes events to allow for screen redraw
         QPixmap p;
-//        frame = images.at(i);
+        //frame = images.at(i);
 
         frame = frame.convertToFormat(QImage::Format_RGB32);
 
         image2Pixmap(frame,p);
 //        ui->labelVideoFrame->setPixmap(p);
-
 
         if(!vfr)
           size=encoder.encodeImage(frame);                      // Fixed frame rate
@@ -515,9 +510,6 @@ int MainWindow::GenerateEncodedVideo(QString filename,bool vfr)
         }
 
         printf("Encoded: %d\n",size);
-        // ------
-
-
 
         if(!nextFrame() || i == 1000000)
         {
@@ -525,7 +517,6 @@ int MainWindow::GenerateEncodedVideo(QString filename,bool vfr)
             break;
         }
     }
-
     encoder.close();
     printf("Done encoding.");
     return i;
@@ -555,8 +546,6 @@ void MainWindow::GenerateEncodedVideo(QList<QImage> &images, QString filename,bo
     else
        encoder.createFile(filename,width,height,bitrate*1000/fps,gop,1000);  // For variable frame rates: set the time base to e.g. 1ms (1000fps),
                                                                             // and correct the bitrate according to the expected average frame rate (fps)
-
-
     // Generate a few hundred frames
     int size=0;
     int maxframe=images.length();
@@ -574,12 +563,8 @@ void MainWindow::GenerateEncodedVideo(QList<QImage> &images, QString filename,bo
         image2Pixmap(frame,p);
         ui->labelVideoFrame->setPixmap(p);
 
-
-
 //       if(!p.save("../../../frame" + QString::number((int)i) + ".png"))
 //           printf("Image NOT Written");
-
-
        
        if(!vfr)
           size=encoder.encodeImage(frame);                      // Fixed frame rate
@@ -593,13 +578,9 @@ void MainWindow::GenerateEncodedVideo(QList<QImage> &images, QString filename,bo
           else
              size=encoder.encodeImagePts(frame,pts);
        }
-
        printf("Encoded: %d\n",size);
     }
-
     encoder.close();
     printf("Done encoding.");
 }
-
-
 

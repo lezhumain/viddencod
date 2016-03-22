@@ -39,39 +39,45 @@ QTFFMPEGWRAPPER_SOURCE_PATH = ../../QTFFmpegWrapper
 # LINUX
 # VIDENCODE = "/media/DATA/PERSO/EPSI COURS/TP/FFMPEG/viddencod/qtffmpegwrapper_src-20130507/"
 # WINDOWS
-VIDENCODE = "../"
+VIDENCODE = ".."
 
 # Set FFMPEG_LIBRARY_PATH to point to the directory containing the FFmpeg import libraries (if needed - typically for Windows), i.e. the dll.a files
 # LINUX
 #FFMPEG = "/media/DATA/PERSO/EPSI COURS/TP/FFMPEG/FFMPEG-3.0"
 # WINDOWS
-FFMPEG = "../../ffmpeg_lib_win64"
+FFMPEG = "../../ffmpeg_lib_win32"
 
 # Set FFMPEG_LIBRARY_PATH to point to the directory containing the FFMPEG libs
-FFMPEG_LIBRARY_PATH = "$$FFMPEG/lib"
+FFMPEG_LIBRARY_PATH = "$$FFMPEG/lib/lib"
+
 # Set FFMPEG_INCLUDE_PATH to point to the directory containing the FFMPEG includes (if needed - typically for Windows)
 FFMPEG_INCLUDE_PATH = "$$FFMPEG/include"
 
 # ##############################################################################
 # Do not modify: FFMPEG default settings
 # ##############################################################################
+
 # Sources for QT wrapper
-SOURCES += $$QTFFMPEGWRAPPER_SOURCE_PATH/QVideoEncoder.cpp \
-           $$QTFFMPEGWRAPPER_SOURCE_PATH/QVideoDecoder.cpp
+SOURCES += $$QTFFMPEGWRAPPER_SOURCE_PATH/QVideoEncoder.cpp
+HEADERS += $$QTFFMPEGWRAPPER_SOURCE_PATH/headers/QVideoEncoder.h
+SOURCES += $$QTFFMPEGWRAPPER_SOURCE_PATH/QVideoDecoder.cpp
+HEADERS += $$QTFFMPEGWRAPPER_SOURCE_PATH/headers/QVideoDecoder.h
 
-HEADERS += $$QTFFMPEGWRAPPER_SOURCE_PATH/headers/QVideoEncoder.h \
-           $$QTFFMPEGWRAPPER_SOURCE_PATH/headers/QVideoDecoder.h
-
+# Sub-layer for the TP
 SOURCES += $$VIDENCODE/simpleencdec/QVideoEncoderTest.cpp
 HEADERS += $$VIDENCODE/simpleencdec/QVideoEncoderTest.hpp
 
 # add the include path
+# for ffmpeg.h
 INCLUDEPATH += $$QTFFMPEGWRAPPER_SOURCE_PATH
+
+# for lib*.h ffmpeg source
 INCLUDEPATH += $$FFMPEG_INCLUDE_PATH
 
-# Add the library path
+# Add the library path for ffmpeg
 LIBS += -L$$FFMPEG_LIBRARY_PATH
-# Set list of required FFmpeg libraries
+
+# Set list of required FFmpeg libraries parameters for the linker
 LIBS += -lavutil -lavcodec -lavformat -lswscale
 
 # Requied for some C99 defines
@@ -80,4 +86,3 @@ DEFINES += __STDC_CONSTANT_MACROS
 # ##############################################################################
 # FFMPEG: END OF CONFIGURATION
 # ##############################################################################
-

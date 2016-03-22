@@ -34,9 +34,11 @@ extern "C" {
 
 #include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
+#include "libavformat/avio.h"
 #include "libavutil/mathematics.h"
 #include "libavutil/rational.h"
 #include "libavutil/avstring.h"
+#include "libavutil/pixfmt.h"
 #include "libswscale/swscale.h"
 }
 }

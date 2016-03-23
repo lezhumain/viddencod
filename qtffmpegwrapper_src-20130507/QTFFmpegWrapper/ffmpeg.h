@@ -38,6 +38,7 @@ extern "C" {
 #include "libavutil/mathematics.h"
 #include "libavutil/rational.h"
 #include "libavutil/avstring.h"
+#include "libavutil/mem.h"
 #include "libavutil/pixfmt.h"
 #include "libswscale/swscale.h"
 }

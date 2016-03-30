@@ -5,7 +5,7 @@
 #include <QFile>
 #include <QImage>
 
-#include "ffmpeg.h"
+#include <ffmpeg.h>
 
 // NOT USED
 class AVideoDecoder

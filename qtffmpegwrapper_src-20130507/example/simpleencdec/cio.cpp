@@ -89,6 +89,10 @@ int ConsoleInit(void)
 
 #endif
 
+int ConsoleInit(void)
+{
+    return 0;
+}
 
 
 

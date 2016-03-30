@@ -21,7 +21,7 @@ THIS SOFTWARE IS PROVIDED BY COPYRIGHT HOLDERS ``AS IS'' AND ANY EXPRESS OR IMPL
 #include <QFile>
 #include <QImage>
 
-#include "ffmpeg.h"
+#include <ffmpeg.h>
 
 class QVideoEncoder
 {

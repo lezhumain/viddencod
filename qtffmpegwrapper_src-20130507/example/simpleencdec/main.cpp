@@ -15,7 +15,6 @@ THIS SOFTWARE IS PROVIDED BY COPYRIGHT HOLDERS ``AS IS'' AND ANY EXPRESS OR IMPL
 
 
 #include <QtWidgets/QApplication>
-// Qt 4: #include <QtGui/QApplication>
 #include "mainwindow.h"
 
 int main(int argc, char *argv[])

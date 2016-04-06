@@ -17,7 +17,7 @@ THIS SOFTWARE IS PROVIDED BY COPYRIGHT HOLDERS ``AS IS'' AND ANY EXPRESS OR IMPL
 #include <stdint.h>
 
 #include "headers/QVideoDecoder.h"
-#include "ffmpeg.h"
+#include <ffmpeg.h>
 
 
 /******************************************************************************
@@ -62,7 +62,7 @@ QVideoDecoder::~QVideoDecoder()
 
 void QVideoDecoder::InitVars()
 {
-   ok=false;
+   ok = false;
    pFormatCtx=0;
    pCodecCtx=0;
    pCodec=0;
@@ -473,7 +473,7 @@ void QVideoDecoder::dumpFormat(ffmpeg::AVFormatContext *ic,
                  const char *url,
                  int is_output)
 {
-    int i;
+//    int i;
     uint8_t *printed = (uint8_t*)ffmpeg::av_mallocz(ic->nb_streams);
     if (ic->nb_streams && !printed)
         return;

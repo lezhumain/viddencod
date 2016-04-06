@@ -8,10 +8,10 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
 	 mainwindow.cpp \
-	 cio.cpp
+         cio.cpp
 
 HEADERS += mainwindow.h \
-	 cio.h
+         cio.h
 
 FORMS += mainwindow.ui
 RESOURCES += resource.qrc
@@ -37,17 +37,20 @@ DEFINES += DEVELMODE
 QTFFMPEGWRAPPER_SOURCE_PATH = ../../QTFFmpegWrapper
 
 # LINUX
-# VIDENCODE = "/media/DATA/PERSO/EPSI COURS/TP/FFMPEG/viddencod/qtffmpegwrapper_src-20130507/"
+#VIDENCODE = "/media/DATA/PERSO/EPSI COURS/TP/FFMPEG/viddencod/qtffmpegwrapper_src-20130507/"
 # WINDOWS
 VIDENCODE = ".."
 
 # Set FFMPEG_LIBRARY_PATH to point to the directory containing the FFmpeg import libraries (if needed - typically for Windows), i.e. the dll.a files
 # LINUX
-#FFMPEG = "/media/DATA/PERSO/EPSI COURS/TP/FFMPEG/FFMPEG-3.0"
+#FFMPEG = "/home/vro/FFMPEG-3.0"
 # WINDOWS
 FFMPEG = "../../ffmpeg_lib_win32"
 
 # Set FFMPEG_LIBRARY_PATH to point to the directory containing the FFMPEG libs
+# LINUX
+#FFMPEG_LIBRARY_PATH = "$$FFMPEG/lib"
+# WINDOWS
 FFMPEG_LIBRARY_PATH = "$$FFMPEG/lib/lib"
 
 # Set FFMPEG_INCLUDE_PATH to point to the directory containing the FFMPEG includes (if needed - typically for Windows)
@@ -66,6 +69,8 @@ HEADERS += $$QTFFMPEGWRAPPER_SOURCE_PATH/headers/QVideoDecoder.h
 # Sub-layer for the TP
 SOURCES += $$VIDENCODE/simpleencdec/QVideoEncoderTest.cpp
 HEADERS += $$VIDENCODE/simpleencdec/QVideoEncoderTest.hpp
+SOURCES += $$VIDENCODE/simpleencdec/QVideoDecoderTest.cpp
+HEADERS += $$VIDENCODE/simpleencdec/QVideoDecoderTest.hpp
 
 # add the include path
 # for ffmpeg.h
@@ -78,7 +83,11 @@ INCLUDEPATH += $$FFMPEG_INCLUDE_PATH
 LIBS += -L$$FFMPEG_LIBRARY_PATH
 
 # Set list of required FFmpeg libraries parameters for the linker
-LIBS += -lavutil -lavcodec -lavformat -lswscale
+LIBS += -lavutil \
+        -lavcodec \
+        -lavformat \
+        -lswscale \
+        -lswresample
 
 # Requied for some C99 defines
 DEFINES += __STDC_CONSTANT_MACROS

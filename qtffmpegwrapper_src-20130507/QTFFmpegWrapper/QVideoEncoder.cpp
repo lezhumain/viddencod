@@ -16,6 +16,8 @@ THIS SOFTWARE IS PROVIDED BY COPYRIGHT HOLDERS ``AS IS'' AND ANY EXPRESS OR IMPL
 #include <QPainter>
 #include "headers/QVideoEncoder.h"
 #include <ffmpeg.h>
+#include <QDebug>
+#include <QTimer>
 
 /******************************************************************************
 *******************************************************************************
@@ -259,8 +261,20 @@ int QVideoEncoder::encodeImage_p(const QImage &img,
    if(!isOk())
       return -1;
 
+
+   QTimer timer;
+   timer.start();
    //convertImage(img);       // Custom conversion routine
    convertImage_sws(img);     // SWS conversion
+   int ms = timer.interval();
+   double s = ms / 1000.;
+   //ms -= s;
+   timer.stop();
+   qWarning() << "Conversion took" << QString::number(ms) + "ms";
+
+
+
+
 
    if(custompts)                             // Handle custom pts
      pCodecCtx->coded_frame->pts = pts;      // Set the time stamp

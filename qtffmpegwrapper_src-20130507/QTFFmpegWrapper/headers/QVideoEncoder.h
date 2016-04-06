@@ -32,22 +32,27 @@ class QVideoEncoder
       bool ok;
 
       // FFmpeg stuff
-      ffmpeg::AVFormatContext *pFormatCtx;
-      ffmpeg::AVOutputFormat *pOutputFormat;
-      ffmpeg::AVCodecContext *pCodecCtx;
-      ffmpeg::AVStream *pVideoStream;
-      ffmpeg::AVCodec *pCodec;
+      ffmpeg::AVFormatContext *pFormatCtxVideo;
+      ffmpeg::AVOutputFormat *pOutputFormatVideo;
+      ffmpeg::AVCodecContext *pCodecCtxVideo;
+      ffmpeg::AVStream *pStream;
+      ffmpeg::AVCodec *pCodecVideo;
+
       // Frame data
-      ffmpeg::AVFrame *ppicture;
+      ffmpeg::AVFrame *ppictureVideo;
       uint8_t *picture_buf;
+
       // Compressed data
       int outbuf_size;
       uint8_t* outbuf;
+
       // Conversion
       ffmpeg::SwsContext *img_convert_ctx;
+
       // Packet
       ffmpeg::AVPacket pkt;
 
+      // Output filename
       QString fileName;
 
       unsigned getWidth();
@@ -70,7 +75,6 @@ class QVideoEncoder
       bool convertImage_sws(const QImage &img);
 
       virtual int encodeImage_p(const QImage &,bool custompts=false,unsigned pts=0);
-
 
    public:
       QVideoEncoder();

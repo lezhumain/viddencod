@@ -35,14 +35,17 @@ extern "C" {
 #include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
 #include "libavformat/avio.h"
-#include "libavutil/error.h"
-#include "libavutil/mathematics.h"
-#include "libavutil/rational.h"
+
 #include "libavutil/avstring.h"
+#include "libavutil/error.h"
+#include "libavutil/imgutils.h"
+#include "libavutil/mathematics.h"
 #include "libavutil/mem.h"
 #include "libavutil/opt.h"
 #include "libavutil/pixfmt.h"
-#include "libavutil/imgutils.h"
+#include "libavutil/rational.h"
+#include "libavutil/time.h"
+
 #include "libswscale/swscale.h"
 }
 }

@@ -43,15 +43,15 @@ VIDENCODE = ".."
 
 # Set FFMPEG_LIBRARY_PATH to point to the directory containing the FFmpeg import libraries (if needed - typically for Windows), i.e. the dll.a files
 # LINUX
-FFMPEG = "/home/vro/FFMPEG-3.0"
+#FFMPEG = "/home/vro/FFMPEG-3.0"
 # WINDOWS
-#FFMPEG = "../../ffmpeg_lib_win32"
+FFMPEG = "../../ffmpeg_lib_win32"
 
 # Set FFMPEG_LIBRARY_PATH to point to the directory containing the FFMPEG libs
 # LINUX
-FFMPEG_LIBRARY_PATH = "$$FFMPEG/lib"
+#FFMPEG_LIBRARY_PATH = "$$FFMPEG/lib"
 # WINDOWS
-#FFMPEG_LIBRARY_PATH = "$$FFMPEG/lib/lib"
+FFMPEG_LIBRARY_PATH = "$$FFMPEG/lib/lib"
 
 # Set FFMPEG_INCLUDE_PATH to point to the directory containing the FFMPEG includes (if needed - typically for Windows)
 FFMPEG_INCLUDE_PATH = "$$FFMPEG/include"

@@ -25,7 +25,7 @@ THIS SOFTWARE IS PROVIDED BY COPYRIGHT HOLDERS ``AS IS'' AND ANY EXPRESS OR IMPL
 #include "ui_mainwindow.h"
 
 #include "cio.h"
-
+#include "fifo.hpp"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -602,5 +602,22 @@ void MainWindow::GenerateEncodedVideo(QList<QImage> &images, QString filename,bo
     printf("Done encoding.");
 }
 
+void MainWindow::on_actionTest_video_triggered()
+{
+    Fifo<QString> *f = new Fifo<QString>();
 
 
+//    f->PushBack(QString("lol1"));
+//    f->PushBack(QString("lol2"));
+//    f->PushBack(QString("lol3"));
+
+//    QString s;
+//    int count = f->Count();
+
+//    for(int i = 0; i < count; ++i)
+//        s += f->PopFront() + "\n";
+
+//    qWarning() << s;
+
+    delete(f);
+}

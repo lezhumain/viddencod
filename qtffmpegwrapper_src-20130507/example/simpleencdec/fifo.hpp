@@ -9,6 +9,7 @@ class Fifo
 {
     public:
         Fifo();
+        Fifo(Fifo &f){}
         void PushBack(T item);
         T PopFront();
         int Count() const;

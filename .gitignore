@@ -8,3 +8,4 @@ qtffmpegwrapper_src-20130507/Les_nulss - Copy.avi
 qtffmpegwrapper_src-20130507/test - Copy.avi
 qtffmpegwrapper_src-20130507/build*
 qtffmpegwrapper_src-20130507/example/build*
+*.user.*

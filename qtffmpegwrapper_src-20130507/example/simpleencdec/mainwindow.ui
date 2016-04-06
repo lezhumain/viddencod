@@ -136,6 +136,7 @@
     <addaction name="actionSave_synthetic_video"/>
     <addaction name="actionSave_synthetic_variable_frame_rate_video"/>
     <addaction name="actionEncode_video"/>
+    <addaction name="actionTest"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuVideo"/>
@@ -172,6 +173,11 @@
   <action name="actionEncode_video">
    <property name="text">
     <string>Encode video</string>
+   </property>
+  </action>
+  <action name="actionTest">
+   <property name="text">
+    <string>Test</string>
    </property>
   </action>
  </widget>

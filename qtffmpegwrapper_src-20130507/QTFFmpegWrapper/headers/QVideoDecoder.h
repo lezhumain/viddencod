@@ -29,7 +29,7 @@ class QVideoDecoder
       // Basic FFmpeg stuff
       ffmpeg::AVFormatContext *pFormatCtx;
       int videoStream;
-      ffmpeg::AVCodecContext  *pCodecCtx;
+      ffmpeg::AVCodecContext  *pCodecCtxVideo;
       ffmpeg::AVCodec         *pCodec;
       ffmpeg::AVFrame         *pFrame;
       ffmpeg::AVFrame         *pFrameRGB;
@@ -69,7 +69,7 @@ class QVideoDecoder
       virtual bool seekNextFrame();
       virtual bool seekMs(int ts);
       virtual bool seekFrame(int64_t frame);
-      virtual int getVideoLengthMs();
+      virtual int64_t getVideoLengthSeconds();
 
 
       virtual bool isOk();

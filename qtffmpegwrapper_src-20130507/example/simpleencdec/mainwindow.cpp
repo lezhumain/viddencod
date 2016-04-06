@@ -447,6 +447,7 @@ int MainWindow::GenerateEncodedVideo(QString filename, bool vfr)
 
     // Generate a few hundred frames
     int size = 0;
+    int fileOk = false;
 
     // Create the encoder
     QVideoEncoderTest encoder;
@@ -483,14 +484,14 @@ int MainWindow::GenerateEncodedVideo(QString filename, bool vfr)
         if(i == 0)
         {
              if(!vfr)
-                encoder.createFile(filename,
+                fileOk = encoder.createFile(filename,
                                    frame.width(),
                                    frame.height(),
                                    bitrate,
                                    gop,
                                    fps);        // Fixed frame rate
              else
-                encoder.createFile(filename,
+                fileOk = encoder.createFile(filename,
                                    frame.width(),
                                    frame.height(),
                                    bitrate * 1000 / fps,
@@ -587,8 +588,8 @@ void MainWindow::GenerateEncodedVideo(QList<QImage> &images, QString filename,bo
         image2Pixmap(frame,p);
         ui->labelVideoFrame->setPixmap(p);
 
-       if(!p.save("../../../frame" + QString::number((int)i) + ".png"))
-           printf("Image NOT Written");
+//       if(!p.save("../../../frame" + QString::number((int)i) + ".png"))
+//           printf("Image NOT Written");
        
        if(!vfr)
           size=encoder.encodeImage(frame);                      // Fixed frame rate

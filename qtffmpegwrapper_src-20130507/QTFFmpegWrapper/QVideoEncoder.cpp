@@ -18,6 +18,7 @@ THIS SOFTWARE IS PROVIDED BY COPYRIGHT HOLDERS ``AS IS'' AND ANY EXPRESS OR IMPL
 #include <ffmpeg.h>
 #include <QDebug>
 #include <QTimer>
+#include <QTime>
 
 /******************************************************************************
 *******************************************************************************
@@ -266,14 +267,15 @@ int QVideoEncoder::encodeImage_p(const QImage &img,
       return -1;
 
 
-   QTimer timer;
-   timer.start();
+   //QTimer timer;
+   QTime *timer;
+   timer->start();
    //convertImage(img);       // Custom conversion routine
    convertImage_sws(img);     // SWS conversion
-   int ms = timer.interval();
+   int ms = timer->elapsed();
    double s = ms / 1000.;
    //ms -= s;
-   timer.stop();
+   delete(timer);
    qWarning() << "Conversion took" << QString::number(ms) + "ms";
 
 

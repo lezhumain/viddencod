@@ -17,5 +17,5 @@ class Fifo
         QList<T> _list;
         QMutex _mutex;
 };
-#include "Fifo.cpp"
+#include "fifo.cpp"
 #endif // FIFO_H

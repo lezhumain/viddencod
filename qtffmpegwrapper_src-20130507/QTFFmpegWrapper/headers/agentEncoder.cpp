@@ -1,6 +1,11 @@
-#include "agent.hpp"
+#include "agentEncoder.hpp"
 
-Agent::Agent(QObject *parent) : QObject(parent)
+AgentEncoder::AgentEncoder(QObject *parent) : QObject(parent)
+{
+
+}
+
+void AgentEncoder::EncoderFrames(Ordonnanceur &ordo)
 {
 
 }

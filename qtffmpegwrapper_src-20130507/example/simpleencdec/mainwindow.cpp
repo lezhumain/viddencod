@@ -13,7 +13,6 @@ Redistribution and use in source and binary forms, with or without modification,
 THIS SOFTWARE IS PROVIDED BY COPYRIGHT HOLDERS ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE FREEBSD PROJECT OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-
 #include <cmath>
 #include <QFileDialog>
 #include <QMessageBox>
@@ -21,11 +20,14 @@ THIS SOFTWARE IS PROVIDED BY COPYRIGHT HOLDERS ``AS IS'' AND ANY EXPRESS OR IMPL
 #include <QDebug>
 #include <QTime>
 #include <QDateTime>
+#include <QWaitCondition>
+#include <QMutex>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-
+#include <ffmpeg.h>
+#include "QVideoEncoderTest.hpp"
+#include "QVideoDecoderTest.hpp"
 #include "cio.h"
-
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -35,7 +37,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ConsoleInit();
     printf("Starting up\n");
-
+//    GenerateSyntheticVideo("/media/virtuelram/test.avi", false);
+    loadVideo("../../test.avi");
 }
 
 MainWindow::~MainWindow()
@@ -96,8 +99,8 @@ void MainWindow::on_actionLoad_video_triggered()
 **/
 void MainWindow::loadVideo(QString fileName)
 {
-   decoder.openFile(fileName);
-   if(decoder.isOk()==false)
+   m_decoder.openFile(fileName);
+   if(m_decoder.isOk()==false)
    {
       QMessageBox::critical(this,"Error","Error loading the video");
       return;
@@ -116,7 +119,7 @@ void MainWindow::errLoadVideo()
 }
 bool MainWindow::checkVideoLoadOk()
 {
-   if(decoder.isOk()==false)
+   if(m_decoder.isOk()==false)
    {
       errLoadVideo();
       return false;
@@ -129,35 +132,36 @@ bool MainWindow::checkVideoLoadOk()
 **/
 void MainWindow::displayFrame()
 {
-   // Check we've loaded a video successfully
+    QImage img;
+    QPixmap p;
+    int et,en;
+
+    // Check we've loaded a video successfully
    if(!checkVideoLoadOk())
       return;
 
-   QImage img;
-
    // Decode a frame
-   int et,en;
-   if(!decoder.getFrame(img,&en,&et))
+   if(!m_decoder.getFrame(img,&en,&et))
    {
       QMessageBox::critical(this,"Error","Error decoding the frame");
       return;
    }
-   // Convert the QImage to a QPixmap for display
 
-   QPixmap p;
+   // Convert the QImage to a QPixmap for display
    image2Pixmap(img,p);
+
    // Display the QPixmap
    ui->labelVideoFrame->setPixmap(p);
 
    // Display the video size
-   ui->labelVideoInfo->setText(QString("Size %2 ms. Display: #%3 @ %4 ms.").arg(decoder.getVideoLengthMs()).arg(en).arg(et));
+   ui->labelVideoInfo->setText(QString("Size %2 ms. Display: #%3 @ %4 ms.").arg(m_decoder.getVideoLengthSeconds()).arg(en).arg(et));
 
 }
 
 QList<QImage> MainWindow::getAllFrames()
 {
     short frameRate = 25;
-    int lengthMs = decoder.getVideoLengthMs();
+    int lengthMs = m_decoder.getVideoLengthSeconds();
     qWarning() << "length" << lengthMs ;
 
     int maxFrames = lengthMs * frameRate / 1000; // not working
@@ -170,7 +174,7 @@ QList<QImage> MainWindow::getAllFrames()
     {
         QImage img;
         int eframeNumbern, frameTime;
-        if(!decoder.getFrame(img,&eframeNumbern,&frameTime))
+        if(!m_decoder.getFrame(img,&eframeNumbern,&frameTime))
         {
            QMessageBox::critical(this,"Error","Error decoding the frame");
            listIm.clear();
@@ -190,7 +194,7 @@ QList<QImage> MainWindow::getAllFrames()
 
 bool MainWindow::nextFrame()
 {
-   if(!decoder.seekNextFrame())
+   if(!m_decoder.seekNextFrame())
    {
 //      QMessageBox::critical(this,"Error","seekNextFrame failed");
        qWarning() << "seekNextFrame failed";
@@ -226,7 +230,7 @@ void MainWindow::on_pushButtonSeekFrame_clicked()
    }
 
    // Seek to the desired frame
-   if(!decoder.seekFrame(frame))
+   if(!m_decoder.seekFrame(frame))
    {
       QMessageBox::critical(this,"Error","Seek failed");
       return;
@@ -253,7 +257,7 @@ void MainWindow::on_pushButtonSeekMillisecond_clicked()
    }
 
    // Seek to the desired frame
-   if(!decoder.seekMs(ms))
+   if(!m_decoder.seekMs(ms))
    {
       QMessageBox::critical(this,"Error","Seek failed");
       return;
@@ -320,7 +324,7 @@ void MainWindow::on_actionEncode_video_triggered()
 
 //    QList<QImage> listImg = getAllFrames();
 
-    short nbFrames = GenerateEncodedVideo("../../../test.avi");
+    short nbFrames = GenerateEncodedVideo("/media/virtuelram/test.avi", false);
 
     if(nbFrames == -1)
     {
@@ -336,7 +340,7 @@ void MainWindow::on_actionEncode_video_triggered()
             + "f/s (Total Time: "
             + test.toString("hh:mm:ss") + ").";
 
-    printf(msg.toStdString().c_str());
+    printf("%s\n", msg.toStdString().c_str());
     qWarning() << msg;
 }
 
@@ -355,7 +359,7 @@ void MainWindow::GenerateSyntheticVideo(QString filename, bool vfr)
 {
    int width=640;
    int height=480;
-   int bitrate=1000000;
+   int bitrate=400000;
    int gop = 20;
    int fps = 25;
 
@@ -378,16 +382,21 @@ void MainWindow::GenerateSyntheticVideo(QString filename, bool vfr)
    QEventLoop evt;      // we use an event loop to allow for paint events to show on-screen the generated video
 
    // Generate a few hundred frames
-   int size=0;
-   int maxframe=500;
-   unsigned pts=0;
-   for(unsigned i=0;i<maxframe;i++)
+   int size = 0;
+   int maxframe = 100;
+   unsigned pts = 0;
+
+   for( int i = 0; i < maxframe; i++)
    {
       // Clear the frame
       painter.fillRect(frame.rect(),Qt::red);   
 
       // Draw a moving square
-      painter.fillRect(width*i/maxframe,height*i/maxframe,30,30,Qt::blue);
+      painter.fillRect(width * i / maxframe,
+                       height * i / maxframe,
+                       30,
+                       30,
+                       Qt::blue);
 
       // Frame number
       painter.drawText(frame.rect(),Qt::AlignCenter,QString("Frame %1\nLast frame was %2 bytes").arg(i).arg(size));
@@ -422,111 +431,114 @@ void MainWindow::GenerateSyntheticVideo(QString filename, bool vfr)
 
 }
 
-int MainWindow::GenerateEncodedVideo(QString filename,bool vfr)
+int MainWindow::GenerateEncodedVideo(QString filename, bool vfr)
 {
     short frameRate = 25;
-
-    qWarning() << "\t\tHERE1";
-
-
-    int lengthMs = decoder.getVideoLengthMs();
-    qWarning() << "length" << lengthMs ;
-
-    int maxFrames = lengthMs * frameRate / 1000; // not working
-    maxFrames = maxFrames < 0 ? 50000 : maxFrames;
-    qWarning() << "maxframes" << maxFrames ;
-
-
-    int width, height;
-    int bitrate=476000; // 1000000
+    int bitrate = 476000; // 1000000
     int gop = 20;
+
+    //Number of frames per second for the output video
     int fps = 25;
 
-    // The image on which we draw the frames
-    QImage frame;
+    int eframeNumbern = 0;
+    int frameTime = 0;
+    int lengthMs = 0;
+    int totalFramesVideo = 0;
+
+    // Generate a few hundred frames
+    int size = 0;
 
     // Create the encoder
     QVideoEncoderTest encoder;
 
-    // Generate a few hundred frames
-    int size = 0;
-    int maxframe = 3 * 3600 * frameRate ; // TODO: get actual total frame
-    unsigned pts = 0;
+    // we use an event loop to allow for paint events to show on-screen the generated video
+    QEventLoop evt;
 
-    int i = 0;
-    //ffmpeg::AVCodec *codec = encoder.GetCodec();
-    ffmpeg::AVCodecContext *codecCTX = encoder.GetCodecCTX();
-//    return 0;
+    int i;
 
-    for(; i < maxFrames; ++i)
+    // The image on which we draw the frames
+    QImage frame;
+
+    // Display the frame, and processes events to allow for screen redraw
+    QPixmap p;
+
+    lengthMs = m_decoder.getVideoLengthSeconds();
+    qWarning() << "Longueur de la vidéo : " << lengthMs << " secondes";
+
+    //  number of frames : TIME_TOTAL_SEC * FRAMES_PER_SEC
+    totalFramesVideo = lengthMs * frameRate;
+    qWarning() << "Nombre total de frames de la vidéo :" << totalFramesVideo ;
+
+    for(i = 0; i < totalFramesVideo; ++i)
     {
-        QImage frame;
-        int eframeNumbern, frameTime;
-        if(!decoder.getFrame(frame,&eframeNumbern,&frameTime))
+        //  Decoding the frames ont by one
+        if(!m_decoder.getFrame(frame,&eframeNumbern,&frameTime))
         {
            QMessageBox::critical(this,"Error","Error decoding the frame");
            return -1;
         }
 
+        //  If we are with the first frame,
+        //  we create the output file
         if(i == 0)
         {
-             width = frame.width();
-             height = frame.height();
              if(!vfr)
-                encoder.createFile(filename,width,height,bitrate,gop,fps);        // Fixed frame rate
+                encoder.createFile(filename,
+                                   frame.width(),
+                                   frame.height(),
+                                   bitrate,
+                                   gop,
+                                   fps);        // Fixed frame rate
              else
-                encoder.createFile(filename,width,height,bitrate*1000/fps,gop,1000);  // For variable frame rates: set the time base to e.g. 1ms (1000fps),
+                encoder.createFile(filename,
+                                   frame.width(),
+                                   frame.height(),
+                                   bitrate * 1000 / fps,
+                                   gop,
+                                   1000);  // For variable frame rates: set the time base to e.g. 1ms (1000fps),
         }                                                                         // and correct the bitrate according to the expected average frame rate (fps)
-        else if(i == 1)
-        {
-            ffmpeg::AVCodecContext *codecCTX = encoder.GetCodecCTX();
-            ffmpeg::AVCodec *codec1 = codecCTX->codec,
-                            *codec2 = encoder.GetCodec();
-
-            //codecCTX->pix_fmt = ffmpeg::PIX_FMT_RGBA;
-
-            //            if(codecCTX != 0x0)
-            //              qWarning() << codecCTX->codec->name;
-        }
-
-
 
         // handle
-        // Display the frame, and processes events to allow for screen redraw
-        QPixmap p;
-//        frame = images.at(i);
-
         frame = frame.convertToFormat(QImage::Format_RGB32);
-
+        //  Paste the decoded frame into the QPixmap for display the data
         image2Pixmap(frame,p);
-//        ui->labelVideoFrame->setPixmap(p);
+        ui->labelVideoFrame->setPixmap(p);
 
+        //  Force to paint the QPixmap with the new decoded frame
+        evt.processEvents();
+
+        // Display the video size
+        ui->labelVideoInfo->setText(QString("Size %2 ms. Display: #%3 @ %4 ms.").arg(m_decoder.getVideoLengthSeconds()).arg(eframeNumbern).arg(frameTime));
+
+        //ffmpeg::av_usleep(50000);
 
         if(!vfr)
-          size=encoder.encodeImage(frame);                      // Fixed frame rate
+          size = encoder.encodeImage(frame);                      // Fixed frame rate
         else
         {
+          //  Timestamp for the encoded video
+          unsigned pts = 0;
+
           // Variable frame rate: the pts of the first frame is 0,
           // subsequent frames slow down
           pts += sqrt(i);
-          if(i==0)
-             size=encoder.encodeImagePts(frame,0);
+
+          if(!i)
+            size = encoder.encodeImagePts(frame,0);
           else
-             size=encoder.encodeImagePts(frame,pts);
+            size = encoder.encodeImagePts(frame, pts);
         }
 
-        printf("Encoded: %d\n",size);
-        // ------
+        qWarning() << "Actual frame is " << eframeNumbern << " / " << totalFramesVideo ;
+//        printf("Encoded: %d bytes \n",size);
 
-
-
-        if(!nextFrame() || i == 1000000)
+        if(!nextFrame())
         {
-            qWarning() << "Current frame:" << eframeNumbern << "[i =" << i << "]";
+            qWarning() << "Finished reading the video to be encoded" ;
+            qWarning() << "Last frame is frame:" << eframeNumbern << "[i =" << i << "]";
             break;
         }
     }
-
     encoder.close();
     printf("Done encoding.");
     return i;
@@ -542,12 +554,15 @@ void MainWindow::GenerateEncodedVideo(QList<QImage> &images, QString filename,bo
 {
     int width = images.at(0).width();
     int height = images.at(0).height();
-    int bitrate=476000; // 1000000
+    int bitrate = 476000; // 1000000
     int gop = 20;
     int fps = 25;
 
     // The image on which we draw the frames
     QImage frame;
+
+    // Display the frame, and processes events to allow for screen redraw
+    QPixmap pixToDisplay;
 
     // Create the encoder
     QVideoEncoderTest encoder;
@@ -556,14 +571,12 @@ void MainWindow::GenerateEncodedVideo(QList<QImage> &images, QString filename,bo
     else
        encoder.createFile(filename,width,height,bitrate*1000/fps,gop,1000);  // For variable frame rates: set the time base to e.g. 1ms (1000fps),
                                                                             // and correct the bitrate according to the expected average frame rate (fps)
-
-
     // Generate a few hundred frames
-    int size=0;
-    int maxframe=images.length();
-    unsigned pts=0;
+    int size = 0;
+    int maxframe = images.length();
+    unsigned pts = 0;
 
-    for(unsigned i=0;i<maxframe;i++)
+    for(int i = 0; i < maxframe; i++)
     {
         // Display the frame, and processes events to allow for screen redraw
         QPixmap p;
@@ -571,16 +584,11 @@ void MainWindow::GenerateEncodedVideo(QList<QImage> &images, QString filename,bo
 
         frame = frame.convertToFormat(QImage::Format_RGB32);
 
-//       p = QPixmap::fromImage(frame);
         image2Pixmap(frame,p);
         ui->labelVideoFrame->setPixmap(p);
 
-
-
-//       if(!p.save("../../../frame" + QString::number((int)i) + ".png"))
-//           printf("Image NOT Written");
-
-
+       if(!p.save("../../../frame" + QString::number((int)i) + ".png"))
+           printf("Image NOT Written");
        
        if(!vfr)
           size=encoder.encodeImage(frame);                      // Fixed frame rate
@@ -594,13 +602,9 @@ void MainWindow::GenerateEncodedVideo(QList<QImage> &images, QString filename,bo
           else
              size=encoder.encodeImagePts(frame,pts);
        }
-
        printf("Encoded: %d\n",size);
     }
-
     encoder.close();
     printf("Done encoding.");
 }
-
-
 

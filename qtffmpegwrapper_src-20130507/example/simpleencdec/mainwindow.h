@@ -19,10 +19,8 @@ THIS SOFTWARE IS PROVIDED BY COPYRIGHT HOLDERS ``AS IS'' AND ANY EXPRESS OR IMPL
 
 #include <QMainWindow>
 
-//#include "QVideoEncoder.h"
 #include "QVideoEncoderTest.hpp"
-#include "QVideoDecoder.h"
-
+#include "../../QTFFmpegWrapper/headers/QVideoDecoder.h"
 
 namespace Ui
 {
@@ -37,7 +35,8 @@ public:
 	 ~MainWindow();
 
 protected:
-	 QVideoDecoder decoder;
+     QVideoDecoder m_decoder;
+     QVideoEncoder m_encoder;
 
 
 	 void changeEvent(QEvent *e);

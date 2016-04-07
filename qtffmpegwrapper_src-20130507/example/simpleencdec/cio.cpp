@@ -20,14 +20,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
 #include <stdio.h>
-//#include <unistd.h>
-//#include <conio.h>
 #include <stdlib.h>
 #include <string.h>
-//#include <wincon.h>
-//#include <windows.h>
 #include <string>
-
 
 #ifdef WIN32
 
@@ -94,6 +89,12 @@ int ConsoleInit(void)
 
 #endif
 
+/*
+int ConsoleInit(void)
+{
+    return 0;
+}
+*/
 
 
 

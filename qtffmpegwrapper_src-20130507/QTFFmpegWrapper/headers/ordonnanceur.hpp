@@ -15,7 +15,7 @@ private slots:
     //Stop agent,supprimer liste,regarder thread si dans liste et si tout finit
     void OnFinished(int idagent);
 private:
-    Fifo _fifoFrame<QImage>;
+    Fifo<QImage> _fifoFrame;
     QList<QImage> _lstFrameEncoded;
     QList<AgentEncoder> _lstAgent;
     bool CreateThread();

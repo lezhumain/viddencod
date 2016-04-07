@@ -22,7 +22,7 @@ T Fifo<T>::PopFront()
     if(!_list.isEmpty())
         return _list.takeFirst();
     else
-        return 0;
+        return NULL;
 }
 
 template <class T>

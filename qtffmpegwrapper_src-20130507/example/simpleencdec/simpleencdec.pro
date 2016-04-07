@@ -10,12 +10,14 @@ SOURCES += main.cpp \
 	 mainwindow.cpp \
          cio.cpp \
     ../../QTFFmpegWrapper/headers/ordonnanceur.cpp \
-    ../../QTFFmpegWrapper/headers/agentEncoder.cpp
+    ../../QTFFmpegWrapper/headers/agentEncoder.cpp \
+    fifo.cpp
 
 HEADERS += mainwindow.h \
          cio.h \
     ../../QTFFmpegWrapper/headers/ordonnanceur.hpp \
-    ../../QTFFmpegWrapper/headers/agentEncoder.hpp
+    ../../QTFFmpegWrapper/headers/agentEncoder.hpp \
+    fifo.hpp
 
 FORMS += mainwindow.ui
 RESOURCES += resource.qrc

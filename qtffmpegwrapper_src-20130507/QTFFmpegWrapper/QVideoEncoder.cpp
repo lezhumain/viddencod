@@ -112,7 +112,7 @@ bool QVideoEncoder::createFile(QString fileName,unsigned width,unsigned height,u
 
 
 
-   avcodec_thread_init(pCodecCtx, 10);
+   //avcodec_thread_init(pCodecCtx, 10);
 
    //if (c->codec_id == CODEC_ID_MPEG2VIDEO)
    //{
@@ -124,13 +124,13 @@ bool QVideoEncoder::createFile(QString fileName,unsigned width,unsigned height,u
       pCodecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
 
 
-   if (av_set_parameters(pFormatCtx, NULL) < 0)
-   {
-      printf("Invalid output format parameters\n");
-      return false;
-   }
+//   if (ffmpeg::av_set_parameters(pFormatCtx, NULL) < 0)
+//   {
+//      printf("Invalid output format parameters\n");
+//      return false;
+//   }
 
-   ffmpeg::dump_format(pFormatCtx, 0, fileName.toStdString().c_str(), 1);
+   ffmpeg::av_dump_format(pFormatCtx, 0, fileName.toStdString().c_str(), 1);
 
    // open_video
    // find the video encoder
@@ -161,13 +161,13 @@ bool QVideoEncoder::createFile(QString fileName,unsigned width,unsigned height,u
       return false;
    }
 
-   if (url_fopen(&pFormatCtx->pb, fileName.toStdString().c_str(), URL_WRONLY) < 0)
+   if (avio_open(&pFormatCtx->pb, fileName.toStdString().c_str(), URL_WRONLY) < 0)
    {
       printf( "Could not open '%s'\n", fileName.toStdString().c_str());
       return false;
    }
 
-   av_write_header(pFormatCtx);
+   avformat_write_header(pFormatCtx, NULL);
 
 
 
@@ -202,7 +202,7 @@ bool QVideoEncoder::close()
    }
 
    // Close file
-   url_fclose(pFormatCtx->pb);
+   avio_close(pFormatCtx->pb);
 
    // Free the stream
    av_free(pFormatCtx);
@@ -267,7 +267,6 @@ void QVideoEncoder::initVars()
 **/
 bool QVideoEncoder::initCodec()
 {
-   ffmpeg::avcodec_init();
    ffmpeg::av_register_all();
 
    printf("License: %s\n",ffmpeg::avformat_license());

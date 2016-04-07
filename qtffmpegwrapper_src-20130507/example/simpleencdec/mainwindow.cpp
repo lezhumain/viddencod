@@ -25,7 +25,7 @@ THIS SOFTWARE IS PROVIDED BY COPYRIGHT HOLDERS ``AS IS'' AND ANY EXPRESS OR IMPL
 #include "ui_mainwindow.h"
 
 #include "cio.h"
-#include "fifo.hpp"
+#include "fifo.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -33,7 +33,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ConsoleInit();
+    //ConsoleInit();
     printf("Starting up\n");
 
 }
@@ -446,7 +446,7 @@ int MainWindow::GenerateEncodedVideo(QString filename,bool vfr)
     QImage frame;
 
     // Create the encoder
-    QVideoEncoderTest encoder;
+    QVideoEncoder encoder;
 
     // Generate a few hundred frames
     int size = 0;
@@ -455,7 +455,7 @@ int MainWindow::GenerateEncodedVideo(QString filename,bool vfr)
 
     int i = 0;
     //ffmpeg::AVCodec *codec = encoder.GetCodec();
-    ffmpeg::AVCodecContext *codecCTX = encoder.GetCodecCTX();
+//    ffmpeg::AVCodecContext *codecCTX = encoder.GetCodecCTX();
 //    return 0;
 
     for(; i < maxFrames; ++i)
@@ -479,9 +479,9 @@ int MainWindow::GenerateEncodedVideo(QString filename,bool vfr)
         }                                                                         // and correct the bitrate according to the expected average frame rate (fps)
         else if(i == 1)
         {
-            ffmpeg::AVCodecContext *codecCTX = encoder.GetCodecCTX();
-            ffmpeg::AVCodec *codec1 = codecCTX->codec,
-                            *codec2 = encoder.GetCodec();
+//            ffmpeg::AVCodecContext *codecCTX = encoder.GetCodecCTX();
+//            ffmpeg::AVCodec *codec1 = codecCTX->codec,
+//                            *codec2 = encoder.GetCodec();
 
             //codecCTX->pix_fmt = ffmpeg::PIX_FMT_RGBA;
 
@@ -550,7 +550,7 @@ void MainWindow::GenerateEncodedVideo(QList<QImage> &images, QString filename,bo
     QImage frame;
 
     // Create the encoder
-    QVideoEncoderTest encoder;
+    QVideoEncoder encoder;
     if(!vfr)
        encoder.createFile(filename,width,height,bitrate,gop,fps);        // Fixed frame rate
     else
@@ -606,18 +606,17 @@ void MainWindow::on_actionTest_video_triggered()
 {
     Fifo<QString> *f = new Fifo<QString>();
 
+    f->PushBack(QString("lol1"));
+    f->PushBack(QString("lol2"));
+    f->PushBack(QString("lol3"));
 
-//    f->PushBack(QString("lol1"));
-//    f->PushBack(QString("lol2"));
-//    f->PushBack(QString("lol3"));
+    QString s;
+    int count = f->Count();
 
-//    QString s;
-//    int count = f->Count();
+    for(int i = 0; i < count; ++i)
+        s += f->PopFront() + "\n";
 
-//    for(int i = 0; i < count; ++i)
-//        s += f->PopFront() + "\n";
-
-//    qWarning() << s;
+    qWarning() << s;
 
     delete(f);
 }

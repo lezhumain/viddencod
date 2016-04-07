@@ -38,7 +38,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ConsoleInit();
     printf("Starting up\n");
 //    GenerateSyntheticVideo("/media/virtuelram/test.avi", false);
-    loadVideo("../../test.avi");
+    //loadVideo("../../test.avi");
 }
 
 MainWindow::~MainWindow()
@@ -324,7 +324,7 @@ void MainWindow::on_actionEncode_video_triggered()
 
 //    QList<QImage> listImg = getAllFrames();
 
-    short nbFrames = GenerateEncodedVideo("/media/virtuelram/test.avi", false);
+    short nbFrames = GenerateEncodedVideo("./test.avi", false);
 
     if(nbFrames == -1)
     {

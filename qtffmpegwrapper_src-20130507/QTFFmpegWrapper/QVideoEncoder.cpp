@@ -17,6 +17,10 @@ THIS SOFTWARE IS PROVIDED BY COPYRIGHT HOLDERS ``AS IS'' AND ANY EXPRESS OR IMPL
 #include "headers/QVideoEncoder.h"
 #include <ffmpeg.h>
 
+
+#include <QDebug>
+#include <QTime>
+
 /******************************************************************************
 *******************************************************************************
 * QVideoEncoder   QVideoEncoder   QVideoEncoder   QVideoEncoder   QVideoEncoder
@@ -282,10 +286,16 @@ int QVideoEncoder::encodeImage_p(const QImage &img,
    ppictureVideo->format = img.format();
 
    int isEncodedFrameNotEmpty = 0;
+
+   QTime *t = new QTime();
+   t->start();
    ffmpeg::avcodec_encode_video2(pCodecCtxVideo,
                                  &pkt,
                                  ppictureVideo,
                                  &isEncodedFrameNotEmpty);
+    int ms = t->elapsed();
+    delete(t);
+    qWarning() << "\tConversion took " + QString::number(ms) + "ms";
 
    if(custompts)                        // Handle custom pts (must set it again for the rest of the processing)
      pCodecCtxVideo->coded_frame->pts = pts; // Set the time stamp
@@ -302,6 +312,9 @@ int QVideoEncoder::encodeImage_p(const QImage &img,
 
       pkt.stream_index= pStream->index;
 
+
+      qWarning() << "\tSize of context: " + QString::number(sizeof(*pCodecCtxVideo));
+      qWarning() << "\tSize of pkt: " + QString::number(sizeof(pkt));
       int ret = av_interleaved_write_frame(pFormatCtxVideo,
                                            &pkt);
 

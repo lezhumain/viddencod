@@ -39,25 +39,26 @@ DEFINES += DEVELMODE
 # Set QTFFMPEGWRAPPER_SOURCE_PATH to point to the directory containing the QTFFmpegWrapper sources
 QTFFMPEGWRAPPER_SOURCE_PATH = ../../QTFFmpegWrapper
 
-# LINUX
-#VIDENCODE = "/media/DATA/PERSO/EPSI COURS/TP/FFMPEG/viddencod/qtffmpegwrapper_src-20130507/"
-# WINDOWS
-VIDENCODE = ".."
+#ifdef __linux__
+    VIDENCODE = "/media/DATA/PERSO/EPSI COURS/TP/FFMPEG/viddencod/qtffmpegwrapper_src-20130507/"
+    FFMPEG = "/home/vro/FFMPEG-3.0"
+    FFMPEG_LIBRARY_PATH = "$$FFMPEG/lib"
+#elif _WIN32
+    VIDENCODE = ".."
+    FFMPEG = "../../ffmpeg_lib_win32"
+    FFMPEG_LIBRARY_PATH = "$$FFMPEG/lib/lib"
+    # Set FFMPEG_INCLUDE_PATH to point to the directory containing the FFMPEG includes (if needed - typically for Windows)
+    FFMPEG_INCLUDE_PATH = "$$FFMPEG/include"
+#endif
+
 
 # Set FFMPEG_LIBRARY_PATH to point to the directory containing the FFmpeg import libraries (if needed - typically for Windows), i.e. the dll.a files
-# LINUX
-FFMPEG = "/home/vro/FFMPEG-3.0"
-# WINDOWS
-#FFMPEG = "../../ffmpeg_lib_win32"
+# FFMPEG = ...
 
 # Set FFMPEG_LIBRARY_PATH to point to the directory containing the FFMPEG libs
-# LINUX
-FFMPEG_LIBRARY_PATH = "$$FFMPEG/lib"
-# WINDOWS
-#FFMPEG_LIBRARY_PATH = "$$FFMPEG/lib/lib"
+# FFMPEG_LIBRARY_PATH = ...
 
-# Set FFMPEG_INCLUDE_PATH to point to the directory containing the FFMPEG includes (if needed - typically for Windows)
-FFMPEG_INCLUDE_PATH = "$$FFMPEG/include"
+
 
 # ##############################################################################
 # Do not modify: FFMPEG default settings

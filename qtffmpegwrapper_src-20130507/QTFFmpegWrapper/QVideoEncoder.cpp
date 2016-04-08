@@ -39,6 +39,22 @@ QVideoEncoder::~QVideoEncoder()
    close();
 }
 
+//ffmpeg::AVFormatContext* QVideoEncoder::GetContext(void)
+//{
+//    return pFormatCtxVideo;
+//}
+
+void QVideoEncoder::SetFramerate()
+{
+    pFormatCtxVideo->streams[0]->time_base.num = Frame_Rate.num;
+    pFormatCtxVideo->streams[0]->time_base.den = Frame_Rate.den;
+}
+
+void QVideoEncoder::UpdateFrameRate(ffmpeg::AVRational FramRat)
+{
+    Frame_Rate = FramRat;
+}
+
 bool QVideoEncoder::createFile(QString fileName,unsigned width,unsigned height,unsigned bitrate,unsigned gop,unsigned fps)
 {
    // If we had an open video, close it.
@@ -79,14 +95,17 @@ bool QVideoEncoder::createFile(QString fileName,unsigned width,unsigned height,u
       return false;
    }
 
+    SetFramerate();
+
    pCodecCtxVideo                        = pStream->codec;
    pCodecCtxVideo->codec_id              = pOutputFormatVideo->video_codec;
    pCodecCtxVideo->codec_type            = ffmpeg::AVMEDIA_TYPE_VIDEO;
-   pCodecCtxVideo->bit_rate              = Bitrate;
+   pCodecCtxVideo->bit_rate              = 30/*GetFramerate()*/;
    pCodecCtxVideo->width                 = getWidth();
    pCodecCtxVideo->height                = getHeight();
-   pCodecCtxVideo->time_base.den         = fps;
-   pCodecCtxVideo->time_base.num         = 1;
+
+//   pCodecCtxVideo->time_base.den         = fps;
+//   pCodecCtxVideo->time_base.num         = 1;
    pCodecCtxVideo->gop_size              = Gop;
    pCodecCtxVideo->pix_fmt               = ffmpeg::AV_PIX_FMT_YUV420P;
    pCodecCtxVideo->thread_count          = 1;

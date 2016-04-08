@@ -38,7 +38,6 @@ protected:
      QVideoDecoder m_decoder;
      QVideoEncoder m_encoder;
 
-
 	 void changeEvent(QEvent *e);
 
 	 // Helper
@@ -57,12 +56,10 @@ protected:
      void GenerateEncodedVideo(QList<QImage> &images, QString filename, bool vfr = false);
      int GenerateEncodedVideo(QString filename, bool vfr = false);
 
-
 private:
 	 Ui::MainWindow *ui;
      QList<QImage> getAllFrames();
-
-
+     ffmpeg::AVRational FrameRateDecodedVideo;
 
 private slots:
 	 void on_actionSave_synthetic_video_triggered();

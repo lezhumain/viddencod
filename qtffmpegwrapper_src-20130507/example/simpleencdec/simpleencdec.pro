@@ -73,10 +73,10 @@ SOURCES += $$QTFFMPEGWRAPPER_SOURCE_PATH/QVideoDecoder.cpp
 HEADERS += $$QTFFMPEGWRAPPER_SOURCE_PATH/headers/QVideoDecoder.h
 
 # Sub-layer for the TP
-SOURCES += $$VIDENCODE/example/simpleencdec/QVideoEncoderTest.cpp
-HEADERS += $$VIDENCODE/example/simpleencdec/QVideoEncoderTest.hpp
-SOURCES += $$VIDENCODE/example/simpleencdec/QVideoDecoderTest.cpp
-HEADERS += $$VIDENCODE/example/simpleencdec/QVideoDecoderTest.hpp
+#SOURCES += $$VIDENCODE/example/simpleencdec/QVideoEncoderTest.cpp
+#HEADERS += $$VIDENCODE/example/simpleencdec/QVideoEncoderTest.hpp
+#SOURCES += $$VIDENCODE/example/simpleencdec/QVideoDecoderTest.cpp
+#HEADERS += $$VIDENCODE/example/simpleencdec/QVideoDecoderTest.hpp
 
 # add the include path
 # for ffmpeg.h

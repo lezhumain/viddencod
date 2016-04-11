@@ -1,7 +1,11 @@
 #pragma once
+
+
+#include <QMutex>
+
 class QString;
 class QFile;
-class QMutex;
+
 
 class LogManager
 {
@@ -21,7 +25,7 @@ private:
     static LogManager *_instance;
     bool log(int idThread, QString message, QString criticite);
     QFile *_logFile;
-    QMutex *_mutex;
+    QMutex _mutex;
 
 };
 

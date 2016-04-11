@@ -28,10 +28,12 @@ THIS SOFTWARE IS PROVIDED BY COPYRIGHT HOLDERS ``AS IS'' AND ANY EXPRESS OR IMPL
 #include "QVideoEncoderTest.hpp"
 #include "QVideoDecoderTest.hpp"
 #include "cio.h"
+#include "logmanager.hpp"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    m_lengthMs(0)
 {
     ui->setupUi(this);
 
@@ -39,8 +41,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ConsoleInit();
 #endif
     printf("Starting up\n");
-//    GenerateSyntheticVideo("/media/virtuelram/test.avi", false);
-  loadVideo("../../test.avi");
 }
 
 MainWindow::~MainWindow()
@@ -320,11 +320,12 @@ void MainWindow::on_actionEncode_video_triggered()
     short nbFrames = 0;
 //    QList<QImage> listImg = getAllFrames();
 
-    nbFrames = GenerateEncodedVideo("/media/virtuelram/test.avi", false);
+    nbFrames = GenerateEncodedVideo("./test.avi", false);
     if(nbFrames == -1)
     {
         printf("An error happened...");
         QMessageBox::information(this,"Info","Couldn't encode video");
+        LogManager::GetInstance()->LogError(0, "Couldn't encode video");
         return;
     }
 

@@ -60,7 +60,7 @@ private:
 	 Ui::MainWindow *ui;
      QList<QImage> getAllFrames();
      ffmpeg::AVRational m_FrameRateDecodedVideo;
-     double m_lengthMs = 0;
+     double m_lengthMs;
 
 private slots:
 	 void on_actionSave_synthetic_video_triggered();

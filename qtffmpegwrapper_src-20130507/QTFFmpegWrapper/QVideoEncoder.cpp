@@ -24,6 +24,8 @@ THIS SOFTWARE IS PROVIDED BY COPYRIGHT HOLDERS ``AS IS'' AND ANY EXPRESS OR IMPL
 #include <QDebug>
 #include <QTime>
 
+#include "logmanager.hpp"
+
 /******************************************************************************
 *******************************************************************************
 * QVideoEncoder   QVideoEncoder   QVideoEncoder   QVideoEncoder   QVideoEncoder
@@ -308,7 +310,9 @@ int QVideoEncoder::encodeImage_p(const QImage &img,
    double s = ms / 1000.;
    //ms -= s;
    delete(timer);
-   qWarning() << "Conversion took" << QString::number(ms) + "ms";
+   QString msg = "Conversion took " + QString::number(ms) + "ms";
+   qWarning() << msg;
+   LogManager::GetInstance()->LogInfo(0, msg);
 
 
 

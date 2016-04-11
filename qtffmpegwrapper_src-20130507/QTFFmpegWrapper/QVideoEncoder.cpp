@@ -50,8 +50,7 @@ QVideoEncoder::~QVideoEncoder()
 
 void QVideoEncoder::SetFramerate()
 {
-//    pFormatCtxVideo->streams[0]->time_base.num = Frame_Rate.num;
-//    pFormatCtxVideo->streams[0]->time_base.den = Frame_Rate.den;
+    //  Recopie du framerate dans le paramètre du framerate de l'output
     pFormatCtxVideo->streams[0]->time_base = Frame_Rate;
 }
 
@@ -69,14 +68,6 @@ void QVideoEncoder::SaveTmpFrameRate(ffmpeg::AVRational *FramRat)
 
 bool QVideoEncoder::createFile(QString fileName,unsigned width,unsigned height,unsigned bitrate,unsigned gop,unsigned fps)
 {
-    ffmpeg::AVRational tmp;
-    tmp.num = 0;
-    tmp.den = 0;
-    GetFramerate(&tmp);
-
-    printf("1. Frame_Rate.num = %d", Frame_Rate.num);
-    printf("1. Frame_Rate.den = %d", Frame_Rate.den);
-
    // If we had an open video, close it.
    close();
 
@@ -133,8 +124,8 @@ bool QVideoEncoder::createFile(QString fileName,unsigned width,unsigned height,u
    pCodecCtxVideo->thread_count          = 1;
    pCodecCtxVideo->bit_rate              = 64000;
    pCodecCtxVideo->sample_fmt            = ffmpeg::AV_SAMPLE_FMT_S16;
-   pCodecCtxVideo->sample_rate = 44100;
-   pCodecCtxVideo->channels = 2;
+   pCodecCtxVideo->sample_rate           = 44100;
+   pCodecCtxVideo->channels              = 2;
    // some formats want stream headers to be separate
    if(pFormatCtxVideo->oformat->flags & AVFMT_GLOBALHEADER)
       pCodecCtxVideo->flags |= CODEC_FLAG_GLOBAL_HEADER;

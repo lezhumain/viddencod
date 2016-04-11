@@ -38,18 +38,20 @@ DEFINES += DEVELMODE
 # ##############################################################################
 # Set QTFFMPEGWRAPPER_SOURCE_PATH to point to the directory containing the QTFFmpegWrapper sources
 QTFFMPEGWRAPPER_SOURCE_PATH = ../../QTFFmpegWrapper
-
-#ifdef __linux__
-    VIDENCODE = "/media/DATA/PERSO/EPSI COURS/TP/FFMPEG/viddencod/qtffmpegwrapper_src-20130507/"
+# or  or  or
+unix {
+    VIDENCODE = "/media/DATA/tmp/toto/clone/viddencod/qtffmpegwrapper_src-20130507/"
     FFMPEG = "/home/vro/FFMPEG-3.0"
+    FFMPEG_INCLUDE_PATH = "$$FFMPEG/include"
     FFMPEG_LIBRARY_PATH = "$$FFMPEG/lib"
-#elif _WIN32
+}
+win32 {
     VIDENCODE = ".."
     FFMPEG = "../../ffmpeg_lib_win32"
     FFMPEG_LIBRARY_PATH = "$$FFMPEG/lib/lib"
     # Set FFMPEG_INCLUDE_PATH to point to the directory containing the FFMPEG includes (if needed - typically for Windows)
     FFMPEG_INCLUDE_PATH = "$$FFMPEG/include"
-#endif
+}
 
 
 # Set FFMPEG_LIBRARY_PATH to point to the directory containing the FFmpeg import libraries (if needed - typically for Windows), i.e. the dll.a files
@@ -71,10 +73,10 @@ SOURCES += $$QTFFMPEGWRAPPER_SOURCE_PATH/QVideoDecoder.cpp
 HEADERS += $$QTFFMPEGWRAPPER_SOURCE_PATH/headers/QVideoDecoder.h
 
 # Sub-layer for the TP
-SOURCES += $$VIDENCODE/simpleencdec/QVideoEncoderTest.cpp
-HEADERS += $$VIDENCODE/simpleencdec/QVideoEncoderTest.hpp
-SOURCES += $$VIDENCODE/simpleencdec/QVideoDecoderTest.cpp
-HEADERS += $$VIDENCODE/simpleencdec/QVideoDecoderTest.hpp
+SOURCES += $$VIDENCODE/example/simpleencdec/QVideoEncoderTest.cpp
+HEADERS += $$VIDENCODE/example/simpleencdec/QVideoEncoderTest.hpp
+SOURCES += $$VIDENCODE/example/simpleencdec/QVideoDecoderTest.cpp
+HEADERS += $$VIDENCODE/example/simpleencdec/QVideoDecoderTest.hpp
 
 # add the include path
 # for ffmpeg.h

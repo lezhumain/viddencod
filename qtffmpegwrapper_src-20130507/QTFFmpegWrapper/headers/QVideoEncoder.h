@@ -55,8 +55,6 @@ class QVideoEncoder
       // Output filename
       QString fileName;
 
-      ffmpeg::AVRational Frame_Rate;
-
       unsigned getWidth();
       unsigned getHeight();
       bool isSizeValid();
@@ -78,7 +76,7 @@ class QVideoEncoder
 
       virtual int encodeImage_p(const QImage &,bool custompts=false,unsigned pts=0);
 
-      void SetFramerate();
+      void GetFramerate(ffmpeg::AVRational *FramRat);
 
    public:
       QVideoEncoder();
@@ -90,7 +88,10 @@ class QVideoEncoder
       virtual int encodeImage(const QImage &);
       virtual int encodeImagePts(const QImage &,unsigned pts);
       virtual bool isOk();  
-      void UpdateFrameRate(ffmpeg::AVRational FramRat);
+      void SaveTmpFrameRate(ffmpeg::AVRational *FramRat);
+      void SetFramerate();
+
+      ffmpeg::AVRational Frame_Rate;
 };
 
 #endif // QVideoEncoder_H

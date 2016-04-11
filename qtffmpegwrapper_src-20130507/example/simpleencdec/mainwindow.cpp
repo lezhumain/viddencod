@@ -111,11 +111,14 @@ void MainWindow::loadVideo(QString fileName)
 
    // Display a frame
    displayFrame();
+    ffmpeg::AVRational FrameRateDecodedVideotmp;
 
-   m_decoder.GetFPS(&FrameRateDecodedVideo.num,
-                    &FrameRateDecodedVideo.den);
+   m_decoder.GetFPS(&FrameRateDecodedVideotmp.num,
+                    &FrameRateDecodedVideotmp.den);
+   FrameRateDecodedVideo.num = FrameRateDecodedVideotmp.num;
+   FrameRateDecodedVideo.den = FrameRateDecodedVideotmp.den;
 
-   m_encoder.UpdateFrameRate(FrameRateDecodedVideo);
+   m_encoder.SaveTmpFrameRate(&FrameRateDecodedVideo);
 }
 
 void MainWindow::errLoadVideo()

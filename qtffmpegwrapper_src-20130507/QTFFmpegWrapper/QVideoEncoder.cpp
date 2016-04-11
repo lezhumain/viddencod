@@ -46,17 +46,33 @@ QVideoEncoder::~QVideoEncoder()
 
 void QVideoEncoder::SetFramerate()
 {
-    pFormatCtxVideo->streams[0]->time_base.num = Frame_Rate.num;
-    pFormatCtxVideo->streams[0]->time_base.den = Frame_Rate.den;
+//    pFormatCtxVideo->streams[0]->time_base.num = Frame_Rate.num;
+//    pFormatCtxVideo->streams[0]->time_base.den = Frame_Rate.den;
+    pFormatCtxVideo->streams[0]->time_base = Frame_Rate;
 }
 
-void QVideoEncoder::UpdateFrameRate(ffmpeg::AVRational FramRat)
+void QVideoEncoder::GetFramerate(ffmpeg::AVRational *FramRat)
 {
-    Frame_Rate = FramRat;
+    FramRat->num = Frame_Rate.num;
+    FramRat->den = Frame_Rate.den;
+}
+
+void QVideoEncoder::SaveTmpFrameRate(ffmpeg::AVRational *FramRat)
+{
+    Frame_Rate.num = FramRat->num;
+    Frame_Rate.den = FramRat->den;
 }
 
 bool QVideoEncoder::createFile(QString fileName,unsigned width,unsigned height,unsigned bitrate,unsigned gop,unsigned fps)
 {
+    ffmpeg::AVRational tmp;
+    tmp.num = 0;
+    tmp.den = 0;
+    GetFramerate(&tmp);
+
+    printf("1. Frame_Rate.num = %d", Frame_Rate.num);
+    printf("1. Frame_Rate.den = %d", Frame_Rate.den);
+
    // If we had an open video, close it.
    close();
 
@@ -94,8 +110,10 @@ bool QVideoEncoder::createFile(QString fileName,unsigned width,unsigned height,u
       printf("Could not allocate stream\n");
       return false;
    }
+   printf("2. Frame_Rate.num = %d", Frame_Rate.num);
+   printf("2. Frame_Rate.den = %d", Frame_Rate.den);
 
-    SetFramerate();
+   SetFramerate();
 
    pCodecCtxVideo                        = pStream->codec;
    pCodecCtxVideo->codec_id              = pOutputFormatVideo->video_codec;

@@ -9,12 +9,14 @@ TEMPLATE = app
 SOURCES += main.cpp \
 	 mainwindow.cpp \
          cio.cpp \
-    fifo.tpp
+    fifo.tpp \
+    logmanager.cpp
 
 HEADERS += mainwindow.h \
          cio.h \
     ../../QTFFmpegWrapper/fifo.hpp \
-    fifo.h
+    fifo.h \
+    logmanager.hpp
 
 FORMS += mainwindow.ui
 RESOURCES += resource.qrc

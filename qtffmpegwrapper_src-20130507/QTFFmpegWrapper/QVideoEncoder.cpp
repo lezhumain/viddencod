@@ -20,6 +20,10 @@ THIS SOFTWARE IS PROVIDED BY COPYRIGHT HOLDERS ``AS IS'' AND ANY EXPRESS OR IMPL
 #include <QTimer>
 #include <QTime>
 
+
+#include <QDebug>
+#include <QTime>
+
 /******************************************************************************
 *******************************************************************************
 * QVideoEncoder   QVideoEncoder   QVideoEncoder   QVideoEncoder   QVideoEncoder
@@ -42,8 +46,40 @@ QVideoEncoder::~QVideoEncoder()
    close();
 }
 
+//ffmpeg::AVFormatContext* QVideoEncoder::GetContext(void)
+//{
+//    return pFormatCtxVideo;
+//}
+
+void QVideoEncoder::SetFramerate()
+{
+//    pFormatCtxVideo->streams[0]->time_base.num = Frame_Rate.num;
+//    pFormatCtxVideo->streams[0]->time_base.den = Frame_Rate.den;
+    pFormatCtxVideo->streams[0]->time_base = Frame_Rate;
+}
+
+void QVideoEncoder::GetFramerate(ffmpeg::AVRational *FramRat)
+{
+    FramRat->num = Frame_Rate.num;
+    FramRat->den = Frame_Rate.den;
+}
+
+void QVideoEncoder::SaveTmpFrameRate(ffmpeg::AVRational *FramRat)
+{
+    Frame_Rate.num = FramRat->num;
+    Frame_Rate.den = FramRat->den;
+}
+
 bool QVideoEncoder::createFile(QString fileName,unsigned width,unsigned height,unsigned bitrate,unsigned gop,unsigned fps)
 {
+    ffmpeg::AVRational tmp;
+    tmp.num = 0;
+    tmp.den = 0;
+    GetFramerate(&tmp);
+
+    printf("1. Frame_Rate.num = %d", Frame_Rate.num);
+    printf("1. Frame_Rate.den = %d", Frame_Rate.den);
+
    // If we had an open video, close it.
    close();
 
@@ -81,15 +117,20 @@ bool QVideoEncoder::createFile(QString fileName,unsigned width,unsigned height,u
       printf("Could not allocate stream\n");
       return false;
    }
+   printf("2. Frame_Rate.num = %d", Frame_Rate.num);
+   printf("2. Frame_Rate.den = %d", Frame_Rate.den);
+
+   SetFramerate();
 
    pCodecCtxVideo                        = pStream->codec;
    pCodecCtxVideo->codec_id              = pOutputFormatVideo->video_codec;
    pCodecCtxVideo->codec_type            = ffmpeg::AVMEDIA_TYPE_VIDEO;
-   pCodecCtxVideo->bit_rate              = Bitrate;
+   pCodecCtxVideo->bit_rate              = 30/*GetFramerate()*/;
    pCodecCtxVideo->width                 = getWidth();
    pCodecCtxVideo->height                = getHeight();
-   pCodecCtxVideo->time_base.den         = fps;
-   pCodecCtxVideo->time_base.num         = 1;
+
+//   pCodecCtxVideo->time_base.den         = fps;
+//   pCodecCtxVideo->time_base.num         = 1;
    pCodecCtxVideo->gop_size              = Gop;
    pCodecCtxVideo->pix_fmt               = ffmpeg::AV_PIX_FMT_YUV420P;
    pCodecCtxVideo->thread_count          = 1;
@@ -298,10 +339,16 @@ int QVideoEncoder::encodeImage_p(const QImage &img,
    ppictureVideo->format = img.format();
 
    int isEncodedFrameNotEmpty = 0;
+
+   QTime *t = new QTime();
+   t->start();
    ffmpeg::avcodec_encode_video2(pCodecCtxVideo,
                                  &pkt,
                                  ppictureVideo,
                                  &isEncodedFrameNotEmpty);
+    int ms = t->elapsed();
+    delete(t);
+    qWarning() << "\tConversion took " + QString::number(ms) + "ms";
 
    if(custompts)                        // Handle custom pts (must set it again for the rest of the processing)
      pCodecCtxVideo->coded_frame->pts = pts; // Set the time stamp
@@ -318,6 +365,9 @@ int QVideoEncoder::encodeImage_p(const QImage &img,
 
       pkt.stream_index= pStream->index;
 
+
+      qWarning() << "\tSize of context: " + QString::number(sizeof(*pCodecCtxVideo));
+      qWarning() << "\tSize of pkt: " + QString::number(sizeof(pkt));
       int ret = av_interleaved_write_frame(pFormatCtxVideo,
                                            &pkt);
 

@@ -9,4 +9,5 @@ qtffmpegwrapper_src-20130507/test - Copy.avi
 qtffmpegwrapper_src-20130507/build*
 qtffmpegwrapper_src-20130507/example/build*
 qtffmpegwrapper_src-20130507/example/simpleencdec/simpleencdec.pro.*
+*.avi
 *.orig

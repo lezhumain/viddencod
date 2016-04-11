@@ -18,4 +18,6 @@ class Fifo
         QMutex _mutex;
 };
 
+#include "fifo.tpp"
+
 #endif // FIFO_H

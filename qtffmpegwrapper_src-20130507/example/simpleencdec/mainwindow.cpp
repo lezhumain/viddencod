@@ -326,7 +326,7 @@ void MainWindow::on_actionEncode_video_triggered()
 
 //    QList<QImage> listImg = getAllFrames();
 
-    short nbFrames = GenerateEncodedVideo("/media/virtuelram/test.avi", false);
+    short nbFrames = GenerateEncodedVideo("../test.avi", false);
 
     if(nbFrames == -1)
     {
@@ -613,7 +613,19 @@ void MainWindow::GenerateEncodedVideo(QList<QImage> &images, QString filename,bo
 void MainWindow::on_actionTest_triggered()
 {
     Ordonnanceur *michel = Ordonnanceur::GetInstance(2);
+    QImage imgTest(QSize(720, 480), QImage::Format_RGB32);
+    imgTest.fill(Qt::darkGray);
+//    QList<QImage> frames = getAllFrames(); // TODO check all frames are here
+//    int length = frames.length();
 
+//    for(int i = 0; i < length; ++i)
+//    {
+//        QImage img = frames.takeFirst();
+//        michel->PushFrameToFifo( img );
+//    }
+
+    michel->PushFrameToFifo(imgTest);
+    qWarning() << "FIFO length:" << michel->GetFifoLength();
     michel->StartThread();
 
     qWarning() << "DONE";

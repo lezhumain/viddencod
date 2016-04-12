@@ -5,6 +5,8 @@
 #include <QList>
 #include <QImage>
 
+class Ordonnanceur;
+
 class AgentEncoder : public QObject
 {
     Q_OBJECT
@@ -20,6 +22,7 @@ public slots:
     void Run();
 
 private:
+    Ordonnanceur* _ordo; // dont delete
     const short _id;
     void EncodeFrames(QList<QImage> lstFrameToEncode, QList<QImage> lstFrameEncoded);
     void EncodeSound();

@@ -29,6 +29,8 @@ THIS SOFTWARE IS PROVIDED BY COPYRIGHT HOLDERS ``AS IS'' AND ANY EXPRESS OR IMPL
 #include "QVideoDecoderTest.hpp"
 #include "cio.h"
 
+#include "ordonnanceur.hpp"
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -38,7 +40,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ConsoleInit();
     printf("Starting up\n");
 //    GenerateSyntheticVideo("/media/virtuelram/test.avi", false);
-    loadVideo("../../test.avi");
+//    loadVideo("../../test.avi");
 }
 
 MainWindow::~MainWindow()
@@ -608,3 +610,11 @@ void MainWindow::GenerateEncodedVideo(QList<QImage> &images, QString filename,bo
     printf("Done encoding.");
 }
 
+void MainWindow::on_actionTest_triggered()
+{
+    Ordonnanceur *michel = Ordonnanceur::GetInstance(2);
+
+    michel->StartThread();
+
+    qWarning() << "DONE";
+}

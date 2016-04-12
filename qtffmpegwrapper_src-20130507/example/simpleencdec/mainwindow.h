@@ -73,6 +73,7 @@ private slots:
 	 void on_actionQuit_triggered();
 	 void on_actionSave_synthetic_variable_frame_rate_video_triggered();
      void on_actionEncode_video_triggered();
+     void on_actionTest_triggered();
 };
 
 #endif // MAINWINDOW_H

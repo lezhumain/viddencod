@@ -9,15 +9,15 @@ TEMPLATE = app
 SOURCES += main.cpp \
 	 mainwindow.cpp \
          cio.cpp \
-    ../../QTFFmpegWrapper/headers/ordonnanceur.cpp \
-    ../../QTFFmpegWrapper/headers/agentEncoder.cpp \
-    fifo.cpp
+    fifo.cpp \
+    agentencoder.cpp \
+    ordonnanceur.cpp
 
 HEADERS += mainwindow.h \
          cio.h \
-    ../../QTFFmpegWrapper/headers/ordonnanceur.hpp \
-    ../../QTFFmpegWrapper/headers/agentEncoder.hpp \
-    fifo.hpp
+    fifo.hpp \
+    agentencoder.hpp \
+    ordonnanceur.hpp
 
 FORMS += mainwindow.ui
 RESOURCES += resource.qrc

@@ -9,3 +9,4 @@ qtffmpegwrapper_src-20130507/Les_nulss - Copy.avi
 qtffmpegwrapper_src-20130507/test - Copy.avi
 qtffmpegwrapper_src-20130507/example/build-simpleencdec-Desktop_Qt_5_5_1_MinGW_32bit-Debug
 qtffmpegwrapper_src-20130507/example/simpleencdec/simpleencdec.pro.*
+*.orig

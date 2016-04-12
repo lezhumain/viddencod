@@ -1,5 +1,6 @@
 #ifndef ORDONNANCEUR_H
 #define ORDONNANCEUR_H
+
 #include <QImage>
 #include <QObject>
 #include <QList>
@@ -23,12 +24,14 @@ private:
     int StopThread();
     bool WriteVideo();
 
+    const short _nbThread;
+
 public:
     Ordonnanceur();
     void PushFrameToFifo(QImage frame);
     QImage PopFrame();
     void ClearFifo();
-    unsigned int GetFifoLength();
+    unsigned int GetFifoLength() const;
 
 
 };

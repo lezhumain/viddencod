@@ -1,5 +1,14 @@
 #include "ordonnanceur.hpp"
+
 #include "fifo.hpp"
+Ordonnanceur::Ordonnanceur(const short nbThread) :
+    QObject(),
+    _nbThread(nbThread)
+{
+
+}
+
+
 bool Ordonnanceur::CreateThread()
 {
 
@@ -25,11 +34,6 @@ bool Ordonnanceur::WriteVideo()
     return 1;
 }
 
-Ordonnanceur::Ordonnanceur()
-{
-
-}
-
 void Ordonnanceur::PushFrameToFifo(QImage frame)
 {
    this->_fifoFrame.PushBack(frame);
@@ -45,7 +49,7 @@ void Ordonnanceur::ClearFifo()
 
 }
 
-unsigned int Ordonnanceur::GetFifoLength()
+unsigned int Ordonnanceur::GetFifoLength() const
 {
     return this->_fifoFrame.Count();
 }

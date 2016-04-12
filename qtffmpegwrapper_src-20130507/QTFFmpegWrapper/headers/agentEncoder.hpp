@@ -15,6 +15,7 @@ signals:
 
 public slots:
     void EncoderFrames(QList<QImage> lstFrameToEncode,QList<QImage>&lstFrameEncoded);
+    void EncodeSound();
 };
 
 #endif // AGENT_H

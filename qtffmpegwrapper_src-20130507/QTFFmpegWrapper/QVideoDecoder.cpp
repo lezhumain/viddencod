@@ -539,7 +539,7 @@ void QVideoDecoder::dumpFormat(ffmpeg::AVFormatContext *ic,
         }
         printf(", bitrate: ");
         if (ic->bit_rate) {
-            printf("%d kb/s\n", ic->bit_rate / 1000);
+            printf("%li kb/s\n", ic->bit_rate / 1000);
         } else {
             printf("N/A\n");
         }

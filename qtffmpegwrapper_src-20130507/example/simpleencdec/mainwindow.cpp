@@ -36,12 +36,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
 #ifdef WIN32
-#include <wtypes.h>
-    ConsoleInit();
+//    ConsoleInit();
 #endif
     printf("Starting up\n");
 //    GenerateSyntheticVideo("/media/virtuelram/test.avi", false);
-  loadVideo("../../test.avi");
+  loadVideo("../../../test.avi");
 }
 
 MainWindow::~MainWindow()
@@ -321,7 +320,13 @@ void MainWindow::on_actionEncode_video_triggered()
     short nbFrames = 0;
 //    QList<QImage> listImg = getAllFrames();
 
-    nbFrames = GenerateEncodedVideo("/media/virtuelram/test.avi", false);
+//    QString title("Save an encoded video ");
+//    QString fileName = QFileDialog::getSaveFileName(this, title,QString(),"Video (*.avi *.asf *.mpg)");
+//    if(!fileName.isNull())
+//        nbFrames = GenerateEncodedVideo(fileName.toStdString().c_str(), false);
+    QString fileName = "output.avi";
+    nbFrames = GenerateEncodedVideo(fileName.toStdString().c_str(), false);
+
     if(nbFrames == -1)
     {
         printf("An error happened...");
@@ -374,7 +379,8 @@ void MainWindow::GenerateSyntheticVideo(QString filename, bool vfr)
                         width,
                         height,
                         bitrate*1000/fps,
-                        gop,1000);  // For variable frame rates: set the time base to e.g. 1ms (1000fps),
+                        gop,
+                        1000);  // For variable frame rates: set the time base to e.g. 1ms (1000fps),
                                     // and correct the bitrate according to the expected average frame rate (fps)
 
    QEventLoop evt;      // we use an event loop to allow for paint events to show on-screen the generated video
@@ -428,15 +434,14 @@ void MainWindow::GenerateSyntheticVideo(QString filename, bool vfr)
 
 int MainWindow::GenerateEncodedVideo(QString filename, bool vfr)
 {
+    int bitrate      = 476000;
+    int gop          = 10;
+    int eframeNumbern = 0;
+    int frameTime = 0;
+
     //Number of frames per second for the output video
     double dframeRate = ((double)(m_FrameRateDecodedVideo.den) /
                        (double)m_FrameRateDecodedVideo.num);
-//    int frameRate = (int)dframeRate;
-    int bitrate = 476000; // 1000000
-    int gop = 20;
-
-    int eframeNumbern = 0;
-    int frameTime = 0;
 
     int totalFramesVideo = 0;
     bool fileOk = false;
@@ -459,7 +464,7 @@ int MainWindow::GenerateEncodedVideo(QString filename, bool vfr)
     qWarning() << "Longueur de la vidéo : " << m_lengthMs << " secondes";
 
     //  number of frames : TIME_TOTAL_MSEC * FRAMES_PER_SEC
-    totalFramesVideo = (m_lengthMs / 1000) * (int)dframeRate;
+    totalFramesVideo = (int)((m_lengthMs  * dframeRate) / 1000);
     qWarning() << "Nombre total de frames de la vidéo :" << totalFramesVideo ;
 
     for(i = 0; i < totalFramesVideo; ++i)
@@ -495,7 +500,7 @@ int MainWindow::GenerateEncodedVideo(QString filename, bool vfr)
         }                                                                         // and correct the bitrate according to the expected average frame rate (fps)
 
         // handle
-        frame = frame.convertToFormat(QImage::Format_RGB32);
+        //frame = frame.convertToFormat(QImage::Format_RGB32);
         //  Paste the decoded frame into the QPixmap for display the data
         image2Pixmap(frame,p);
         ui->labelVideoFrame->setPixmap(p);

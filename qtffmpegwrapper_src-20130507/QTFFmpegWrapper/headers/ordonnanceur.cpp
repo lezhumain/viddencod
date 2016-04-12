@@ -22,7 +22,7 @@ void Ordonnanceur::OnFinished(int idagent)
 
 bool Ordonnanceur::WriteVideo()
 {
-
+    return 1;
 }
 
 Ordonnanceur::Ordonnanceur()

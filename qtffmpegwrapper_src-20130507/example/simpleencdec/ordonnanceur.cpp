@@ -11,7 +11,10 @@ Ordonnanceur::Ordonnanceur(const short nbThread) :
 
 bool Ordonnanceur::CreateThread()
 {
+    for (int i = 0; i < _nbThread; ++i)
+    {
 
+    }
 }
 
 int Ordonnanceur::StartThread()

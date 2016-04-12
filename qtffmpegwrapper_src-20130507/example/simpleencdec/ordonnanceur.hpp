@@ -27,7 +27,7 @@ private:
     const short _nbThread;
 
 public:
-    Ordonnanceur();
+    Ordonnanceur(const short nbThread);
     void PushFrameToFifo(QImage frame);
     QImage PopFrame();
     void ClearFifo();

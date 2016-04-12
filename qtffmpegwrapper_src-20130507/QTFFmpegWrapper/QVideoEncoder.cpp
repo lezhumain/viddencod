@@ -16,10 +16,15 @@ THIS SOFTWARE IS PROVIDED BY COPYRIGHT HOLDERS ``AS IS'' AND ANY EXPRESS OR IMPL
 #include <QPainter>
 #include "headers/QVideoEncoder.h"
 #include <ffmpeg.h>
+#include <QDebug>
+#include <QTimer>
+#include <QTime>
 
 
 #include <QDebug>
 #include <QTime>
+
+#include "logmanager.hpp"
 
 /******************************************************************************
 *******************************************************************************
@@ -329,8 +334,23 @@ int QVideoEncoder::encodeImage_p(const QImage &img,
    if(!isOk())
       return -1;
 
+
+   //QTimer timer;
+   QTime *timer;
+   timer->start();
    //convertImage(img);       // Custom conversion routine
    convertImage_sws(img);     // SWS conversion
+   int ms = timer->elapsed();
+   double s = ms / 1000.;
+   //ms -= s;
+   delete(timer);
+   QString msg = "Conversion took " + QString::number(ms) + "ms";
+   qWarning() << msg;
+   LogManager::GetInstance()->LogInfo(0, msg);
+
+
+
+
 
    if(custompts)                             // Handle custom pts
      pCodecCtxVideoEncoder->coded_frame->pts = pts;      // Set the time stamp
@@ -355,7 +375,7 @@ int QVideoEncoder::encodeImage_p(const QImage &img,
                                  &pkt,
                                  ppictureVideoEncoder,
                                  &isEncodedFrameNotEmpty);
-    int ms = t->elapsed();
+    ms = t->elapsed();
     delete(t);
     qWarning() << "\tConversion took " + QString::number(ms) + "ms";
 

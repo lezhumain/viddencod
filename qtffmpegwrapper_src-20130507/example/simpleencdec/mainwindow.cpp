@@ -28,18 +28,20 @@ THIS SOFTWARE IS PROVIDED BY COPYRIGHT HOLDERS ``AS IS'' AND ANY EXPRESS OR IMPL
 #include "QVideoEncoderTest.hpp"
 #include "QVideoDecoderTest.hpp"
 #include "cio.h"
+#include "logmanager.hpp"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    m_lengthMs(0)
 {
     ui->setupUi(this);
 
 #ifdef WIN32
-//    ConsoleInit();
+    ConsoleInit();
+
 #endif
-    printf("Starting up\n");
-//    GenerateSyntheticVideo("/media/virtuelram/test.avi", false);
+  printf("Starting up\n");
   loadVideo("../../../test.avi");
 }
 
@@ -320,6 +322,11 @@ void MainWindow::on_actionEncode_video_triggered()
     short nbFrames = 0;
 //    QList<QImage> listImg = getAllFrames();
 
+    QString title("Save an encoded video ");
+    QString fileName = QFileDialog::getSaveFileName(this, title,QString(),"Video (*.avi *.mp4 *.mpg)");
+    if(!fileName.isNull())
+      nbFrames = GenerateEncodedVideo(fileName.toStdString().c_str(), false);
+
 //    QString title("Save an encoded video ");
 //    QString fileName = QFileDialog::getSaveFileName(this, title,QString(),"Video (*.avi *.asf *.mpg)");
 //    if(!fileName.isNull())
@@ -331,6 +338,7 @@ void MainWindow::on_actionEncode_video_triggered()
     {
         printf("An error happened...");
         QMessageBox::information(this,"Info","Couldn't encode video");
+        LogManager::GetInstance()->LogError(0, "Couldn't encode video");
         return;
     }
 
@@ -396,7 +404,7 @@ void MainWindow::GenerateSyntheticVideo(QString filename, bool vfr)
    for( int i = 0; i < maxframe; i++)
    {
       // Clear the frame
-      painter.fillRect(frame.rect(),Qt::red);   
+      painter.fillRect(frame.rect(),Qt::red);
 
       // Draw a moving square
       painter.fillRect(width * i / maxframe,
@@ -434,10 +442,10 @@ void MainWindow::GenerateSyntheticVideo(QString filename, bool vfr)
 
 int MainWindow::GenerateEncodedVideo(QString filename, bool vfr)
 {
-    int bitrate      = 476000;
-    int gop          = 10;
+    int bitrate       = 476000;
+    int gop           = 10;
     int eframeNumbern = 0;
-    int frameTime = 0;
+    int frameTime     = 0;
 
     //Number of frames per second for the output video
     double dframeRate = ((double)(m_FrameRateDecodedVideo.den) /
@@ -500,7 +508,7 @@ int MainWindow::GenerateEncodedVideo(QString filename, bool vfr)
         }                                                                         // and correct the bitrate according to the expected average frame rate (fps)
 
         // handle
-        //frame = frame.convertToFormat(QImage::Format_RGB32);
+        frame = frame.convertToFormat(QImage::Format_RGB32);
         //  Paste the decoded frame into the QPixmap for display the data
         image2Pixmap(frame,p);
         ui->labelVideoFrame->setPixmap(p);
@@ -607,7 +615,7 @@ void MainWindow::GenerateEncodedVideo(QList<QImage> &images, QString filename,bo
 
        if(!p.save("../../../frame" + QString::number((int)i) + ".png"))
            printf("Image NOT Written");
-       
+
        if(!vfr)
           size=m_encoder.encodeImage(frame);                      // Fixed frame rate
        else

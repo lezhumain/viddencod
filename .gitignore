@@ -1,4 +1,3 @@
-build*
 *.autosave
 *.pro.user.0c14d04
 *.user.orig
@@ -7,7 +6,8 @@ qtffmpegwrapper_src-20130507/Brooklyn.Nine-Nine.S03E01.HDTV.x264-BATV.avi
 qtffmpegwrapper_src-20130507/Brooklyn.Nine-Nine.S03E01.HDTV.x264-BATV.mp4
 qtffmpegwrapper_src-20130507/Les_nulss - Copy.avi
 qtffmpegwrapper_src-20130507/test - Copy.avi
-qtffmpegwrapper_src-20130507/example/build-simpleencdec-Desktop_Qt_5_5_1_MinGW_32bit-Debug
+qtffmpegwrapper_src-20130507/build*
+qtffmpegwrapper_src-20130507/example/build*
 qtffmpegwrapper_src-20130507/example/simpleencdec/simpleencdec.pro.*
 *.avi
 *.orig

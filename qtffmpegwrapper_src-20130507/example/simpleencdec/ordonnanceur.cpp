@@ -19,10 +19,10 @@ Ordonnanceur::~Ordonnanceur()
     // TODO delete agents
 //    for(int i = 0; i < _nbThread; ++i)
 //    {
-////        AgentEncoder *agent = _lstAgent.takeFirst();
-////        delete(agent);
+// //        AgentEncoder *agent = _lstAgent.takeFirst();
+// //        delete(agent);
 
-////        _lstAgent.removeFirst();
+// //        _lstAgent.removeFirst();
 //    }
 
     qWarning() << "Ordonnanceur destroyed";
@@ -78,7 +78,7 @@ void Ordonnanceur::OnFinished(const short idagent)
     }
 
     if(length == 1)
-        Kill(); // can delete...
+        Ordonnanceur::Kill(); // can delete...
 }
 
 bool Ordonnanceur::WriteVideo()

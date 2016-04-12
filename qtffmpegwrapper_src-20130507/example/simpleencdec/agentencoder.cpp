@@ -6,7 +6,7 @@ AgentEncoder::AgentEncoder(const short id, QObject *parent) :
     QObject(parent),
     _id(id)
 {
-//    _ordo = Ordonnanceur::GetInstance(2);
+    _ordo = reinterpret_cast<Ordonnanceur*>(parent);
     qWarning() << "Agent" << _id << "created.";
 }
 
@@ -18,8 +18,8 @@ AgentEncoder::~AgentEncoder()
 // Declenchee quand l'ordo envoi le signal 'Start'
 void AgentEncoder::Run()
 {
-    if(_ordo == NULL)
-        _ordo = Ordonnanceur::GetInstance();
+//    if(_ordo == NULL)
+//        _ordo = Ordonnanceur::GetInstance();
     // get frame from fifo
     QImage img = _ordo->PopFrame();
 

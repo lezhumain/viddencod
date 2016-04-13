@@ -246,7 +246,7 @@ QList<QImage> Ordonnanceur::getAllFrames()
     if(loaded)
     {
         lengthMs = m_decoder.getVideoLengthSeconds(); // open video first
-        qWarning() << "length" << lengthMs ;
+        qWarning() << "length" << QString::number(lengthMs) + "ms";
 
         maxFrames = lengthMs * frameRate / 1000; // not working
         maxFrames = maxFrames < 0 ? 50000 : maxFrames;
@@ -259,6 +259,7 @@ QList<QImage> Ordonnanceur::getAllFrames()
             if(!m_decoder.getFrame(img,&eframeNumbern,&frameTime))
             {
     //           QMessageBox::critical(this,"Error","Error decoding the frame");
+                qWarning() << "Error decoding the frame";
                listIm.clear();
                return listIm;
             }

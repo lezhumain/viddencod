@@ -53,15 +53,14 @@ private:
     bool WriteVideo();
 
     ~Ordonnanceur();
-    Ordonnanceur(const short nbThread, const QString &filename = "../../../Les_nulss.avi");
+//    Ordonnanceur(const short nbThread, const QString &filename = "../../Les_nulss.avi");
+    Ordonnanceur(const short nbThread, const QString &filename = "D:\\Downloads\\Series\\Brooklyn Nine Nine\\Brooklyn.Nine-Nine.S03E11.HDTV.x264-FUM[ettv]\\Brooklyn.Nine-Nine.S03E11.HDTV.x264-FUM[ettv].mp4");
     bool loadVideo(QString fileName);
     void displayFrame();
     bool checkVideoLoadOk();
     void image2Pixmap(QImage &img,QPixmap &pixmap);
     QList<QImage> getAllFrames();
     bool nextFrame();
-
-
 
 };
 

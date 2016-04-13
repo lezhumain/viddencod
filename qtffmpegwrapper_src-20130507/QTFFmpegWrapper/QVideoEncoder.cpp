@@ -107,7 +107,10 @@ bool QVideoEncoder::prepare_stream(QString fileName,
     }
 
     pFormatCtxVideoEncoder->oformat = pOutputFormatVideoEncoder;
-    snprintf(pFormatCtxVideoEncoder->filename, sizeof(pFormatCtxVideoEncoder->filename), "%s", fileName.toStdString().c_str());
+    snprintf(pFormatCtxVideoEncoder->filename,
+             sizeof(pFormatCtxVideoEncoder->filename),
+             "%s",
+             fileName.toStdString().c_str());
 
     // Add the video stream
     pStreamEncoder = avformat_new_stream(pFormatCtxVideoEncoder,0);
@@ -295,16 +298,16 @@ int QVideoEncoder::encodeImagePts(const QImage &img,unsigned pts)
 
 void QVideoEncoder::initVars()
 {
-   ok                 = false;
+   ok                        = false;
    pFormatCtxVideoEncoder    = 0;
    pOutputFormatVideoEncoder = 0;
    pCodecCtxVideoEncoder     = 0;
    pStreamEncoder            = 0;
    pCodecVideoEncoder        = 0;
-   ppictureVideoEncoder     = NULL;
-   outbuf             = 0;
-   picture_buf        = 0;
-   img_convert_ctx    = 0;
+   ppictureVideoEncoder      = NULL;
+   outbuf                    = 0;
+   picture_buf               = 0;
+   img_convert_ctx           = 0;
 }
 
 /**
@@ -315,9 +318,9 @@ bool QVideoEncoder::initCodec()
    ffmpeg::avcodec_register_all();
    ffmpeg::av_register_all();
 
-   qDebug() << "License: " << ffmpeg::avformat_license();
-   qDebug() << "AVCodec version: " << ffmpeg::avformat_version();
-   qDebug() << "AVFormat configuration: " << ffmpeg::avformat_configuration();
+//   qDebug() << "License: " << ffmpeg::avformat_license();
+//   qDebug() << "AVCodec version: " << ffmpeg::avformat_version();
+//   qDebug() << "AVFormat configuration: " << ffmpeg::avformat_configuration();
 
    return true;
 }
@@ -334,7 +337,7 @@ int QVideoEncoder::encodeImage_p(const QImage &img,
    if(!isOk())
       return -1;
 
-   QTime *timerConvertImage = new QTime;
+   QTime *timerConvertImage = new QTime();
    QTime *timeEncodeImage = new QTime();
    timerConvertImage->start();
    convertImage(img);       // Custom conversion routine
@@ -343,7 +346,7 @@ int QVideoEncoder::encodeImage_p(const QImage &img,
    delete(timerConvertImage);
 
    QString msg = "Conversion took " + QString::number(ms) + "ms";
-   qWarning() << msg;
+//   qWarning() << msg;
    LogManager::GetInstance()->LogInfo(0, msg);
 
    if(custompts)                             // Handle custom pts
@@ -371,7 +374,7 @@ int QVideoEncoder::encodeImage_p(const QImage &img,
                                  &isEncodedFrameNotEmpty);
     ms = timeEncodeImage->elapsed();
     delete(timeEncodeImage);
-    qWarning() << "\tConversion took " + QString::number(ms) + "ms";
+//    qWarning() << "\tConversion took " + QString::number(ms) + "ms";
 
 //   if(custompts)                        // Handle custom pts (must set it again for the rest of the processing)
 //     pCodecCtxVideoEncoder->coded_frame->pts = pts; // Set the time stamp
@@ -526,7 +529,7 @@ bool QVideoEncoder::convertImage(const QImage &img)
    {
       unsigned char *s = (unsigned char*)img.scanLine(y);
       unsigned char *d = (unsigned char*)&picture_buf[y * getWidth()];
-      printf("Line %d. d: %p. picture_buf: %p\n",y,d,picture_buf);
+//      printf("Line %d. d: %p. picture_buf: %p\n",y,d,picture_buf);
 
       for(unsigned x = 0; x < getWidth(); x++)
       {
@@ -550,7 +553,7 @@ bool QVideoEncoder::convertImage(const QImage &img)
       unsigned int ss = img.bytesPerLine();
       unsigned char *d = (unsigned char*)&picture_buf[size+y/2*getWidth()/2];
 
-      printf("Line %d. d: %p. picture_buf: %p\n",y,d,picture_buf);
+//      printf("Line %d. d: %p. picture_buf: %p\n",y,d,picture_buf);
 
       for(unsigned x=0;x<getWidth();x+=2)
       {

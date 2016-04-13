@@ -7,16 +7,13 @@ TARGET = simpleencdec
 TEMPLATE = app
 
 SOURCES += main.cpp \
-	 mainwindow.cpp \
-         cio.cpp \
-    fifo.tpp \
-    logmanager.cpp
+           mainwindow.cpp \
+           cio.cpp \
+           logmanager.cpp
 
 HEADERS += mainwindow.h \
-         cio.h \
-    ../../QTFFmpegWrapper/fifo.hpp \
-    fifo.h \
-    logmanager.hpp
+           cio.h \
+           logmanager.hpp
 
 FORMS += mainwindow.ui
 RESOURCES += resource.qrc
@@ -55,15 +52,6 @@ win32 {
     FFMPEG_INCLUDE_PATH = "$$FFMPEG/include"
 }
 
-
-# Set FFMPEG_LIBRARY_PATH to point to the directory containing the FFmpeg import libraries (if needed - typically for Windows), i.e. the dll.a files
-# FFMPEG = ...
-
-# Set FFMPEG_LIBRARY_PATH to point to the directory containing the FFMPEG libs
-# FFMPEG_LIBRARY_PATH = ...
-
-
-
 # ##############################################################################
 # Do not modify: FFMPEG default settings
 # ##############################################################################
@@ -75,15 +63,12 @@ SOURCES += $$QTFFMPEGWRAPPER_SOURCE_PATH/QVideoDecoder.cpp
 HEADERS += $$QTFFMPEGWRAPPER_SOURCE_PATH/headers/QVideoDecoder.h
 
 # Sub-layer for the TP
-SOURCES += $$VIDENCODE/simpleencdec/QVideoEncoderTest.cpp
-HEADERS += $$VIDENCODE/simpleencdec/QVideoEncoderTest.hpp
-SOURCES += $$VIDENCODE/simpleencdec/QVideoDecoderTest.cpp
-HEADERS += $$VIDENCODE/simpleencdec/QVideoDecoderTest.hpp
-
-#SOURCES += $$VIDENCODE/example/simpleencdec/QVideoEncoderTest.cpp
-#HEADERS += $$VIDENCODE/example/simpleencdec/QVideoEncoderTest.hpp
-#SOURCES += $$VIDENCODE/example/simpleencdec/QVideoDecoderTest.cpp
-#HEADERS += $$VIDENCODE/example/simpleencdec/QVideoDecoderTest.hpp
+SOURCES += $$VIDENCODE/example/simpleencdec/QVideoEncoderTest.cpp
+HEADERS += $$VIDENCODE/example/simpleencdec/QVideoEncoderTest.hpp
+SOURCES += $$VIDENCODE/example/simpleencdec/QVideoDecoderTest.cpp
+HEADERS += $$VIDENCODE/example/simpleencdec/QVideoDecoderTest.hpp
+SOURCES += $$VIDENCODE/example/simpleencdec/fifo.tpp
+HEADERS += $$VIDENCODE/example/simpleencdec/fifo.h
 
 # add the include path
 # for ffmpeg.h

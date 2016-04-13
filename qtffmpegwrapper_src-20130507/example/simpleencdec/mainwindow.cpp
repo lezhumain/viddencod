@@ -42,7 +42,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 #endif
   printf("Starting up\n");
-  loadVideo("../../../test.avi");
+  loadVideo("../../test.avi");
 }
 
 MainWindow::~MainWindow()

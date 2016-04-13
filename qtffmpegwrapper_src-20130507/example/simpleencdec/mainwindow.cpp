@@ -322,10 +322,10 @@ void MainWindow::on_actionEncode_video_triggered()
     short nbFrames = 0;
 //    QList<QImage> listImg = getAllFrames();
 
-    QString title("Save an encoded video ");
-    QString fileName = QFileDialog::getSaveFileName(this, title,QString(),"Video (*.avi *.mp4 *.mpg)");
-    if(!fileName.isNull())
-      nbFrames = GenerateEncodedVideo(fileName.toStdString().c_str(), false);
+//    QString title("Save an encoded video ");
+//    QString fileName = QFileDialog::getSaveFileName(this, title,QString(),"Video (*.avi *.mp4 *.mpg)");
+//    if(!fileName.isNull())
+//      nbFrames = GenerateEncodedVideo(fileName.toStdString().c_str(), false);
 
 //    QString title("Save an encoded video ");
 //    QString fileName = QFileDialog::getSaveFileName(this, title,QString(),"Video (*.avi *.asf *.mpg)");

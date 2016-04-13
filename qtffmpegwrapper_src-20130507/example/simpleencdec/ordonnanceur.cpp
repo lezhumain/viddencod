@@ -19,6 +19,13 @@ Ordonnanceur::Ordonnanceur(const short nbThread, const QString& filename) :
 
 Ordonnanceur::~Ordonnanceur()
 {
+    if(!_lstAgent.empty())
+    {
+        int len = _lstAgent.length();
+        for(int i = 0; i < len; ++i)
+            _lstAgent.removeFirst();
+    }
+
     qWarning() << "Ordonnanceur destroyed";
 }
 
@@ -33,6 +40,7 @@ bool Ordonnanceur::Start()
     if(nbF == 0)
     {
         qWarning() << "Didn't get any frame.";
+        Ordonnanceur::Kill();
         return false;
     }
 
@@ -100,6 +108,7 @@ void Ordonnanceur::OnFinished(const short idagent)
         // take from list & delete
         AgentEncoder *agent = _lstAgent.takeAt(i);
         delete(agent);
+//        _lstAgent.removeAt(i); // ???
     }
 
     if(length == 1)
@@ -155,20 +164,22 @@ void Ordonnanceur::Kill()
 /**
   Prompts the user for the video to load, and display the first frame
 **/
-void Ordonnanceur::loadVideo(QString fileName)
+bool Ordonnanceur::loadVideo(QString fileName)
 {
    m_decoder.openFile(fileName);
    if(m_decoder.isOk()==false)
    {
 //      QMessageBox::critical(this,"Error","Error loading the video");
         qWarning() << "Error loading the video";
-        return;
+        return false;
    }
 
-   // Get a new frame
-   nextFrame();
+   // Get first frame
+//   nextFrame();
    // Display a frame
-   displayFrame();
+//   displayFrame();
+
+   return true;
 }
 
 /**
@@ -229,33 +240,35 @@ QList<QImage> Ordonnanceur::getAllFrames()
     short frameRate = 25;
     int lengthMs, maxFrames;
 
-    loadVideo(_filename);
-
-    lengthMs = m_decoder.getVideoLengthSeconds(); // open video first
-    qWarning() << "length" << lengthMs ;
-
-    maxFrames = lengthMs * frameRate / 1000; // not working
-    maxFrames = maxFrames < 0 ? 50000 : maxFrames;
-    qWarning() << "maxframes" << maxFrames ;
-
+    bool loaded = loadVideo(_filename);
     QList<QImage> listIm;
 
-    for(int i = 0; i < maxFrames; ++i)
+    if(loaded)
     {
-        QImage img;
-        int eframeNumbern, frameTime;
-        if(!m_decoder.getFrame(img,&eframeNumbern,&frameTime))
-        {
-//           QMessageBox::critical(this,"Error","Error decoding the frame");
-           listIm.clear();
-           return listIm;
-        }
-        listIm.append(img);
+        lengthMs = m_decoder.getVideoLengthSeconds(); // open video first
+        qWarning() << "length" << lengthMs ;
 
-        if(!nextFrame() || i == 1000000)
+        maxFrames = lengthMs * frameRate / 1000; // not working
+        maxFrames = maxFrames < 0 ? 50000 : maxFrames;
+        qWarning() << "maxframes" << maxFrames ;
+
+        for(int i = 0; i < maxFrames; ++i)
         {
-            qWarning() << "Current frame:" << eframeNumbern << "[i =" << i << "]";
-            break;
+            QImage img;
+            int eframeNumbern, frameTime;
+            if(!m_decoder.getFrame(img,&eframeNumbern,&frameTime))
+            {
+    //           QMessageBox::critical(this,"Error","Error decoding the frame");
+               listIm.clear();
+               return listIm;
+            }
+            listIm.append(img);
+
+            if(!nextFrame() || i == 1000000)
+            {
+                qWarning() << "Current frame:" << eframeNumbern << "[i =" << i << "]";
+                break;
+            }
         }
     }
 

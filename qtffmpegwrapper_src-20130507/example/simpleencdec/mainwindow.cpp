@@ -630,7 +630,8 @@ void MainWindow::on_actionTest_triggered()
     qWarning() << "FIFO length:" << michel->GetFifoLength();
 
 //    michel->StartThread();
-    michel->Start();
+    if( michel->Start() == false)
+        qWarning() << "Error at some point.";
 
     qWarning() << "DONE";
 }

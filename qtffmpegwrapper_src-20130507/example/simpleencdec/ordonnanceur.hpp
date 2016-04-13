@@ -53,8 +53,8 @@ private:
     bool WriteVideo();
 
     ~Ordonnanceur();
-    Ordonnanceur(const short nbThread, const QString &filename = "../../Les_nulss.avi");
-    void loadVideo(QString fileName);
+    Ordonnanceur(const short nbThread, const QString &filename = "../../../Les_nulss.avi");
+    bool loadVideo(QString fileName);
     void displayFrame();
     bool checkVideoLoadOk();
     void image2Pixmap(QImage &img,QPixmap &pixmap);

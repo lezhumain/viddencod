@@ -623,10 +623,14 @@ void MainWindow::on_actionTest_triggered()
 //        QImage img = frames.takeFirst();
 //        michel->PushFrameToFifo( img );
 //    }
-
-    michel->PushFrameToFifo(imgTest);
+    Ordonnanceur::frame_t sframe;
+    sframe.frame = imgTest;
+    sframe.index = 0;
+    michel->PushFrameToFifo(sframe);
     qWarning() << "FIFO length:" << michel->GetFifoLength();
-    michel->StartThread();
+
+//    michel->StartThread();
+    michel->Start();
 
     qWarning() << "DONE";
 }

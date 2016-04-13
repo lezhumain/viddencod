@@ -21,13 +21,14 @@ void AgentEncoder::Run()
 //    if(_ordo == NULL)
 //        _ordo = Ordonnanceur::GetInstance();
     // get frame from fifo
-    QImage img = _ordo->PopFrame();
+    Ordonnanceur::frame_t frame = _ordo->PopFrame();
+    QImage *img = &(frame.frame);
 
     // encode it
 
     // put it in encoded list
 
-    qWarning() << "Agent" << _id << "starts. Got:" << (img.isNull() ? "NULL" : "IMG");
+    qWarning() << "Agent" << _id << "starts. Got:" << (img->isNull() ? "NULL" : "IMG");
     int max = 100000000000, i;
 
     while(i < max)

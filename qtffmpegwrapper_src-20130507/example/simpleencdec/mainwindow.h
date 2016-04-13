@@ -19,7 +19,7 @@ THIS SOFTWARE IS PROVIDED BY COPYRIGHT HOLDERS ``AS IS'' AND ANY EXPRESS OR IMPL
 
 #include <QMainWindow>
 
-#include "QVideoEncoderTest.hpp"
+#include "../../QTFFmpegWrapper/headers/QVideoEncoder.h"
 #include "../../QTFFmpegWrapper/headers/QVideoDecoder.h"
 
 namespace Ui

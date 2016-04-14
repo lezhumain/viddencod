@@ -7,8 +7,8 @@ class QVideoEncoderTest : public QVideoEncoder
 {
 public:
     QVideoEncoderTest();
-    ffmpeg::AVCodec* GetCodec(){return pCodecVideo;}
-    ffmpeg::AVCodecContext* GetCodecCTX(){return pCodecCtxVideo;}
+    ffmpeg::AVCodec* GetCodec(){return pCodecVideoEncoder;}
+    ffmpeg::AVCodecContext* GetCodecCTX(){return pCodecCtxVideoEncoder;}
 };
 
 #endif // QVIDEOENCODERTEST_HPP

@@ -1,5 +1,4 @@
-#include "fifo.hpp"
-#include <QMutexLocker>
+#include "fifo.tpp"
 
 template <class T>
 Fifo<T>::Fifo() :

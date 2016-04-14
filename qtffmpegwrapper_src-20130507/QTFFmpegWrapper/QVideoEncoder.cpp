@@ -127,6 +127,7 @@ bool QVideoEncoder::prepare_stream(QString fileName,
     pCodecCtxVideoEncoder                        = pStreamEncoder->codec;
     pCodecCtxVideoEncoder->codec_id              = pOutputFormatVideoEncoder->video_codec;
     pCodecCtxVideoEncoder->codec_type            = ffmpeg::AVMEDIA_TYPE_VIDEO;
+    pCodecCtxVideoEncoder->compression_level     = 2;
 
     //  Setting size and format
     pCodecCtxVideoEncoder->bit_rate              = Bitrate;

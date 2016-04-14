@@ -42,7 +42,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 #endif
   printf("Starting up\n");
-  loadVideo("../../test.avi");
+  loadVideo("../../test_light.avi");
 }
 
 MainWindow::~MainWindow()
@@ -442,8 +442,8 @@ void MainWindow::GenerateSyntheticVideo(QString filename, bool vfr)
 
 int MainWindow::GenerateEncodedVideo(QString filename, bool vfr)
 {
-    int bitrate       = 476000;
-    int gop           = 10;
+    int bitrate       = 1000000;
+    int gop           = 1;
     int eframeNumbern = 0;
     int frameTime     = 0;
 
@@ -508,7 +508,7 @@ int MainWindow::GenerateEncodedVideo(QString filename, bool vfr)
         }                                                                         // and correct the bitrate according to the expected average frame rate (fps)
 
         // handle
-        frame = frame.convertToFormat(QImage::Format_RGB32);
+//        frame = frame.convertToFormat(QImage::Format_RGB32);
         //  Paste the decoded frame into the QPixmap for display the data
         image2Pixmap(frame,p);
         ui->labelVideoFrame->setPixmap(p);
@@ -518,8 +518,6 @@ int MainWindow::GenerateEncodedVideo(QString filename, bool vfr)
 
         // Display the video size
         ui->labelVideoInfo->setText(QString("Size %2 ms. Display: #%3 @ %4 ms.").arg(m_decoder.getVideoLengthSeconds()).arg(eframeNumbern).arg(frameTime));
-
-        //ffmpeg::av_usleep(50000);
 
         if(!vfr)
           size = m_encoder.encodeImage(frame);                      // Fixed frame rate
@@ -535,7 +533,9 @@ int MainWindow::GenerateEncodedVideo(QString filename, bool vfr)
           if(!i)
             size = m_encoder.encodeImagePts(frame,0);
           else
+          {
             size = m_encoder.encodeImagePts(frame, pts);
+          }
         }
 
 //        qWarning() << "Actual frame is " << eframeNumbern << " / " << totalFramesVideo ;

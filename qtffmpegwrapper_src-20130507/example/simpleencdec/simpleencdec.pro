@@ -9,11 +9,17 @@ TEMPLATE = app
 SOURCES += main.cpp \
            mainwindow.cpp \
            cio.cpp \
-           ordonnanceur.cpp
+           ordonnanceur.cpp \
+           logmanager.cpp \
+           fifo.tpp \
+           agentEncoder.cpp
 
 HEADERS += mainwindow.h \
            cio.h \
-           ordonnanceur.hpp
+           ordonnanceur.hpp \
+           logmanager.hpp \
+           fifo.h \
+           agentEncoder.hpp
 
 FORMS += mainwindow.ui
 RESOURCES += resource.qrc
@@ -61,17 +67,6 @@ SOURCES += $$QTFFMPEGWRAPPER_SOURCE_PATH/QVideoEncoder.cpp
 HEADERS += $$QTFFMPEGWRAPPER_SOURCE_PATH/headers/QVideoEncoder.h
 SOURCES += $$QTFFMPEGWRAPPER_SOURCE_PATH/QVideoDecoder.cpp
 HEADERS += $$QTFFMPEGWRAPPER_SOURCE_PATH/headers/QVideoDecoder.h
-
-#SOURCES += $$QTFFMPEGWRAPPER_SOURCE_PATH/ordonnanceur.cpp
-#HEADERS += $$QTFFMPEGWRAPPER_SOURCE_PATH/headers/ordonnanceur.hpp
-
-# Sub-layer for the TP
-SOURCES += $$VIDENCODE/example/simpleencdec/logmanager.cpp
-HEADERS += $$VIDENCODE/example/simpleencdec/logmanager.hpp
-SOURCES += $$VIDENCODE/example/simpleencdec/fifo.tpp
-HEADERS += $$VIDENCODE/example/simpleencdec/fifo.h
-SOURCES += $$VIDENCODE/example/simpleencdec/agentEncoder.cpp
-HEADERS += $$VIDENCODE/example/simpleencdec/agentEncoder.hpp
 
 # add the include path
 # for ffmpeg.h

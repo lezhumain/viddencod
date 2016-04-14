@@ -22,9 +22,9 @@ THIS SOFTWARE IS PROVIDED BY COPYRIGHT HOLDERS ``AS IS'' AND ANY EXPRESS OR IMPL
 #include <QDateTime>
 #include <QWaitCondition>
 #include <QMutex>
-#include "ffmpeg.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <ffmpeg.h>
 #include "QVideoEncoderTest.hpp"
 #include "QVideoDecoderTest.hpp"
 #include "cio.h"
@@ -167,18 +167,15 @@ void MainWindow::displayFrame()
 
    // Display the video size
    ui->labelVideoInfo->setText(QString("Size %2 ms. Display: #%3 @ %4 ms.").arg(m_decoder.getVideoLengthSeconds()).arg(en).arg(et));
+
 }
 
 QList<QImage> MainWindow::getAllFrames()
 {
-//    short frameRate = 25;
-    int eframeNumbern;
-    int frameTime;
     double lengthMs = m_decoder.getVideoLengthSeconds();
-    QImage img;
     double maxFrames = lengthMs * (double)((m_FrameRateDecodedVideo.den
                                           / m_FrameRateDecodedVideo.num));
-//    maxFrames = maxFrames < 0 ? 50000 : maxFrames;
+    //    maxFrames = maxFrames < 0 ? 50000 : maxFrames;
     QList<QImage> listIm;
 
     qWarning() << "length" << lengthMs ;
@@ -186,6 +183,8 @@ QList<QImage> MainWindow::getAllFrames()
 
     for(int i = 0; i <(int) maxFrames; ++i)
     {
+        QImage img;
+        int eframeNumbern, frameTime;
         if(!m_decoder.getFrame(img,&eframeNumbern,&frameTime))
         {
            QMessageBox::critical(this,"Error","Error decoding the frame");
@@ -194,12 +193,13 @@ QList<QImage> MainWindow::getAllFrames()
         }
         listIm.append(img);
 
-        if(!nextFrame())
+        if(!nextFrame() || i == 1000000)
         {
             qWarning() << "Current frame:" << eframeNumbern << "[i =" << i << "]";
             break;
         }
     }
+
     return listIm;
 }
 
@@ -220,6 +220,7 @@ void MainWindow::on_pushButtonNextFrame_clicked()
    nextFrame();
    displayFrame();
 }
+
 
 void MainWindow::on_pushButtonSeekFrame_clicked()
 {
@@ -245,7 +246,9 @@ void MainWindow::on_pushButtonSeekFrame_clicked()
    }
    // Display the frame
    displayFrame();
+
 }
+
 
 void MainWindow::on_pushButtonSeekMillisecond_clicked()
 {
@@ -271,7 +274,13 @@ void MainWindow::on_pushButtonSeekMillisecond_clicked()
    }
    // Display the frame
    displayFrame();
+
+
 }
+
+
+
+
 
 /******************************************************************************
 *******************************************************************************
@@ -304,6 +313,7 @@ void MainWindow::on_actionSave_synthetic_variable_frame_rate_video_triggered()
    }
 }
 
+
 void MainWindow::on_actionEncode_video_triggered()
 {
     int secElapsed;
@@ -326,11 +336,6 @@ void MainWindow::on_actionEncode_video_triggered()
 //    QString fileName = QFileDialog::getSaveFileName(this, title,QString(),"Video (*.avi *.mp4 *.mpg)");
 //    if(!fileName.isNull())
 //      nbFrames = GenerateEncodedVideo(fileName.toStdString().c_str(), false);
-
-//    QString title("Save an encoded video ");
-//    QString fileName = QFileDialog::getSaveFileName(this, title,QString(),"Video (*.avi *.asf *.mpg)");
-//    if(!fileName.isNull())
-//        nbFrames = GenerateEncodedVideo(fileName.toStdString().c_str(), false);
     QString fileName = "output.avi";
     nbFrames = GenerateEncodedVideo(fileName.toStdString().c_str(), false);
 
@@ -350,8 +355,7 @@ void MainWindow::on_actionEncode_video_triggered()
             + " frames at "
             + QString::number(nbFrames / secElapsed)
             + "f/s (Total Time: "
-            + test.toString("hh:mm:ss")
-            + ").";
+            + test.toString("hh:mm:ss") + ").";
 
     printf("%s\n", msg.toStdString().c_str());
     qWarning() << msg;
@@ -416,8 +420,13 @@ void MainWindow::GenerateSyntheticVideo(QString filename, bool vfr)
       // Frame number
       painter.drawText(frame.rect(),Qt::AlignCenter,QString("Frame %1\nLast frame was %2 bytes").arg(i).arg(size));
 
+      // Display the frame, and processes events to allow for screen redraw
+      QPixmap p;
+
+
       image2Pixmap(frame,p);
       ui->labelVideoFrame->setPixmap(p);
+
 
       evt.processEvents();
 
@@ -438,6 +447,7 @@ void MainWindow::GenerateSyntheticVideo(QString filename, bool vfr)
    }
 
    encoder.close();
+
 }
 
 int MainWindow::GenerateEncodedVideo(QString filename, bool vfr)
@@ -519,6 +529,8 @@ int MainWindow::GenerateEncodedVideo(QString filename, bool vfr)
         // Display the video size
         ui->labelVideoInfo->setText(QString("Size %2 ms. Display: #%3 @ %4 ms.").arg(m_decoder.getVideoLengthSeconds()).arg(eframeNumbern).arg(frameTime));
 
+        //ffmpeg::av_usleep(50000);
+
         if(!vfr)
           size = m_encoder.encodeImage(frame);                      // Fixed frame rate
         else
@@ -584,6 +596,8 @@ void MainWindow::GenerateEncodedVideo(QList<QImage> &images, QString filename,bo
     // Display the frame, and processes events to allow for screen redraw
     QPixmap pixToDisplay;
 
+    // Create the encoder
+    QVideoEncoderTest encoder;
     if(!vfr)
        fileOk = m_encoder.createFile(filename,width,height,bitrate,gop,fps);        // Fixed frame rate
     else
@@ -615,7 +629,7 @@ void MainWindow::GenerateEncodedVideo(QList<QImage> &images, QString filename,bo
 
        if(!p.save("../../../frame" + QString::number((int)i) + ".png"))
            printf("Image NOT Written");
-
+       
        if(!vfr)
           size=m_encoder.encodeImage(frame);                      // Fixed frame rate
        else

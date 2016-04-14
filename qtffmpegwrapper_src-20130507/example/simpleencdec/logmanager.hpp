@@ -1,5 +1,5 @@
-#pragma once
-
+#ifndef __LOG_MANAGER_HPP
+#define __LOG_MANAGER_HPP
 
 #include <QMutex>
 
@@ -29,3 +29,4 @@ private:
 
 };
 
+#endif //__LOG_MANAGER_HPP

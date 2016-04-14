@@ -9,11 +9,11 @@ TEMPLATE = app
 SOURCES += main.cpp \
            mainwindow.cpp \
            cio.cpp \
-           logmanager.cpp
+           ordonnanceur.cpp
 
 HEADERS += mainwindow.h \
            cio.h \
-           logmanager.hpp
+           ordonnanceur.hpp
 
 FORMS += mainwindow.ui
 RESOURCES += resource.qrc
@@ -37,7 +37,7 @@ DEFINES += DEVELMODE
 # ##############################################################################
 # Set QTFFMPEGWRAPPER_SOURCE_PATH to point to the directory containing the QTFFmpegWrapper sources
 QTFFMPEGWRAPPER_SOURCE_PATH = ../../QTFFmpegWrapper
-# or  or  or
+
 unix {
     VIDENCODE = "/media/DATA/tmp/toto/clone/viddencod/qtffmpegwrapper_src-20130507/"
     FFMPEG = "/home/vro/FFMPEG-3.0"
@@ -62,13 +62,16 @@ HEADERS += $$QTFFMPEGWRAPPER_SOURCE_PATH/headers/QVideoEncoder.h
 SOURCES += $$QTFFMPEGWRAPPER_SOURCE_PATH/QVideoDecoder.cpp
 HEADERS += $$QTFFMPEGWRAPPER_SOURCE_PATH/headers/QVideoDecoder.h
 
+#SOURCES += $$QTFFMPEGWRAPPER_SOURCE_PATH/ordonnanceur.cpp
+#HEADERS += $$QTFFMPEGWRAPPER_SOURCE_PATH/headers/ordonnanceur.hpp
+
 # Sub-layer for the TP
-SOURCES += $$VIDENCODE/example/simpleencdec/QVideoEncoderTest.cpp
-HEADERS += $$VIDENCODE/example/simpleencdec/QVideoEncoderTest.hpp
-SOURCES += $$VIDENCODE/example/simpleencdec/QVideoDecoderTest.cpp
-HEADERS += $$VIDENCODE/example/simpleencdec/QVideoDecoderTest.hpp
+SOURCES += $$VIDENCODE/example/simpleencdec/logmanager.cpp
+HEADERS += $$VIDENCODE/example/simpleencdec/logmanager.hpp
 SOURCES += $$VIDENCODE/example/simpleencdec/fifo.tpp
 HEADERS += $$VIDENCODE/example/simpleencdec/fifo.h
+SOURCES += $$VIDENCODE/example/simpleencdec/agentEncoder.cpp
+HEADERS += $$VIDENCODE/example/simpleencdec/agentEncoder.hpp
 
 # add the include path
 # for ffmpeg.h

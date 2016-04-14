@@ -1,12 +1,13 @@
-#include "logmanager.hpp"
 #include <qstring.h>
 #include <qfile.h>
 #include <QDate>
 #include <QMutex>
 #include <QMutexLocker>
 #include <qtextstream.h>
+#include "logmanager.hpp"
 
 LogManager* LogManager::_instance = NULL;
+
 LogManager::LogManager()
 {
     _logFile = new QFile(".\\Videncode.log");

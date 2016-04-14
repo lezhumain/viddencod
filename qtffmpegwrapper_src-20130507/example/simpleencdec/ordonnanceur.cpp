@@ -3,7 +3,7 @@
 #include <QPixmap>
 #include <QPainter>
 
-#include "fifo.hpp"
+#include "fifo.h"
 
 
 Ordonnanceur* Ordonnanceur::_instance = NULL;

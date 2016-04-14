@@ -182,10 +182,7 @@ QList<QImage> MainWindow::getAllFrames()
     QList<QImage> listIm;
 
     qWarning() << "length" << lengthMs ;
-
-    int maxFrames = lengthMs * frameRate / 1000; // not working
-    maxFrames = maxFrames < 0 ? 50000 : maxFrames;
-    qWarning() << "maxframes" << maxFrames ;
+    qWarning() << "maxFrames" << maxFrames ;
 
     for(int i = 0; i <(int) maxFrames; ++i)
     {
@@ -484,17 +481,8 @@ int MainWindow::GenerateEncodedVideo(QString filename, bool vfr)
     double dframeRate = ((double)(m_FrameRateDecodedVideo.den) /
                        (double)m_FrameRateDecodedVideo.num);
 
-    int eframeNumbern = 0;
-    int frameTime = 0;
-    int lengthMs = 0;
     int totalFramesVideo = 0;
     bool fileOk = false;
-
-    // Generate a few hundred frames
-    int size = 0;
-
-    // Create the encoder
-    QVideoEncoderTest encoder;
 
     // we use an event loop to allow for paint events to show on-screen the generated video
     QEventLoop evt;
@@ -561,7 +549,7 @@ int MainWindow::GenerateEncodedVideo(QString filename, bool vfr)
         //ffmpeg::av_usleep(50000);
 
         if(!vfr)
-          size = m_encoder.encodeImage(frame);                      // Fixed frame rate
+          int size = m_encoder.encodeImage(frame);                      // Fixed frame rate
         else
         {
           //  Timestamp for the encoded video
@@ -572,10 +560,10 @@ int MainWindow::GenerateEncodedVideo(QString filename, bool vfr)
           pts += sqrt(i);
 
           if(!i)
-            size = m_encoder.encodeImagePts(frame, 0);
+            int size = m_encoder.encodeImagePts(frame, 0);
           else
           {
-            size = m_encoder.encodeImagePts(frame, pts);
+            int size = m_encoder.encodeImagePts(frame, pts);
           }
         }
 

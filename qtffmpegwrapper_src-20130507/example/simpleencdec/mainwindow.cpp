@@ -340,10 +340,6 @@ void MainWindow::on_actionEncode_video_triggered()
 //    if(!fileName.isNull())
 //      nbFrames = GenerateEncodedVideo(fileName.toStdString().c_str(), false);
 
-//    QString title("Save an encoded video ");
-//    QString fileName = QFileDialog::getSaveFileName(this, title,QString(),"Video (*.avi *.asf *.mpg)");
-//    if(!fileName.isNull())
-//        nbFrames = GenerateEncodedVideo(fileName.toStdString().c_str(), false);
     QString fileName = "output.avi";
     nbFrames = GenerateEncodedVideo(fileName.toStdString().c_str(), false);
 
@@ -369,17 +365,6 @@ void MainWindow::on_actionEncode_video_triggered()
     printf("%s\n", msg.toStdString().c_str());
     qWarning() << msg;
 }
-
-//void MainWindow::on_actionSave_synthetic_video_triggered()
-//{
-//   QString title("Save a synthetic video");
-//   QString fileName = QFileDialog::getSaveFileName(this, title,QString(),"Video (*.avi *.asf *.mpg)");
-//   if(!fileName.isNull())
-//   {
-//      GenerateSyntheticVideo(fileName);
-//   }
-//}
-
 
 void MainWindow::GenerateSyntheticVideo(QString filename, bool vfr)
 {
@@ -532,7 +517,7 @@ int MainWindow::GenerateEncodedVideo(QString filename, bool vfr)
 
             if(!fileOk)
                 break;
-        }                                                                         // and correct the bitrate according to the expected average frame rate (fps)
+        }
 
         // handle
 //        frame = frame.convertToFormat(QImage::Format_RGB32);

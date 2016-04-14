@@ -25,6 +25,7 @@ private:
 
 public:
     Ordonnanceur();
+    ~Ordonnanceur();
     void PushFrameToFifo(QImage frame);
     QImage PopFrame();
     void ClearFifo();

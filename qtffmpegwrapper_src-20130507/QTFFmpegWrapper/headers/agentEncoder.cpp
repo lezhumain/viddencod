@@ -6,7 +6,13 @@ AgentEncoder::AgentEncoder(QObject *parent) : QObject(parent)
 
 }
 
-void AgentEncoder::EncoderFrames(QList<QImage> lstFrameToEncode,QList<QImage> &lstFrameEncoded)
+void AgentEncoder::EncoderFrames(QList<QImage> lstFrameToEncode,
+                                 QList<QImage> &lstFrameEncoded)
+{
+
+}
+
+void AgentEncoder::EncodeSound()
 {
 
 }

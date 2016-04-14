@@ -30,6 +30,11 @@ Ordonnanceur::Ordonnanceur()
 
 }
 
+Ordonnanceur::~Ordonnanceur()
+{
+
+}
+
 void Ordonnanceur::PushFrameToFifo(QImage frame)
 {
    this->_fifoFrame.PushBack(frame);

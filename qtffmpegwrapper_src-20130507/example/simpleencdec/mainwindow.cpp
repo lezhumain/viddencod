@@ -632,3 +632,7 @@ void MainWindow::GenerateEncodedVideo(QList<QImage> &images, QString filename,bo
 
 }
 
+void MainWindow::on_actionTest_triggered()
+{
+    qWarning() << "OK";
+}

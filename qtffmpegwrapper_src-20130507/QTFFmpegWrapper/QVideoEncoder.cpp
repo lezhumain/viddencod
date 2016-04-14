@@ -140,8 +140,15 @@ bool QVideoEncoder::createFile(QString fileName,unsigned width,unsigned height,u
    int iret = avcodec_open2(pCodecCtxVideo, pCodecVideo, NULL);
    if ( iret < 0)
    {
-      printf("could not open codec\n");
-      return false;
+        char error[1024];
+        int ret = 1;
+
+        ffmpeg::av_strerror(ret, error, sizeof(error));
+        qWarning() << "\t" << ret;
+        qWarning() << "\t" << error;
+
+        printf("could not open codec\n");
+        return false;
    }
 
    // Allocate memory for output
@@ -348,9 +355,9 @@ int QVideoEncoder::encodeImage_p(const QImage &img,
 **/
 bool QVideoEncoder::isSizeValid()
 {
-    if(getWidth()%8)
+    if(getWidth()%2)
        return false;
-    if(getHeight()%8)
+    if(getHeight()%2)
        return false;
     return true;
 }

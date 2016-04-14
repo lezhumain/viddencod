@@ -1,4 +1,4 @@
-#include "fifo.tpp"
+#include "fifo.hpp"
 
 template <class T>
 Fifo<T>::Fifo() :
@@ -19,10 +19,14 @@ void Fifo<T>::PushBack(T item)
 template <class T>
 T Fifo<T>::PopFront()
 {
-    if(!_list.isEmpty())
-        return _list.takeFirst();
-    else
-        return 0;
+    T item;
+    _mutex.lock();
+    if(!_list.isEmpty()){
+        item = _list.takeFirst();
+    }
+
+    _mutex.unlock();
+    return item;
 }
 
 template <class T>

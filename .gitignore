@@ -11,3 +11,4 @@ qtffmpegwrapper_src-20130507/example/build-simpleencdec-Desktop_Qt_5_5_1_MinGW_3
 qtffmpegwrapper_src-20130507/example/simpleencdec/simpleencdec.pro.*
 *.avi
 *.orig
+*.mp4

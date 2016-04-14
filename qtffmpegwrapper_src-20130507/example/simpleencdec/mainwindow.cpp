@@ -29,6 +29,8 @@ THIS SOFTWARE IS PROVIDED BY COPYRIGHT HOLDERS ``AS IS'' AND ANY EXPRESS OR IMPL
 #include "QVideoDecoderTest.hpp"
 #include "cio.h"
 
+#include "ordonnanceur.hpp"
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -315,7 +317,8 @@ void MainWindow::on_actionEncode_video_triggered()
     short nbFrames = 0;
 //    QList<QImage> listImg = getAllFrames();
 
-    nbFrames = GenerateEncodedVideo("/media/virtuelram/test.avi", false);
+    short nbFrames = GenerateEncodedVideo("/media/virtuelram/test.avi", false);
+
     if(nbFrames == -1)
     {
         printf("An error happened...");
@@ -622,3 +625,28 @@ void MainWindow::GenerateEncodedVideo(QList<QImage> &images, QString filename,bo
 
 }
 
+void MainWindow::on_actionTest_triggered()
+{
+    Ordonnanceur *michel = Ordonnanceur::GetInstance(2);
+    QImage imgTest(QSize(720, 480), QImage::Format_RGB32);
+    imgTest.fill(Qt::darkGray);
+//    QList<QImage> frames = getAllFrames(); // TODO check all frames are here
+//    int length = frames.length();
+
+//    for(int i = 0; i < length; ++i)
+//    {
+//        QImage img = frames.takeFirst();
+//        michel->PushFrameToFifo( img );
+//    }
+    Ordonnanceur::frame_t sframe;
+    sframe.frame = imgTest;
+    sframe.index = 0;
+    michel->PushFrameToFifo(sframe);
+    qWarning() << "FIFO length:" << michel->GetFifoLength();
+
+//    michel->StartThread();
+    if( michel->Start() == false)
+        qWarning() << "Error at some point.";
+
+    qWarning() << "DONE";
+}

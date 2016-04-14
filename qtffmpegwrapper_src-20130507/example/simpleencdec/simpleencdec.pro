@@ -43,7 +43,7 @@ DEFINES += DEVELMODE
 # ##############################################################################
 # Set QTFFMPEGWRAPPER_SOURCE_PATH to point to the directory containing the QTFFmpegWrapper sources
 QTFFMPEGWRAPPER_SOURCE_PATH = ../../QTFFmpegWrapper
-# or  or  or
+
 unix {
     VIDENCODE = "/media/DATA/tmp/toto/clone/viddencod/qtffmpegwrapper_src-20130507/"
     FFMPEG = "/home/vro/FFMPEG-3.0"
@@ -73,8 +73,8 @@ SOURCES += $$VIDENCODE/example/simpleencdec/QVideoEncoderTest.cpp
 HEADERS += $$VIDENCODE/example/simpleencdec/QVideoEncoderTest.hpp
 SOURCES += $$VIDENCODE/example/simpleencdec/QVideoDecoderTest.cpp
 HEADERS += $$VIDENCODE/example/simpleencdec/QVideoDecoderTest.hpp
-SOURCES += $$VIDENCODE/example/simpleencdec/fifo.tpp
-HEADERS += $$VIDENCODE/example/simpleencdec/fifo.h
+#SOURCES += $$VIDENCODE/example/simpleencdec/fifo.tpp
+#HEADERS += $$VIDENCODE/example/simpleencdec/fifo.h
 
 # add the include path
 # for ffmpeg.h

@@ -16,10 +16,15 @@ THIS SOFTWARE IS PROVIDED BY COPYRIGHT HOLDERS ``AS IS'' AND ANY EXPRESS OR IMPL
 #include <QPainter>
 #include "headers/QVideoEncoder.h"
 #include <ffmpeg.h>
+#include <QDebug>
+#include <QTimer>
+#include <QTime>
 
 
 #include <QDebug>
 #include <QTime>
+
+#include "logmanager.hpp"
 
 /******************************************************************************
 *******************************************************************************
@@ -43,98 +48,125 @@ QVideoEncoder::~QVideoEncoder()
    close();
 }
 
-//ffmpeg::AVFormatContext* QVideoEncoder::GetContext(void)
-//{
-//    return pFormatCtxVideo;
-//}
-
-void QVideoEncoder::SetFramerate()
+void QVideoEncoder::SetFramerateForFormatContext()
 {
-    pFormatCtxVideo->streams[0]->time_base.num = Frame_Rate.num;
-    pFormatCtxVideo->streams[0]->time_base.den = Frame_Rate.den;
+    //  Recopie du framerate dans le paramètre du framerate de l'output
+    pFormatCtxVideoEncoder->streams[0]->time_base = Frame_Rate;
 }
 
-void QVideoEncoder::UpdateFrameRate(ffmpeg::AVRational FramRat)
+void QVideoEncoder::SetFramerateForCodecContext()
 {
-    Frame_Rate = FramRat;
+    pCodecCtxVideoEncoder->framerate.den = Frame_Rate.den;
+    pCodecCtxVideoEncoder->time_base.den = Frame_Rate.den;
+    pCodecCtxVideoEncoder->framerate.num = Frame_Rate.num;
+    pCodecCtxVideoEncoder->time_base.num = Frame_Rate.num;
 }
 
-bool QVideoEncoder::createFile(QString fileName,unsigned width,unsigned height,unsigned bitrate,unsigned gop,unsigned fps)
+void QVideoEncoder::GetFramerate(ffmpeg::AVRational *FramRat)
 {
-   // If we had an open video, close it.
-   close();
+    *FramRat = Frame_Rate;
+}
 
-   Width    = width;
-   Height   = height;
-   Gop      = gop;
-   Bitrate  = bitrate;
+void QVideoEncoder::SaveTmpFrameRate(ffmpeg::AVRational *FramRat)
+{
+    Frame_Rate = *FramRat;
+}
 
-   if(!isSizeValid())
-   {
-      printf("Invalid size\n");
-      return false;
-   }
+bool QVideoEncoder::prepare_stream(QString fileName,
+                                   unsigned width,
+                                   unsigned height,
+                                   unsigned bitrate,
+                                   unsigned gop,
+                                   unsigned fps)
+{
+    Width    = width;
+    Height   = height;
+    Gop      = gop;
+    Bitrate  = bitrate;
 
-   pOutputFormatVideo = ffmpeg::av_guess_format(NULL, fileName.toStdString().c_str(), NULL);
-   if (!pOutputFormatVideo)
-   {
-      printf("Could not deduce output format from file extension: using MPEG.\n");
-      pOutputFormatVideo = ffmpeg::av_guess_format("mpeg", NULL, NULL);
-   }
+    if(!isSizeValid())
+    {
+       printf("Invalid size\n");
+       return false;
+    }
 
-   pFormatCtxVideo = ffmpeg::avformat_alloc_context();
-   if(!pFormatCtxVideo)
-   {
-      printf("Error allocating format context\n");
-      return false;
-   }
-   pFormatCtxVideo->oformat = pOutputFormatVideo;
-   snprintf(pFormatCtxVideo->filename, sizeof(pFormatCtxVideo->filename), "%s", fileName.toStdString().c_str());
+    //  Allocate output format file
+    pOutputFormatVideoEncoder = ffmpeg::av_guess_format(NULL, fileName.toStdString().c_str(), NULL);
+    if (!pOutputFormatVideoEncoder)
+    {
+       printf("Could not deduce output format from file extension: using MPEG.\n");
+       pOutputFormatVideoEncoder = ffmpeg::av_guess_format("mpeg", NULL, NULL);
+    }
 
-   // Add the video stream
-   pStream = avformat_new_stream(pFormatCtxVideo,0);
-   if(!pStream )
-   {
-      printf("Could not allocate stream\n");
-      return false;
-   }
+    //  Allocate format context
+    pFormatCtxVideoEncoder = ffmpeg::avformat_alloc_context();
+    if(!pFormatCtxVideoEncoder)
+    {
+       printf("Error allocating format context\n");
+       return false;
+    }
 
-    SetFramerate();
+    pFormatCtxVideoEncoder->oformat = pOutputFormatVideoEncoder;
+    snprintf(pFormatCtxVideoEncoder->filename,
+             sizeof(pFormatCtxVideoEncoder->filename),
+             "%s",
+             fileName.toStdString().c_str());
 
-   pCodecCtxVideo                        = pStream->codec;
-   pCodecCtxVideo->codec_id              = pOutputFormatVideo->video_codec;
-   pCodecCtxVideo->codec_type            = ffmpeg::AVMEDIA_TYPE_VIDEO;
-   pCodecCtxVideo->bit_rate              = 30/*GetFramerate()*/;
-   pCodecCtxVideo->width                 = getWidth();
-   pCodecCtxVideo->height                = getHeight();
+    // Add the video stream
+    pStreamEncoder = avformat_new_stream(pFormatCtxVideoEncoder,0);
+    if(!pStreamEncoder )
+    {
+       printf("Could not allocate stream\n");
+       return false;
+    }
 
-//   pCodecCtxVideo->time_base.den         = fps;
-//   pCodecCtxVideo->time_base.num         = 1;
-   pCodecCtxVideo->gop_size              = Gop;
-   pCodecCtxVideo->pix_fmt               = ffmpeg::AV_PIX_FMT_YUV420P;
-   pCodecCtxVideo->thread_count          = 1;
-   pCodecCtxVideo->bit_rate              = 64000;
-   pCodecCtxVideo->sample_fmt            = ffmpeg::AV_SAMPLE_FMT_S16;
-   pCodecCtxVideo->sample_rate = 44100;
-   pCodecCtxVideo->channels = 2;
-   // some formats want stream headers to be separate
-   if(pFormatCtxVideo->oformat->flags & AVFMT_GLOBALHEADER)
-      pCodecCtxVideo->flags |= CODEC_FLAG_GLOBAL_HEADER;
+    //  Set Framerate for format context
+    SetFramerateForFormatContext();
 
-   ffmpeg::av_dump_format(pFormatCtxVideo, 0, fileName.toStdString().c_str(), 1);
+    //  Setting encoder type
+    pCodecCtxVideoEncoder                        = pStreamEncoder->codec;
+    pCodecCtxVideoEncoder->codec_id              = pOutputFormatVideoEncoder->video_codec;
+    pCodecCtxVideoEncoder->codec_type            = ffmpeg::AVMEDIA_TYPE_VIDEO;
+    pCodecCtxVideoEncoder->compression_level     = 2;
 
-   if (pCodecCtxVideo->codec_id == ffmpeg::AV_CODEC_ID_H264)
-       ffmpeg::av_opt_set(pCodecCtxVideo->priv_data, "preset", "veryslow", 0);
+    //  Setting size and format
+    pCodecCtxVideoEncoder->bit_rate              = Bitrate;
+    pCodecCtxVideoEncoder->width                 = getWidth();
+    pCodecCtxVideoEncoder->height                = getHeight();
+    pCodecCtxVideoEncoder->gop_size              = Gop;
 
-   // open_video
+    //  Setting picture format
+    pCodecCtxVideoEncoder->pix_fmt               = ffmpeg::AV_PIX_FMT_YUV420P;
+    pCodecCtxVideoEncoder->sample_fmt            = ffmpeg::AV_SAMPLE_FMT_S16;
+    pCodecCtxVideoEncoder->thread_count          = 1;
+    pCodecCtxVideoEncoder->bit_rate              = 64000;
+    pCodecCtxVideoEncoder->sample_rate           = 44100;
+    pCodecCtxVideoEncoder->channels              = 2;
 
-   // find the video encoder
-   pCodecVideo = avcodec_find_encoder(pCodecCtxVideo->codec_id);
-   if (!pCodecVideo)
-   {
-      printf("codec not found\n");
-      return false;
-   }
+    //  Set frame for codec context
+    SetFramerateForCodecContext();
+
+    // some formats want stream headers to be separate
+    if(pFormatCtxVideoEncoder->oformat->flags & AVFMT_GLOBALHEADER)
+       pCodecCtxVideoEncoder->flags |= CODEC_FLAG_GLOBAL_HEADER;
+
+//    //  Get context from video file
+//    ffmpeg::av_dump_format(pFormatCtxVideoEncoder,
+//                           0,
+//                           fileName.toStdString().c_str(),
+//                           1);
+
+    //  Select a predefined h264 video preset
+    if (pCodecCtxVideoEncoder->codec_id == ffmpeg::AV_CODEC_ID_H264)
+      ffmpeg::av_opt_set(pCodecCtxVideoEncoder->priv_data, "preset", "veryfast", 0);
+
+    // find the video encoder
+    pCodecVideoEncoder = avcodec_find_encoder(pCodecCtxVideoEncoder->codec_id);
+    if (!pCodecVideoEncoder)
+    {
+       printf("codec not found\n");
+       return false;
+    }
 
    // open the codec
    int iret = avcodec_open2(pCodecCtxVideo, pCodecVideo, NULL);
@@ -151,22 +183,35 @@ bool QVideoEncoder::createFile(QString fileName,unsigned width,unsigned height,u
         return false;
    }
 
-   // Allocate memory for output
-   if(!initOutputBuf())
-   {
-      printf("Can't allocate memory for output bitstream\n");
-      return false;
-   }
+    // Allocate memory for output
+    if(!initOutputBuf())
+    {
+       printf("Can't allocate memory for output bitstream\n");
+       return false;
+    }
 
-   // Allocate the YUV frame
-   if(!initFrame())
-   {
-      printf("Can't init frame\n");
-      return false;
-   }
+    // Allocate the YUV frame
+    if(!initFrame())
+    {
+       printf("Can't init frame\n");
+       return false;
+    }
+}
+
+bool QVideoEncoder::createFile(QString fileName,
+                               unsigned width,
+                               unsigned height,
+                               unsigned bitrate,
+                               unsigned gop,
+                               unsigned fps)
+{
+   // If we had an open video, close it.
+   close();
+
+   prepare_stream(fileName, width, height, bitrate, gop, fps);
 
 #define URL_WRONLY 1
-   int iRet = avio_open(&pFormatCtxVideo->pb,
+   int iRet = avio_open(&pFormatCtxVideoEncoder->pb,
                         fileName.toStdString().c_str(),
                         AVIO_FLAG_WRITE);
    if(iRet < 0)
@@ -176,7 +221,7 @@ bool QVideoEncoder::createFile(QString fileName,unsigned width,unsigned height,u
       return false;
    }
 
-   if(!avformat_write_header(pFormatCtxVideo, NULL))
+   if(!avformat_write_header(pFormatCtxVideoEncoder, NULL))
     ok = true;
 
    return ok;
@@ -190,10 +235,10 @@ bool QVideoEncoder::close()
    if(!isOk())
       return false;
 
-   av_write_trailer(pFormatCtxVideo);
+   av_write_trailer(pFormatCtxVideoEncoder);
 
    // close_video
-   avcodec_close(pStream->codec);
+   avcodec_close(pStreamEncoder->codec);
 
    // Free the picture to be encoded
    freeFrame();
@@ -202,17 +247,17 @@ bool QVideoEncoder::close()
    freeOutputBuf();
 
    /* free the streams */
-   for(int i = 0; i < (int)pFormatCtxVideo->nb_streams; i++)
+   for(int i = 0; i < (int)pFormatCtxVideoEncoder->nb_streams; i++)
    {
-      av_freep(&pFormatCtxVideo->streams[i]->codec);
-      av_freep(&pFormatCtxVideo->streams[i]);
+      av_freep(&pFormatCtxVideoEncoder->streams[i]->codec);
+      av_freep(&pFormatCtxVideoEncoder->streams[i]);
    }
 
    // Close file
-   avio_close(pFormatCtxVideo->pb);
+   avio_close(pFormatCtxVideoEncoder->pb);
 
    // Free the stream
-   av_free(pFormatCtxVideo);
+   av_free(pFormatCtxVideoEncoder);
 
    //   Set variable with default values
    initVars();
@@ -255,16 +300,16 @@ int QVideoEncoder::encodeImagePts(const QImage &img,unsigned pts)
 
 void QVideoEncoder::initVars()
 {
-   ok                 = false;
-   pFormatCtxVideo    = 0;
-   pOutputFormatVideo = 0;
-   pCodecCtxVideo     = 0;
-   pStream            = 0;
-   pCodecVideo        = 0;
-   ppictureVideo      = NULL;
-   outbuf             = 0;
-   picture_buf        = 0;
-   img_convert_ctx    = 0;
+   ok                        = false;
+   pFormatCtxVideoEncoder    = 0;
+   pOutputFormatVideoEncoder = 0;
+   pCodecCtxVideoEncoder     = 0;
+   pStreamEncoder            = 0;
+   pCodecVideoEncoder        = 0;
+   ppictureVideoEncoder      = NULL;
+   outbuf                    = 0;
+   picture_buf               = 0;
+   img_convert_ctx           = 0;
 }
 
 /**
@@ -272,11 +317,12 @@ void QVideoEncoder::initVars()
 **/
 bool QVideoEncoder::initCodec()
 {
+   ffmpeg::avcodec_register_all();
    ffmpeg::av_register_all();
 
-   //printf("License: %s\n",ffmpeg::avformat_license());
-   //printf("AVCodec version %d\n",ffmpeg::avformat_version());
-   //printf("AVFormat configuration: %s\n",ffmpeg::avformat_configuration());
+//   qDebug() << "License: " << ffmpeg::avformat_license();
+//   qDebug() << "AVCodec version: " << ffmpeg::avformat_version();
+//   qDebug() << "AVFormat configuration: " << ffmpeg::avformat_configuration();
 
    return true;
 }
@@ -293,11 +339,20 @@ int QVideoEncoder::encodeImage_p(const QImage &img,
    if(!isOk())
       return -1;
 
-   //convertImage(img);       // Custom conversion routine
-   convertImage_sws(img);     // SWS conversion
+   QTime *timerConvertImage = new QTime();
+   QTime *timeEncodeImage = new QTime();
+   timerConvertImage->start();
+   convertImage(img);       // Custom conversion routine
+   //convertImage_sws(img);     // SWS conversion
+   int ms = timerConvertImage->elapsed();
+   delete(timerConvertImage);
+
+   QString msg = "Conversion took " + QString::number(ms) + "ms";
+//   qWarning() << msg;
+   LogManager::GetInstance()->LogInfo(0, msg);
 
    if(custompts)                             // Handle custom pts
-     pCodecCtxVideo->coded_frame->pts = pts;      // Set the time stamp
+     pCodecCtxVideoEncoder->coded_frame->pts = pts;      // Set the time stamp
 
    //   Clear the output AVPacket pkt
    av_init_packet(&pkt);
@@ -307,47 +362,47 @@ int QVideoEncoder::encodeImage_p(const QImage &img,
    pkt.data = NULL;
    pkt.size = 0;
 
-   ppictureVideo->height = img.height();
-   ppictureVideo->width = img.width();
-   ppictureVideo->format = img.format();
+   ppictureVideoEncoder->height = img.height();
+   ppictureVideoEncoder->width = img.width();
+   ppictureVideoEncoder->format = img.format();
 
    int isEncodedFrameNotEmpty = 0;
 
-   QTime *t = new QTime();
-   t->start();
-   ffmpeg::avcodec_encode_video2(pCodecCtxVideo,
-                                 &pkt,
-                                 ppictureVideo,
-                                 &isEncodedFrameNotEmpty);
-    int ms = t->elapsed();
-    delete(t);
-    qWarning() << "\tConversion took " + QString::number(ms) + "ms";
 
-   if(custompts)                        // Handle custom pts (must set it again for the rest of the processing)
-     pCodecCtxVideo->coded_frame->pts = pts; // Set the time stamp
+   timeEncodeImage->start();
+   ffmpeg::avcodec_encode_video2(pCodecCtxVideoEncoder,
+                                 &pkt,
+                                 ppictureVideoEncoder,
+                                 &isEncodedFrameNotEmpty);
+    ms = timeEncodeImage->elapsed();
+    delete(timeEncodeImage);
+//    qWarning() << "\tConversion took " + QString::number(ms) + "ms";
+
+//   if(custompts)                        // Handle custom pts (must set it again for the rest of the processing)
+//     pCodecCtxVideoEncoder->coded_frame->pts = pts; // Set the time stamp
 
    if (isEncodedFrameNotEmpty)
    {
-      if (pCodecCtxVideo->coded_frame->pts != AV_NOPTS_VALUE)
-         pkt.pts= av_rescale_q(pCodecCtxVideo->coded_frame->pts,
-                               pCodecCtxVideo->time_base,
-                               pStream->time_base);
+//      if (pCodecCtxVideoEncoder->coded_frame->pts != AV_NOPTS_VALUE)
+//         pkt.pts= av_rescale_q(pCodecCtxVideoEncoder->coded_frame->pts,
+//                               pCodecCtxVideoEncoder->time_base,
+//                               pStreamEncoder->time_base);
 
-      if(pCodecCtxVideo->coded_frame->key_frame)
+//      if(pCodecCtxVideoEncoder->coded_frame->key_frame)
          pkt.flags |= AV_PKT_FLAG_KEY;
 
-      pkt.stream_index= pStream->index;
+      pkt.stream_index= pStreamEncoder->index;
 
 
-      qWarning() << "\tSize of context: " + QString::number(sizeof(*pCodecCtxVideo));
-      qWarning() << "\tSize of pkt: " + QString::number(sizeof(pkt));
-      int ret = av_interleaved_write_frame(pFormatCtxVideo,
+//      qWarning() << "\tSize of context: " + QString::number(sizeof(*pCodecCtxVideoEncoder));
+//      qWarning() << "\tSize of pkt: " + QString::number(sizeof(pkt));
+      int ret = av_interleaved_write_frame(pFormatCtxVideoEncoder,
                                            &pkt);
 
       if(ret<0)
          return -1;
    }
-   return pCodecCtxVideo->frame_bits;
+   return 0;/*pCodecCtxVideoEncoder->frame_bits;*/
 }
 
 /**
@@ -382,7 +437,7 @@ bool QVideoEncoder::isOk()
 **/
 bool QVideoEncoder::initOutputBuf()
 {
-   outbuf_size = getWidth()*getHeight()*  3;        // Some extremely generous memory allocation for the encoded frame.
+   outbuf_size = getWidth() * getHeight() *  2;        // Some extremely generous memory allocation for the encoded frame.
    outbuf = new uint8_t[outbuf_size];
 
    if(outbuf == 0)
@@ -398,34 +453,34 @@ void QVideoEncoder::freeOutputBuf()
    if(outbuf)
    {
       delete[] outbuf;
-      outbuf=0;
+      outbuf = 0;
    }
 }
 
 bool QVideoEncoder::initFrame()
 {
-   ppictureVideo = ffmpeg::av_frame_alloc();
-   if(ppictureVideo == 0)
+   ppictureVideoEncoder = ffmpeg::av_frame_alloc();
+   if(ppictureVideoEncoder == 0)
       return false;
 
-   int size = avpicture_get_size(pCodecCtxVideo->pix_fmt,
-                                 pCodecCtxVideo->width,
-                                 pCodecCtxVideo->height);
+   int size = avpicture_get_size(pCodecCtxVideoEncoder->pix_fmt,
+                                 pCodecCtxVideoEncoder->width,
+                                 pCodecCtxVideoEncoder->height);
 
    picture_buf = new uint8_t[size];
    if(picture_buf == 0)
    {
-      av_free(ppictureVideo);
-      ppictureVideo = 0;
+      av_free(ppictureVideoEncoder);
+      ppictureVideoEncoder = 0;
       return false;
    }
 
    // Setup the planes
-   avpicture_fill((ffmpeg::AVPicture *)ppictureVideo,
+   avpicture_fill((ffmpeg::AVPicture *)ppictureVideoEncoder,
                   picture_buf,
-                  pCodecCtxVideo->pix_fmt,
-                  pCodecCtxVideo->width,
-                  pCodecCtxVideo->height);
+                  pCodecCtxVideoEncoder->pix_fmt,
+                  pCodecCtxVideoEncoder->width,
+                  pCodecCtxVideoEncoder->height);
 
    return true;
 }
@@ -438,10 +493,10 @@ void QVideoEncoder::freeFrame()
       picture_buf = 0;
    }
 
-   if(ppictureVideo)
+   if(ppictureVideoEncoder)
    {
-      av_free(ppictureVideo);
-      ppictureVideo = NULL;
+      av_free(ppictureVideoEncoder);
+      ppictureVideoEncoder = NULL;
    }
 }
 
@@ -461,7 +516,8 @@ bool QVideoEncoder::convertImage(const QImage &img)
       return false;
    }
 
-   if(img.format()!=QImage::Format_RGB32	&& img.format() != QImage::Format_ARGB32)
+   if(img.format()!= QImage::Format_RGB32
+   && img.format()!= QImage::Format_ARGB32)
    {
       printf("Wrong image format 1\n");
       return false;
@@ -475,7 +531,7 @@ bool QVideoEncoder::convertImage(const QImage &img)
    {
       unsigned char *s = (unsigned char*)img.scanLine(y);
       unsigned char *d = (unsigned char*)&picture_buf[y * getWidth()];
-      printf("Line %d. d: %p. picture_buf: %p\n",y,d,picture_buf);
+//      printf("Line %d. d: %p. picture_buf: %p\n",y,d,picture_buf);
 
       for(unsigned x = 0; x < getWidth(); x++)
       {
@@ -499,7 +555,7 @@ bool QVideoEncoder::convertImage(const QImage &img)
       unsigned int ss = img.bytesPerLine();
       unsigned char *d = (unsigned char*)&picture_buf[size+y/2*getWidth()/2];
 
-      printf("Line %d. d: %p. picture_buf: %p\n",y,d,picture_buf);
+//      printf("Line %d. d: %p. picture_buf: %p\n",y,d,picture_buf);
 
       for(unsigned x=0;x<getWidth();x+=2)
       {
@@ -545,14 +601,15 @@ bool QVideoEncoder::convertImage_sws(const QImage &img)
 {
    QImage::Format format;
    // Check if the image matches the size
-   if(img.width()!= (int)getWidth() || img.height()!= (int)getHeight())
+   if(img.width() != (int)getWidth()
+   || img.height()!= (int)getHeight())
    {
       printf("Wrong image size!\n");
       return false;
    }
 
    if((format = img.format()) != QImage::Format_RGB32
-      && ((format = img.format()) != QImage::Format_ARGB32))
+   &&((format = img.format()) != QImage::Format_ARGB32))
    {
         printf("Wrong image format 2\n");
         return false;
@@ -591,8 +648,8 @@ bool QVideoEncoder::convertImage_sws(const QImage &img)
                      srcstride,
                      0,
                      getHeight(),
-                     ppictureVideo->data,
-                     ppictureVideo->linesize);
+                     ppictureVideoEncoder->data,
+                     ppictureVideoEncoder->linesize);
 
    return true;
 }

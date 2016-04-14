@@ -41,7 +41,10 @@ class QVideoDecoder
       // State infos for the wrapper
       bool ok;
       QImage LastFrame;
-      int LastFrameTime,LastLastFrameTime,LastLastFrameNumber,LastFrameNumber;
+      int LastFrameTime;
+      int LastLastFrameTime;
+      int LastLastFrameNumber;
+      int LastFrameNumber;
       int DesiredFrameTime,DesiredFrameNumber;
       bool LastFrameOk;                // Set upon start or after a seek we don't have a frame yet
 
@@ -65,7 +68,12 @@ class QVideoDecoder
       virtual bool openFile(QString file);
       virtual void close();
 
-      virtual bool getFrame(QImage&img,int *effectiveframenumber=0,int *effectiveframetime=0,int *desiredframenumber=0,int *desiredframetime=0);
+      virtual bool getFrame(QImage &img,
+                            int *effectiveframenumber = 0,
+                            int *effectiveframetime = 0,
+                            int *desiredframenumber = 0,
+                            int *desiredframetime = 0);
+
       virtual bool seekNextFrame();
       virtual bool seekMs(int ts);
       virtual bool seekFrame(int64_t frame);

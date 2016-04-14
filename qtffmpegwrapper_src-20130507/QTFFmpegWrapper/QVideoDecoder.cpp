@@ -119,11 +119,6 @@ void QVideoDecoder::GetFPS(int *numerateur, int *denominateur)
     *denominateur   = pFormatCtxDecoder->streams[0]->time_base.den;
 }
 
-//ffmpeg::AVFormatContext* QVideoDecoder::GetContext(void)
-//{
-//    return pFormatCtxDecoder;
-//}
-
 bool QVideoDecoder::openFile(QString filename)
 {
     // Close last video..
@@ -539,7 +534,7 @@ void QVideoDecoder::dumpFormat(ffmpeg::AVFormatContext *ic,
         }
         printf(", bitrate: ");
         if (ic->bit_rate) {
-            printf("%d kb/s\n", ic->bit_rate / 1000);
+            printf("%li kb/s\n", ic->bit_rate / 1000);
         } else {
             printf("N/A\n");
         }

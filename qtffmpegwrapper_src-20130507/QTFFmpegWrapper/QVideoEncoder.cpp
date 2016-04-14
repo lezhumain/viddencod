@@ -137,7 +137,7 @@ bool QVideoEncoder::prepare_stream(QString fileName,
 
     //  Setting picture format
     pCodecCtxVideoEncoder->pix_fmt               = ffmpeg::AV_PIX_FMT_YUV420P;
-    pCodecCtxVideoEncoder->sample_fmt            = ffmpeg::AV_SAMPLE_FMT_S16;
+    pCodecCtxVideoEncoder->sample_fmt            = ffmpeg::AV_SAMPLE_FMT_S32;
     pCodecCtxVideoEncoder->thread_count          = 1;
     pCodecCtxVideoEncoder->bit_rate              = 64000;
     pCodecCtxVideoEncoder->sample_rate           = 44100;
@@ -158,7 +158,7 @@ bool QVideoEncoder::prepare_stream(QString fileName,
 
     //  Select a predefined h264 video preset
     if (pCodecCtxVideoEncoder->codec_id == ffmpeg::AV_CODEC_ID_H264)
-      ffmpeg::av_opt_set(pCodecCtxVideoEncoder->priv_data, "preset", "veryfast", 0);
+      ffmpeg::av_opt_set(pCodecCtxVideoEncoder->priv_data, "preset", "veryslow", 0);
 
     // find the video encoder
     pCodecVideoEncoder = avcodec_find_encoder(pCodecCtxVideoEncoder->codec_id);

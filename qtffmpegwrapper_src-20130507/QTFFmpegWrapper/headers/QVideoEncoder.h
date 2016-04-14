@@ -32,14 +32,14 @@ class QVideoEncoder
       bool ok;
 
       // FFmpeg stuff
-      ffmpeg::AVFormatContext *pFormatCtxVideo;
-      ffmpeg::AVOutputFormat *pOutputFormatVideo;
-      ffmpeg::AVCodecContext *pCodecCtxVideo;
-      ffmpeg::AVStream *pStream;
-      ffmpeg::AVCodec *pCodecVideo;
+      ffmpeg::AVFormatContext *pFormatCtxVideoEncoder;
+      ffmpeg::AVOutputFormat *pOutputFormatVideoEncoder;
+      ffmpeg::AVCodecContext *pCodecCtxVideoEncoder;
+      ffmpeg::AVStream *pStreamEncoder;
+      ffmpeg::AVCodec *pCodecVideoEncoder;
 
       // Frame data
-      ffmpeg::AVFrame *ppictureVideo;
+      ffmpeg::AVFrame *ppictureVideoEncoder;
       uint8_t *picture_buf;
 
       // Compressed data
@@ -76,20 +76,36 @@ class QVideoEncoder
 
       virtual int encodeImage_p(const QImage &,bool custompts=false,unsigned pts=0);
 
+      void GetFramerate(ffmpeg::AVRational *FramRat);
+      void SetFramerateForFormatContext();
+      void SetFramerateForCodecContext();
+
+      bool prepare_stream(QString filename,
+                      unsigned width,
+                      unsigned height,
+                      unsigned bitrate,
+                      unsigned gop,
+                      unsigned fps);
+
    public:
       QVideoEncoder();
       virtual ~QVideoEncoder();
 
-      bool createFile(QString filename,unsigned width,unsigned height,unsigned bitrate,unsigned gop,unsigned fps=25);
+      bool createFile(QString filename,
+                      unsigned width,
+                      unsigned height,
+                      unsigned bitrate,
+                      unsigned gop,
+                      unsigned fps);
+
       virtual bool close();
 
       virtual int encodeImage(const QImage &);
       virtual int encodeImagePts(const QImage &,unsigned pts);
       virtual bool isOk();  
+      void SaveTmpFrameRate(ffmpeg::AVRational *FramRat);
 
+      ffmpeg::AVRational Frame_Rate;
 };
-
-
-
 
 #endif // QVideoEncoder_H

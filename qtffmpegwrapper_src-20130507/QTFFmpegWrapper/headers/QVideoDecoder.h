@@ -27,9 +27,9 @@ class QVideoDecoder
 {
    protected:
       // Basic FFmpeg stuff
-      ffmpeg::AVFormatContext *pFormatCtx;
+      ffmpeg::AVFormatContext *pFormatCtxDecoder;
       int videoStream;
-      ffmpeg::AVCodecContext  *pCodecCtxVideo;
+      ffmpeg::AVCodecContext  *pCodecCtxVideoDecoder;
       ffmpeg::AVCodec         *pCodec;
       ffmpeg::AVFrame         *pFrame;
       ffmpeg::AVFrame         *pFrameRGB;
@@ -41,7 +41,10 @@ class QVideoDecoder
       // State infos for the wrapper
       bool ok;
       QImage LastFrame;
-      int LastFrameTime,LastLastFrameTime,LastLastFrameNumber,LastFrameNumber;
+      int LastFrameTime;
+      int LastLastFrameTime;
+      int LastLastFrameNumber;
+      int LastFrameNumber;
       int DesiredFrameTime,DesiredFrameNumber;
       bool LastFrameOk;                // Set upon start or after a seek we don't have a frame yet
 
@@ -65,12 +68,20 @@ class QVideoDecoder
       virtual bool openFile(QString file);
       virtual void close();
 
-      virtual bool getFrame(QImage&img,int *effectiveframenumber=0,int *effectiveframetime=0,int *desiredframenumber=0,int *desiredframetime=0);
+      virtual bool getFrame(QImage &img,
+                            int *effectiveframenumber = 0,
+                            int *effectiveframetime = 0,
+                            int *desiredframenumber = 0,
+                            int *desiredframetime = 0);
+
       virtual bool seekNextFrame();
       virtual bool seekMs(int ts);
       virtual bool seekFrame(int64_t frame);
-      virtual int64_t getVideoLengthSeconds();
+      //virtual int64_t getVideoLengthSeconds();
+      virtual double getVideoLengthSeconds();
 
+//      ffmpeg::AVFormatContext *GetContext(void);
+      void GetFPS(int *numerateur, int *denominateur);
 
       virtual bool isOk();
 };

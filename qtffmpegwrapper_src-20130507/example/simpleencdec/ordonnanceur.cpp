@@ -179,6 +179,8 @@ bool Ordonnanceur::loadVideo(QString fileName)
     // Display a frame
     displayFrame();
     ffmpeg::AVRational frameRateDecodedVideotmp;
+    frameRateDecodedVideotmp.den = -1;
+    frameRateDecodedVideotmp.num = -1;
 
     m_decoder.GetFPS(&frameRateDecodedVideotmp.num,
                      &frameRateDecodedVideotmp.den);
@@ -246,13 +248,17 @@ QList<Ordonnanceur::frame_t> Ordonnanceur::getAllFrames()
 {
     bool loaded = loadVideo(_filename);
 
-    double lengthMs = m_decoder.getVideoLengthSeconds();
-    double maxFrames = lengthMs * (double)((m_FrameRateDecodedVideo.den
-                                          / m_FrameRateDecodedVideo.num));
+    double lengthMs = m_decoder.getVideoLengthSeconds(),
+            maxFrames = m_decoder.getVideoFrameCount(),
+            frameRate = maxFrames / lengthMs;
+//    double maxFrames = (double)lengthMs * ((double)m_FrameRateDecodedVideo.num
+//                                          / (double)m_FrameRateDecodedVideo.den);
+
     QList<Ordonnanceur::frame_t> listIm;
 
     qWarning() << "length" << lengthMs ;
     qWarning() << "maxFrames" << maxFrames ;
+    qWarning() << "frameRate" << frameRate ;
 
     for(double i = 0; i < maxFrames; ++i)
     {
@@ -288,4 +294,9 @@ bool Ordonnanceur::nextFrame()
         bret = true;
 
     return bret;
+}
+
+bool EncodeVideo(QString filename)
+{
+
 }

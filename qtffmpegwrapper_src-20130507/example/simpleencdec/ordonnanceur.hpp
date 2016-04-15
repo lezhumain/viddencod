@@ -29,6 +29,7 @@ public:
     unsigned int GetFifoLength() const;
     int StartThread();
     bool Start();
+    bool EncodeVideo(QString filename);
 
 signals:
     int ThreadStart();

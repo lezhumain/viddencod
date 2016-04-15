@@ -350,6 +350,7 @@ bool QVideoDecoder::decodeSeekFrame(int after)
                                   QImage::Format_RGB888);
                if(LastFrame.isNull() || LastFrame.format() == QImage::Format_Invalid)
                {
+                   LastFrame = QImage(LastFrame.width(), LastFrame.height(), QImage::Format_RGB888);
                    LastFrameOk = false;
                    qWarning() << "null or invalid frame";
                    break;

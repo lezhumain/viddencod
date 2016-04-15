@@ -5,7 +5,7 @@
 #include <QObject>
 #include <QList>
 #include "fifo.hpp"
-#include "agentEncoder.hpp"
+#include "agentencoder.hpp"
 
 #include "../../QTFFmpegWrapper/headers/QVideoEncoder.h"
 #include "../../QTFFmpegWrapper/headers/QVideoDecoder.h"
@@ -30,7 +30,7 @@ public:
     bool Start();
 
 signals:
-    ThreadStart();
+    void ThreadStart();
 
 private slots:
     //Stop agent,supprimer liste,regarder thread si dans liste et si tout finit

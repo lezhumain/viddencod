@@ -16,7 +16,7 @@ public:
     int getId() const{return _id;}
 
 signals:
-    Finished(const short id);
+    void Finished(const short id);
 
 public slots:
     void Run();

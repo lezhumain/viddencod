@@ -5,7 +5,7 @@
 #include <QObject>
 #include <QList>
 #include "fifo.hpp"
-#include "agentencoder.hpp"
+#include "agentEncoder.hpp"
 
 #include "../../QTFFmpegWrapper/headers/QVideoEncoder.h"
 #include "../../QTFFmpegWrapper/headers/QVideoDecoder.h"
@@ -31,7 +31,7 @@ public:
     bool Start();
 
 signals:
-    void ThreadStart();
+    ThreadStart();
 
 private slots:
     //Stop agent,supprimer liste,regarder thread si dans liste et si tout finit
@@ -55,7 +55,7 @@ private:
 
     ~Ordonnanceur();
 //    Ordonnanceur(const short nbThread, const QString &filename = "../../Les_nulss.avi");
-    Ordonnanceur(const short nbThread, const QString &filename = "../../videos/toto.avi");
+    Ordonnanceur(const short nbThread, const QString &filename = "../../videos/Humour.mp4");
     bool loadVideo(QString fileName);
     void displayFrame();
     bool checkVideoLoadOk();

@@ -37,9 +37,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-#ifdef WIN32
     ConsoleInit();
-#endif
     printf("Starting up\n");
 //    GenerateSyntheticVideo("/media/virtuelram/test.avi", false);
 //    loadVideo("../../test.avi");

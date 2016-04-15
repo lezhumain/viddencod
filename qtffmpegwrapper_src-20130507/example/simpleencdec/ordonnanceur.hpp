@@ -17,7 +17,8 @@ class Ordonnanceur : public QObject
 public:
     struct frame_t {
         QImage frame;
-        int index;
+        int eframeNumbern;
+        int frameTime;
     };
 
     static Ordonnanceur* GetInstance(const short nbThread = 0);
@@ -59,7 +60,7 @@ private:
     void displayFrame();
     bool checkVideoLoadOk();
     void image2Pixmap(QImage &img,QPixmap &pixmap);
-    QList<QImage> getAllFrames();
+    QList<frame_t> getAllFrames();
     bool nextFrame();
 
 };

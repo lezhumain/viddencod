@@ -34,7 +34,7 @@ bool Ordonnanceur::Start()
     CreateThread();
 
     // get all frames
-    QList<QImage> frames = getAllFrames();
+    QList<frame_t> frames = getAllFrames();
     int nbF = frames.length();
 
     if(nbF == 0)
@@ -44,15 +44,12 @@ bool Ordonnanceur::Start()
         return false;
     }
 
+    qWarning() << "ORdo got" << nbF << "frames from GetAllFrames";
+
     // putframes in FIFO
     for(int i = 0; i < nbF; ++i)
     {
-        QImage img = frames.takeFirst();
-
-        frame_t tframe;
-        tframe.frame = img;
-        tframe.index = i;
-
+        frame_t tframe = frames.takeFirst();
         _fifoFrame.PushBack(tframe);
     }
 
@@ -175,7 +172,7 @@ bool Ordonnanceur::loadVideo(QString fileName)
    }
 
    // Get first frame
-//   nextFrame();
+   nextFrame();
    // Display a frame
 //   displayFrame();
 
@@ -235,20 +232,21 @@ bool Ordonnanceur::checkVideoLoadOk()
    return true;
 }
 
-QList<QImage> Ordonnanceur::getAllFrames()
+QList<Ordonnanceur::frame_t> Ordonnanceur::getAllFrames()
 {
     short frameRate = 25;
-    int lengthMs, maxFrames;
+    int lengthS, maxFrames;
 
     bool loaded = loadVideo(_filename);
-    QList<QImage> listIm;
+    QList<Ordonnanceur::frame_t> listIm;
 
     if(loaded)
     {
-        lengthMs = m_decoder.getVideoLengthSeconds(); // open video first
-        qWarning() << "length" << QString::number(lengthMs) + "ms";
+        lengthS = m_decoder.getVideoLengthSeconds(); // open video first
+        qWarning() << "length" << QString::number(lengthS) + "s";
 
-        maxFrames = lengthMs * frameRate / 1000; // not working
+//        maxFrames = lengthS * frameRate / 1000; // not working
+        maxFrames = lengthS * frameRate; // not working
         maxFrames = maxFrames < 0 ? 50000 : maxFrames;
         qWarning() << "maxframes" << maxFrames ;
 
@@ -263,11 +261,16 @@ QList<QImage> Ordonnanceur::getAllFrames()
                listIm.clear();
                return listIm;
             }
-            listIm.append(img);
+
+            frame_t sframe;
+            sframe.frame = img;
+            sframe.eframeNumbern = eframeNumbern;
+            sframe.frameTime = frameTime;
+            listIm.append(sframe);
 
             if(!nextFrame() || i == 1000000)
             {
-                qWarning() << "Current frame:" << eframeNumbern << "[i =" << i << "]";
+                qWarning() << "Stopped at frame:" << eframeNumbern << "[i =" << i << "]";
                 break;
             }
         }

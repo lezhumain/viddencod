@@ -18,8 +18,13 @@ AgentEncoder::~AgentEncoder()
 // Declenchee quand l'ordo envoi le signal 'Start'
 void AgentEncoder::Run()
 {
-//    if(_ordo == NULL)
-//        _ordo = Ordonnanceur::GetInstance();
+    qWarning() << "Agent" << _id << "starts.";
+
+    if(_ordo == NULL)
+    {
+        qWarning() << "\t /!\ Ordo was NULL";
+        _ordo = Ordonnanceur::GetInstance();
+    }
     // get frame from fifo
     Ordonnanceur::frame_t frame = _ordo->PopFrame();
     QImage *img = &(frame.frame);
@@ -28,7 +33,7 @@ void AgentEncoder::Run()
 
     // put it in encoded list
 
-    qWarning() << "Agent" << _id << "starts. Got:" << (img->isNull() ? "NULL" : "IMG");
+    qWarning() << "Agent" << _id << "got:" << (img->isNull() ? "NULL" : "IMG");
     int max = 100000000000, i;
 
     while(i < max)

@@ -18,7 +18,7 @@ THIS SOFTWARE IS PROVIDED BY COPYRIGHT HOLDERS ``AS IS'' AND ANY EXPRESS OR IMPL
 
 #include "headers/QVideoDecoder.h"
 #include <ffmpeg.h>
-
+#include <QDebug>
 
 /******************************************************************************
 *******************************************************************************
@@ -336,6 +336,12 @@ bool QVideoDecoder::decodeSeekFrame(int after)
 
                // Convert the frame to QImage
                LastFrame=QImage(w,h,QImage::Format_RGB888);
+               if(LastFrame.isNull())
+               {
+                   LastFrameOk = false;
+                   qWarning() << "null frame";
+                   break;
+               }
 
                for(int y=0;y<h;y++)
                   memcpy(LastFrame.scanLine(y),pFrameRGB->data[0]+y*pFrameRGB->linesize[0],w*3);

@@ -44,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 #endif
   printf("Starting up\n");
-  loadVideo("../../test_light.avi");
+  //loadVideo("../../videos/Humour.mp4");
 }
 
 MainWindow::~MainWindow()

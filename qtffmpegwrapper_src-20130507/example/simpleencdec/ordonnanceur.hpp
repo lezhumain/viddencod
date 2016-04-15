@@ -46,6 +46,8 @@ private:
     QString _filename;
     QVideoDecoder m_decoder;
     QVideoEncoder m_encoder;
+    ffmpeg::AVRational m_FrameRateDecodedVideo;
+
 
     static void Kill();
 

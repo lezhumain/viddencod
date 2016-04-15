@@ -34,15 +34,14 @@ public:
 	 MainWindow(QWidget *parent = 0);
 	 ~MainWindow();
 
+     // Helper
+     static void image2Pixmap(QImage &img,QPixmap &pixmap);
+
 protected:
      QVideoDecoder m_decoder;
      QVideoEncoder m_encoder;
 
 	 void changeEvent(QEvent *e);
-
-	 // Helper
-
-	 void image2Pixmap(QImage &img,QPixmap &pixmap);
 
 	 // Decoder demo
 	 void displayFrame();

@@ -12,11 +12,12 @@ class AgentEncoder : public QObject
     Q_OBJECT
 public:
     explicit AgentEncoder(const short id, QObject *parent = 0);
+    AgentEncoder(QObject *parent);
     ~AgentEncoder();
     int getId() const{return _id;}
 
 signals:
-    Finished(const short id);
+    int Finished(const short id);
 
 public slots:
     void Run();

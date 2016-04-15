@@ -7,17 +7,19 @@ TARGET = simpleencdec
 TEMPLATE = app
 
 SOURCES += main.cpp \
-	 mainwindow.cpp \
-         cio.cpp \
-    fifo.cpp \
-    agentencoder.cpp \
-    ordonnanceur.cpp
+           mainwindow.cpp \
+           cio.cpp \
+           ordonnanceur.cpp \
+           logmanager.cpp \
+           fifo.tpp \
+           agentEncoder.cpp
 
 HEADERS += mainwindow.h \
-         cio.h \
-    fifo.hpp \
-    agentencoder.hpp \
-    ordonnanceur.hpp
+           cio.h \
+           ordonnanceur.hpp \
+           logmanager.hpp \
+           fifo.h \
+           agentEncoder.hpp
 
 FORMS += mainwindow.ui
 RESOURCES += resource.qrc
@@ -42,25 +44,19 @@ DEFINES += DEVELMODE
 # Set QTFFMPEGWRAPPER_SOURCE_PATH to point to the directory containing the QTFFmpegWrapper sources
 QTFFMPEGWRAPPER_SOURCE_PATH = ../../QTFFmpegWrapper
 
-# LINUX
-#VIDENCODE = "/media/DATA/PERSO/EPSI COURS/TP/FFMPEG/viddencod/qtffmpegwrapper_src-20130507/"
-# WINDOWS
-VIDENCODE = ".."
-
-# Set FFMPEG_LIBRARY_PATH to point to the directory containing the FFmpeg import libraries (if needed - typically for Windows), i.e. the dll.a files
-# LINUX
-#FFMPEG = "/home/vro/FFMPEG-3.0"
-# WINDOWS
-FFMPEG = "../../ffmpeg_lib_win32"
-
-# Set FFMPEG_LIBRARY_PATH to point to the directory containing the FFMPEG libs
-# LINUX
-#FFMPEG_LIBRARY_PATH = "$$FFMPEG/lib"
-# WINDOWS
-FFMPEG_LIBRARY_PATH = "$$FFMPEG/lib/lib"
-
-# Set FFMPEG_INCLUDE_PATH to point to the directory containing the FFMPEG includes (if needed - typically for Windows)
-FFMPEG_INCLUDE_PATH = "$$FFMPEG/include"
+unix {
+    VIDENCODE = "/media/DATA/tmp/toto/clone/viddencod/qtffmpegwrapper_src-20130507/"
+    FFMPEG = "/home/vro/FFMPEG-3.0"
+    FFMPEG_INCLUDE_PATH = "$$FFMPEG/include"
+    FFMPEG_LIBRARY_PATH = "$$FFMPEG/lib"
+}
+win32 {
+    VIDENCODE = ".."
+    FFMPEG = "../../../ffmpeg_lib_win32"
+    FFMPEG_LIBRARY_PATH = "$$FFMPEG/lib/lib"
+    # Set FFMPEG_INCLUDE_PATH to point to the directory containing the FFMPEG includes (if needed - typically for Windows)
+    FFMPEG_INCLUDE_PATH = "$$FFMPEG/include"
+}
 
 # ##############################################################################
 # Do not modify: FFMPEG default settings
@@ -71,12 +67,6 @@ SOURCES += $$QTFFMPEGWRAPPER_SOURCE_PATH/QVideoEncoder.cpp
 HEADERS += $$QTFFMPEGWRAPPER_SOURCE_PATH/headers/QVideoEncoder.h
 SOURCES += $$QTFFMPEGWRAPPER_SOURCE_PATH/QVideoDecoder.cpp
 HEADERS += $$QTFFMPEGWRAPPER_SOURCE_PATH/headers/QVideoDecoder.h
-
-# Sub-layer for the TP
-SOURCES += $$VIDENCODE/simpleencdec/QVideoEncoderTest.cpp
-HEADERS += $$VIDENCODE/simpleencdec/QVideoEncoderTest.hpp
-SOURCES += $$VIDENCODE/simpleencdec/QVideoDecoderTest.cpp
-HEADERS += $$VIDENCODE/simpleencdec/QVideoDecoderTest.hpp
 
 # add the include path
 # for ffmpeg.h

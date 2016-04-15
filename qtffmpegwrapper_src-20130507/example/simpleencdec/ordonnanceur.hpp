@@ -54,7 +54,7 @@ private:
 
     ~Ordonnanceur();
 //    Ordonnanceur(const short nbThread, const QString &filename = "../../Les_nulss.avi");
-    Ordonnanceur(const short nbThread, const QString &filename = "D:\\Downloads\\Series\\Brooklyn Nine Nine\\Brooklyn.Nine-Nine.S03E11.HDTV.x264-FUM[ettv]\\Brooklyn.Nine-Nine.S03E11.HDTV.x264-FUM[ettv].mp4");
+    Ordonnanceur(const short nbThread, const QString &filename = "../../videos/toto.avi");
     bool loadVideo(QString fileName);
     void displayFrame();
     bool checkVideoLoadOk();

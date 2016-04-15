@@ -25,12 +25,29 @@ THIS SOFTWARE IS PROVIDED BY COPYRIGHT HOLDERS ``AS IS'' AND ANY EXPRESS OR IMPL
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <ffmpeg.h>
-#include "QVideoEncoderTest.hpp"
-#include "QVideoDecoderTest.hpp"
 #include "cio.h"
 #include "logmanager.hpp"
-
 #include "ordonnanceur.hpp"
+
+#include <stdio.h>  /* defines FILENAME_MAX */
+#ifdef WINDOWS
+    #include <direct.h>
+    #define GetCurrentDir _getcwd
+#else
+    #include <unistd.h>
+    #define GetCurrentDir getcwd
+ #endif
+
+QString GetCurrentDirectory()
+{
+    char cCurrentPath[FILENAME_MAX];
+
+     if (!GetCurrentDir(cCurrentPath, sizeof(cCurrentPath)))
+         return "";
+
+    cCurrentPath[sizeof(cCurrentPath) - 1] = '\0'; /* not really required */
+    return QString(cCurrentPath);
+}
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -43,8 +60,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ConsoleInit();
 
 #endif
-  printf("Starting up\n");
-  loadVideo("../../test_light.avi");
+    printf("Starting up\n");
+
+    qWarning() << "\tCurrent dir: " << GetCurrentDirectory();
+    loadVideo("../../videos/toto.avi");
 }
 
 MainWindow::~MainWindow()

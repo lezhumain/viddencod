@@ -169,7 +169,7 @@ bool QVideoEncoder::prepare_stream(QString fileName,
     }
 
    // open the codec
-   int iret = avcodec_open2(pCodecCtxVideo, pCodecVideo, NULL);
+   int iret = ffmpeg::avcodec_open2(pCodecCtxVideoEncoder, pCodecVideoEncoder, NULL);
    if ( iret < 0)
    {
         char error[1024];

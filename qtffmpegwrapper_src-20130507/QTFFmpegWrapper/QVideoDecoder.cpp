@@ -119,6 +119,11 @@ void QVideoDecoder::GetFPS(int *num, int *den)
     *den = pFormatCtxDecoder->streams[0]->time_base.den;
 }
 
+long QVideoDecoder::GetNbFrames()
+{
+    return pFormatCtxDecoder->streams[0]->nb_frames;
+}
+
 bool QVideoDecoder::openFile(QString filename)
 {
     // Close last video..

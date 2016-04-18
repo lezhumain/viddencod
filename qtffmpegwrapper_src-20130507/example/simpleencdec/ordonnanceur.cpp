@@ -11,7 +11,8 @@ Ordonnanceur* Ordonnanceur::_instance = NULL;
 Ordonnanceur::Ordonnanceur(const short nbThread, const QString& filename) :
     QObject(),
     _nbThread(nbThread),
-    _filename(filename)
+    _filename(filename),
+    m_NbFramesDecodedVideo(-1)
 {
 //    CreateThread();
     m_FrameRateDecodedVideo.num = -1;
@@ -249,10 +250,8 @@ QList<Ordonnanceur::frame_t> Ordonnanceur::getAllFrames()
     double dLengthSec = -1;
     unsigned int maxFrames = -1;
     QList<Ordonnanceur::frame_t> listIm;
-
     //Number of frames per second for the output video
-    double dframeRate = ((double)(m_FrameRateDecodedVideo.num) /
-                         (double)m_FrameRateDecodedVideo.den);
+    double dframeRate;
 
     loaded = loadVideo(_filename);
 
@@ -262,6 +261,8 @@ QList<Ordonnanceur::frame_t> Ordonnanceur::getAllFrames()
         return listIm;
     }
 
+
+    dframeRate = (float)m_FrameRateDecodedVideo.num / m_FrameRateDecodedVideo.den;
     dLengthSec = m_decoder.getVideoLengthSeconds();
     maxFrames = (int)(dLengthSec  * dframeRate);
 

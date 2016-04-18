@@ -52,7 +52,7 @@ unix {
 }
 win32 {
     VIDENCODE = ".."
-    FFMPEG = "../../../ffmpeg_lib_win32"
+    FFMPEG = "../../ffmpeg_lib_win32"
     FFMPEG_LIBRARY_PATH = "$$FFMPEG/lib/lib"
     # Set FFMPEG_INCLUDE_PATH to point to the directory containing the FFMPEG includes (if needed - typically for Windows)
     FFMPEG_INCLUDE_PATH = "$$FFMPEG/include"

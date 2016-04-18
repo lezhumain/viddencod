@@ -81,7 +81,7 @@ int Ordonnanceur::StartThread()
 
 int Ordonnanceur::StopThread()
 {
-
+    return 0;
 }
 
 void Ordonnanceur::OnFinished(const short idagent)
@@ -117,24 +117,6 @@ void Ordonnanceur::OnFinished(const short idagent)
         Ordonnanceur::Kill(); // can delete
 }
 
-bool Ordonnanceur::WriteVideo(frame_t sframe, int iFrame)
-{
-    ffmpeg::AVRational toto;
-    m_encoder.GetFramerate(&toto);
-
-    if(iFrame == 0)
-    {
-        QString _filename_output = "test_output.avi";
-        m_encoder.createFile(_filename_output,
-                             sframe.frame.width(),
-                             sframe.frame.height(),
-                             1000000,
-                             1,
-                             toto.num/toto.den);
-    }
-    m_encoder.encodeImage(sframe.frame);
-}
-
 void Ordonnanceur::PushFrameToFifo(frame_t frame)
 {
     this->_fifoFrame.PushBack(frame);
@@ -147,7 +129,7 @@ Ordonnanceur::frame_t Ordonnanceur::PopFrame()
 
 void Ordonnanceur::ClearFifo()
 {
-
+    return;
 }
 
 unsigned int Ordonnanceur::GetFifoLength() const
@@ -195,7 +177,6 @@ bool Ordonnanceur::loadVideo(QString fileName)
 
     // Display a frame
     displayFrame();
-    ffmpeg::AVRational frameRateDecodedVideotmp;
 
     m_decoder.GetFPS(&frameRateDecodedVideotmp);
     m_FrameRateDecodedVideo = frameRateDecodedVideotmp;
@@ -211,14 +192,15 @@ void Ordonnanceur::displayFrame()
 {
     QImage img;
     QPixmap p;
-    int et,en;
+    int eframeNumbern = 0;
+    int frameTime     = 0;
 
     // Check we've loaded a video successfully
    if(!checkVideoLoadOk())
       return;
 
    // Decode a frame
-   if(!m_decoder.getFrame(img,&en,&et))
+   if(!m_decoder.getFrame(img,&eframeNumbern,&frameTime))
    {
         qWarning() << "Error decoding the frame";
         return;
@@ -258,10 +240,8 @@ QList<Ordonnanceur::frame_t> Ordonnanceur::getAllFrames()
 {
     /*bool loaded = */loadVideo(_filename);
 
-//    ffmpeg::AVRational frameRateDecodedVideotmp;
-//    m_decoder.GetFPS(&frameRateDecodedVideotmp);
-//    m_FrameRateDecodedVideo = frameRateDecodedVideotmp;
-//    m_encoder.SaveTmpFrameRate(&m_FrameRateDecodedVideo);
+    int eframeNumbern = 0;
+    int frameTime = 0;
 
     //Number of frames per second for the output video
     double dframeRate = ((double)(m_FrameRateDecodedVideo.num) /
@@ -269,31 +249,27 @@ QList<Ordonnanceur::frame_t> Ordonnanceur::getAllFrames()
 
     QList<Ordonnanceur::frame_t> listIm;
 
-    double dlengthMilliSec = m_decoder.getVideoLengthMilliSeconds();
-    double dLengthSec = dlengthMilliSec/1000;
+    double dLengthSec = m_decoder.getVideoLengthSeconds();
     qWarning() << "Longueur de la vidéo : " << dLengthSec << " secondes";
 
-    int maxFrames = dLengthSec  * dframeRate;
+    unsigned maxFrames = dLengthSec  * dframeRate;
     qWarning() << "Nombre total de frames de la vidéo :" << maxFrames ;
 
-    for(double i = 0; i < maxFrames; ++i)
+    for(unsigned i = 0; i < maxFrames; ++i)
     {
-//        QImage img;
         Ordonnanceur::frame_t sframe;
-//        int eframeNumbern, frameTime;
-
-        if(!m_decoder.getFrame(sframe.frame, &sframe.eframeNumbern, &sframe.frameTime))
+        if(!m_decoder.getFrame(sframe.frame, &eframeNumbern, &frameTime))
         {
             qWarning() << "Error decoding the frame";
             listIm.clear();
             return listIm;
         }
-        if(sframe.frame.format() == QImage::Format_Invalid)
-            sframe = listIm.last();
+//        if(sframe.frame.format() == QImage::Format_Invalid)
+//            sframe = listIm.last();
 
         listIm.append(sframe);
         sframe.frame = sframe.frame.convertToFormat(QImage::Format_RGB32);
-        WriteVideo(sframe, i);
+//        WriteVideo(sframe, i);
 
         if(!nextFrame())
         {
@@ -301,6 +277,27 @@ QList<Ordonnanceur::frame_t> Ordonnanceur::getAllFrames()
             break;
         }
     }
+}
+
+bool Ordonnanceur::WriteVideo(frame_t sframe, int iFrame)
+{
+    ffmpeg::AVRational toto;
+    m_encoder.GetFramerate(&toto);
+
+    int result = toto.num / toto.den;
+
+    if(iFrame == 0)
+    {
+        QString _filename_output = "test_output.avi";
+        m_encoder.createFile(_filename_output,
+                             sframe.frame.width(),
+                             sframe.frame.height(),
+                             1000000,
+                             1,
+                             result);
+    }
+    m_encoder.encodeImage(sframe.frame);
+    return 0;
 }
 
 bool Ordonnanceur::nextFrame()

@@ -577,7 +577,7 @@ void QVideoDecoder::dumpFormat(ffmpeg::AVFormatContext *ic,
     ffmpeg::av_free(printed);
 }
 
-double QVideoDecoder::getVideoLengthMilliSeconds()
+double QVideoDecoder::getVideoLengthSeconds()
 {
    if(!isOk())
       return -1;
@@ -586,5 +586,5 @@ double QVideoDecoder::getVideoLengthMilliSeconds()
 //              videoStream,
 //              "test video",
 //              0);
-   return (pFormatCtxDecoder->duration / (AV_TIME_BASE/1000));
+   return (pFormatCtxDecoder->duration / AV_TIME_BASE);
 }

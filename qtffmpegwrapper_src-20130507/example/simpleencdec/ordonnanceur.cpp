@@ -11,7 +11,8 @@ Ordonnanceur* Ordonnanceur::_instance = NULL;
 Ordonnanceur::Ordonnanceur(const short nbThread, const QString& filename) :
     QObject(),
     _nbThread(nbThread),
-    _filename(filename)
+    _filename(filename),
+    m_NbFramesDecodedVideo(-1)
 {
 //    CreateThread();
     m_FrameRateDecodedVideo.num = -1;
@@ -180,7 +181,9 @@ bool Ordonnanceur::loadVideo(QString fileName)
 
     m_decoder.GetFPS(&m_FrameRateDecodedVideo);
 //    m_FrameRateDecodedVideo = frameRateDecodedVideotmp;
-//    m_encoder.SaveTmpFrameRate(&m_FrameRateDecodedVideo);
+    m_encoder.SaveTmpFrameRate(&m_FrameRateDecodedVideo);
+
+    m_NbFramesDecodedVideo = m_decoder.GetNbFrames();
 
     return true;
 }
@@ -261,12 +264,12 @@ QList<Ordonnanceur::frame_t> Ordonnanceur::getAllFrames()
 
     dframeRate = (float)m_FrameRateDecodedVideo.num / m_FrameRateDecodedVideo.den;
     dLengthSec = m_decoder.getVideoLengthSeconds();
-    maxFrames = dLengthSec  * dframeRate;
-
+//    maxFrames = dLengthSec  * dframeRate;
+    maxFrames = m_NbFramesDecodedVideo;
 
 
     qWarning() << "Longueur de la vidéo : " << dLengthSec << " secondes\n"
-               << "Nombre total de frames de la vidéo :" << maxFrames << '\n'
+               << "Nombre total de frames de la vidéo0 :" << maxFrames << '\n'
                << "FPS :" << dframeRate ;
 
     for(unsigned i = 0; i < maxFrames; ++i)

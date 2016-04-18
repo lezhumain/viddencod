@@ -118,6 +118,11 @@ void QVideoDecoder::GetFPS(ffmpeg::AVRational *time)
     *time = pFormatCtxDecoder->streams[0]->avg_frame_rate;
 }
 
+long QVideoDecoder::GetNbFrames()
+{
+    return pFormatCtxDecoder->streams[0]->nb_frames;
+}
+
 bool QVideoDecoder::openFile(QString filename)
 {
     // Close last video..

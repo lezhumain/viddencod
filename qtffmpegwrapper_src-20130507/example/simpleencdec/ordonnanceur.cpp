@@ -267,8 +267,10 @@ QList<Ordonnanceur::frame_t> Ordonnanceur::getAllFrames()
             return listIm;
         }
         if(sframe.frame.format() == QImage::Format_Invalid)
+        {
+            qWarning() << "Ordonnanceur::getAllFrames Got an invalid frame";
             sframe = listIm.last();
-
+        }
         listIm.append(sframe);
 
         if(!nextFrame())

@@ -350,6 +350,16 @@ bool QVideoDecoder::decodeSeekFrame(int after)
                {
                    LastFrameOk = false;
                    qWarning() << "null or invalid frame";
+
+                   QImage *testFrame = new QImage(w,
+                                              h,
+                                              QImage::Format_RGB888);
+                   if(testFrame->isNull() || testFrame->format() == QImage::Format_Invalid)
+                   {;
+                       qWarning() << "null or invalid frame again";
+                   }
+                    delete (testFrame);
+
                    break;
                }
 

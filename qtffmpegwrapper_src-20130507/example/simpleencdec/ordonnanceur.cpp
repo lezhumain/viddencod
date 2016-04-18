@@ -179,11 +179,14 @@ bool Ordonnanceur::loadVideo(QString fileName)
     // Display a frame
     displayFrame();
 
-    m_decoder.GetFPS(&m_FrameRateDecodedVideo);
-//    m_FrameRateDecodedVideo = frameRateDecodedVideotmp;
-    m_encoder.SaveTmpFrameRate(&m_FrameRateDecodedVideo);
+    ffmpeg::AVRational m_FrameRateDecodedVideoField;
+    m_decoder.GetFPS(&m_FrameRateDecodedVideoField.num,
+                     &m_FrameRateDecodedVideoField.den);
 
-    m_NbFramesDecodedVideo = m_decoder.GetNbFrames();
+    m_FrameRateDecodedVideo.num = m_FrameRateDecodedVideoField.num;
+    m_FrameRateDecodedVideo.den = m_FrameRateDecodedVideoField.den;
+
+    m_encoder.SaveTmpFrameRate(&m_FrameRateDecodedVideo);
 
     return true;
 }
@@ -247,11 +250,8 @@ QList<Ordonnanceur::frame_t> Ordonnanceur::getAllFrames()
     double dLengthSec = -1;
     unsigned int maxFrames = -1;
     QList<Ordonnanceur::frame_t> listIm;
-    double dframeRate;
-
     //Number of frames per second for the output video
-//    double dframeRate = ((double)(m_FrameRateDecodedVideo.num) /
-//                       (double)m_FrameRateDecodedVideo.den);
+    double dframeRate;
 
     loaded = loadVideo(_filename);
 
@@ -264,12 +264,10 @@ QList<Ordonnanceur::frame_t> Ordonnanceur::getAllFrames()
 
     dframeRate = (float)m_FrameRateDecodedVideo.num / m_FrameRateDecodedVideo.den;
     dLengthSec = m_decoder.getVideoLengthSeconds();
-//    maxFrames = dLengthSec  * dframeRate;
-    maxFrames = m_NbFramesDecodedVideo;
-
+    maxFrames = (int)(dLengthSec  * dframeRate);
 
     qWarning() << "Longueur de la vidéo : " << dLengthSec << " secondes\n"
-               << "Nombre total de frames de la vidéo0 :" << maxFrames << '\n'
+               << "Nombre total de frames de la vidéo :" << maxFrames << '\n'
                << "FPS :" << dframeRate ;
 
     for(unsigned i = 0; i < maxFrames; ++i)
@@ -286,7 +284,7 @@ QList<Ordonnanceur::frame_t> Ordonnanceur::getAllFrames()
 
         listIm.append(sframe);
         sframe.frame = sframe.frame.convertToFormat(QImage::Format_RGB32);
-//        WriteVideo(sframe, i);
+        WriteVideo(sframe, i);
 
         if(!nextFrame())
         {

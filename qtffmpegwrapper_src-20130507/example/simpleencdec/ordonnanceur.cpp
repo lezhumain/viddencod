@@ -163,7 +163,7 @@ void Ordonnanceur::Kill()
 **/
 bool Ordonnanceur::loadVideo(QString fileName)
 {
-    ffmpeg::AVRational frameRateDecodedVideotmp;
+//    ffmpeg::AVRational frameRateDecodedVideotmp;
 
     m_decoder.openFile(fileName);
     if(m_decoder.isOk()==false)
@@ -178,9 +178,9 @@ bool Ordonnanceur::loadVideo(QString fileName)
     // Display a frame
     displayFrame();
 
-    m_decoder.GetFPS(&frameRateDecodedVideotmp);
-    m_FrameRateDecodedVideo = frameRateDecodedVideotmp;
-    m_encoder.SaveTmpFrameRate(&m_FrameRateDecodedVideo);
+    m_decoder.GetFPS(&m_FrameRateDecodedVideo);
+//    m_FrameRateDecodedVideo = frameRateDecodedVideotmp;
+//    m_encoder.SaveTmpFrameRate(&m_FrameRateDecodedVideo);
 
     return true;
 }
@@ -238,22 +238,36 @@ bool Ordonnanceur::checkVideoLoadOk()
 
 QList<Ordonnanceur::frame_t> Ordonnanceur::getAllFrames()
 {
-    /*bool loaded = */loadVideo(_filename);
-
+    bool loaded;
     int eframeNumbern = 0;
     int frameTime = 0;
+    double dLengthSec = -1;
+    unsigned int maxFrames = -1;
+    QList<Ordonnanceur::frame_t> listIm;
+    double dframeRate;
 
     //Number of frames per second for the output video
-    double dframeRate = ((double)(m_FrameRateDecodedVideo.num) /
-                       (double)m_FrameRateDecodedVideo.den);
+//    double dframeRate = ((double)(m_FrameRateDecodedVideo.num) /
+//                       (double)m_FrameRateDecodedVideo.den);
 
-    QList<Ordonnanceur::frame_t> listIm;
+    loaded = loadVideo(_filename);
 
-    double dLengthSec = m_decoder.getVideoLengthSeconds();
-    qWarning() << "Longueur de la vidéo : " << dLengthSec << " secondes";
+    if(!loaded)
+    {
+        qWarning() << "Could not open video.";
+        return listIm;
+    }
 
-    unsigned maxFrames = dLengthSec  * dframeRate;
-    qWarning() << "Nombre total de frames de la vidéo :" << maxFrames ;
+
+    dframeRate = (float)m_FrameRateDecodedVideo.num / m_FrameRateDecodedVideo.den;
+    dLengthSec = m_decoder.getVideoLengthSeconds();
+    maxFrames = dLengthSec  * dframeRate;
+
+
+
+    qWarning() << "Longueur de la vidéo : " << dLengthSec << " secondes\n"
+               << "Nombre total de frames de la vidéo :" << maxFrames << '\n'
+               << "FPS :" << dframeRate ;
 
     for(unsigned i = 0; i < maxFrames; ++i)
     {

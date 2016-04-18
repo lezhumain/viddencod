@@ -116,6 +116,8 @@ bool QVideoDecoder::initCodec()
 void QVideoDecoder::GetFPS(ffmpeg::AVRational *time)
 {
     *time = pFormatCtxDecoder->streams[0]->avg_frame_rate;
+//    time->num = pFormatCtxDecoder->streams[0]->nb_frames;
+//    time->den = getVideoLengthSeconds();
 }
 
 bool QVideoDecoder::openFile(QString filename)
@@ -341,7 +343,6 @@ bool QVideoDecoder::decodeSeekFrame(int after)
                                  pFrameRGB->data,
                                  pFrameRGB->linesize);
 
-               // Convert the frame to QImage
                LastFrame = QImage(w,
                                   h,
                                   QImage::Format_RGB888);
@@ -352,6 +353,7 @@ bool QVideoDecoder::decodeSeekFrame(int after)
                    break;
                }
 
+                // Convert the frame to QImage
                for(int y = 0; y < h; y++)
                   memcpy(LastFrame.scanLine(y),
                          pFrameRGB->data[0] + y * pFrameRGB->linesize[0],

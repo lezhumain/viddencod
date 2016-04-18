@@ -81,7 +81,7 @@ int Ordonnanceur::StartThread()
 
 int Ordonnanceur::StopThread()
 {
-    return 0;
+
 }
 
 void Ordonnanceur::OnFinished(const short idagent)
@@ -195,6 +195,7 @@ bool Ordonnanceur::loadVideo(QString fileName)
 
     // Display a frame
     displayFrame();
+    ffmpeg::AVRational frameRateDecodedVideotmp;
 
     m_decoder.GetFPS(&frameRateDecodedVideotmp);
     m_FrameRateDecodedVideo = frameRateDecodedVideotmp;
@@ -277,7 +278,9 @@ QList<Ordonnanceur::frame_t> Ordonnanceur::getAllFrames()
 
     for(double i = 0; i < maxFrames; ++i)
     {
+//        QImage img;
         Ordonnanceur::frame_t sframe;
+//        int eframeNumbern, frameTime;
 
         if(!m_decoder.getFrame(sframe.frame, &sframe.eframeNumbern, &sframe.frameTime))
         {

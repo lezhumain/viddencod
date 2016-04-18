@@ -30,6 +30,12 @@ THIS SOFTWARE IS PROVIDED BY COPYRIGHT HOLDERS ``AS IS'' AND ANY EXPRESS OR IMPL
 * PUBLIC   PUBLIC   PUBLIC   PUBLIC   PUBLIC   PUBLIC   PUBLIC   PUBLIC   PUBLIC
 ******************************************************************************/
 
+
+/**********************************************/
+/*  BROKEN      BROKEN      BROKEN            */
+/**********************************************/
+
+
 /**
    \brief Constructor - opens a video on later openFile call
 **/
@@ -541,6 +547,33 @@ void QVideoDecoder::dumpFormat(ffmpeg::AVFormatContext *ic,
         }
         printf("\n");
     }
+//    if(ic->nb_programs) {
+//        unsigned int j, total=0;
+//        for(j=0; j<ic->nb_programs; j++) {
+//            ffmpeg::AVMetadataTag *name = av_metadata_get(ic->programs[j]->metadata,
+//                                                  "name", NULL, 0);
+//            printf("  Program %d %s\n", ic->programs[j]->id,
+//                   name ? name->value : "");
+//            /*for(k=0; k<ic->programs[j]->nb_stream_indexes; k++) {
+//                dump_stream_format(ic, ic->programs[j]->stream_index[k], index, is_output);
+//                printed[ic->programs[j]->stream_index[k]] = 1;
+//            }*/
+//            total += ic->programs[j]->nb_stream_indexes;
+//        }
+//        if (total < ic->nb_streams)
+//            printf( "  No Program\n");
+//    }
+//    /*for(i=0;i<ic->nb_streams;i++)
+//        if (!printed[i])
+//            ffmpeg::dump_stream_format(ic, i, index, is_output);*/
+
+//    if (ic->metadata) {
+//        ffmpeg::AVMetadataTag *tag=NULL;
+//        printf("  Metadata\n");
+//        while((tag=av_metadata_get(ic->metadata, "", tag, AV_METADATA_IGNORE_SUFFIX))) {
+//            printf("    %-16s: %s\n", tag->key, tag->value);
+//        }
+//    }
     ffmpeg::av_free(printed);
 }
 

@@ -178,7 +178,9 @@ bool Ordonnanceur::loadVideo(QString fileName)
     // Display a frame
     displayFrame();
 
-    m_decoder.GetFPS(&frameRateDecodedVideotmp);
+    m_decoder.GetFPS(&frameRateDecodedVideotmp.den,
+                     &frameRateDecodedVideotmp.num);
+
     m_FrameRateDecodedVideo = frameRateDecodedVideotmp;
     m_encoder.SaveTmpFrameRate(&m_FrameRateDecodedVideo);
 
@@ -264,12 +266,12 @@ QList<Ordonnanceur::frame_t> Ordonnanceur::getAllFrames()
             listIm.clear();
             return listIm;
         }
-//        if(sframe.frame.format() == QImage::Format_Invalid)
-//            sframe = listIm.last();
+        if(sframe.frame.format() == QImage::Format_Invalid)
+            sframe = listIm.last();
 
         listIm.append(sframe);
         sframe.frame = sframe.frame.convertToFormat(QImage::Format_RGB32);
-//        WriteVideo(sframe, i);
+        WriteVideo(sframe, i);
 
         if(!nextFrame())
         {

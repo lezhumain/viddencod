@@ -113,9 +113,11 @@ bool QVideoDecoder::initCodec()
    return true;
 }
 
-void QVideoDecoder::GetFPS(ffmpeg::AVRational *time)
+void QVideoDecoder::GetFPS(int *numerator,
+                           int *denominator)
 {
-    *time = pFormatCtxDecoder->streams[0]->avg_frame_rate;
+    *numerator = pFormatCtxDecoder->streams[videoStream]->time_base.num;
+    *denominator = pFormatCtxDecoder->streams[videoStream]->time_base.den;
 }
 
 bool QVideoDecoder::openFile(QString filename)

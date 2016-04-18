@@ -30,12 +30,6 @@ THIS SOFTWARE IS PROVIDED BY COPYRIGHT HOLDERS ``AS IS'' AND ANY EXPRESS OR IMPL
 * PUBLIC   PUBLIC   PUBLIC   PUBLIC   PUBLIC   PUBLIC   PUBLIC   PUBLIC   PUBLIC
 ******************************************************************************/
 
-
-/**********************************************/
-/*  BROKEN      BROKEN      BROKEN            */
-/**********************************************/
-
-
 /**
    \brief Constructor - opens a video on later openFile call
 **/
@@ -113,10 +107,9 @@ bool QVideoDecoder::initCodec()
    return true;
 }
 
-void QVideoDecoder::GetFPS(int *numerateur, int *denominateur)
+void QVideoDecoder::GetFPS(ffmpeg::AVRational *time)
 {
-    *numerateur     = pFormatCtxDecoder->streams[0]->time_base.num;
-    *denominateur   = pFormatCtxDecoder->streams[0]->time_base.den;
+    *time = pFormatCtxDecoder->streams[0]->avg_frame_rate;
 }
 
 bool QVideoDecoder::openFile(QString filename)
@@ -548,62 +541,17 @@ void QVideoDecoder::dumpFormat(ffmpeg::AVFormatContext *ic,
         }
         printf("\n");
     }
-//    if(ic->nb_programs) {
-//        unsigned int j, total=0;
-//        for(j=0; j<ic->nb_programs; j++) {
-//            ffmpeg::AVMetadataTag *name = av_metadata_get(ic->programs[j]->metadata,
-//                                                  "name", NULL, 0);
-//            printf("  Program %d %s\n", ic->programs[j]->id,
-//                   name ? name->value : "");
-//            /*for(k=0; k<ic->programs[j]->nb_stream_indexes; k++) {
-//                dump_stream_format(ic, ic->programs[j]->stream_index[k], index, is_output);
-//                printed[ic->programs[j]->stream_index[k]] = 1;
-//            }*/
-//            total += ic->programs[j]->nb_stream_indexes;
-//        }
-//        if (total < ic->nb_streams)
-//            printf( "  No Program\n");
-//    }
-//    /*for(i=0;i<ic->nb_streams;i++)
-//        if (!printed[i])
-//            ffmpeg::dump_stream_format(ic, i, index, is_output);*/
-
-//    if (ic->metadata) {
-//        ffmpeg::AVMetadataTag *tag=NULL;
-//        printf("  Metadata\n");
-//        while((tag=av_metadata_get(ic->metadata, "", tag, AV_METADATA_IGNORE_SUFFIX))) {
-//            printf("    %-16s: %s\n", tag->key, tag->value);
-//        }
-//    }
     ffmpeg::av_free(printed);
 }
 
-//int64_t QVideoDecoder::getVideoLengthSeconds()
-//{
-//   if(!isOk())
-//      return -1;
-
-//   int64_t secs = pFormatCtxDecoder->duration / AV_TIME_BASE;
+double QVideoDecoder::getVideoLengthMilliSeconds()
+{
+   if(!isOk())
+      return -1;
 
 //   dumpFormat(pFormatCtxDecoder,
 //              videoStream,
 //              "test video",
 //              0);
-
-//   return secs;
-//}
-
-double QVideoDecoder::getVideoLengthSeconds()
-{
-   if(!isOk())
-      return -1;
-
-   double secs = pFormatCtxDecoder->duration / (AV_TIME_BASE / 1000);
-
-   dumpFormat(pFormatCtxDecoder,
-              videoStream,
-              "test video",
-              0);
-
-   return secs;
+   return (pFormatCtxDecoder->duration / (AV_TIME_BASE/1000));
 }

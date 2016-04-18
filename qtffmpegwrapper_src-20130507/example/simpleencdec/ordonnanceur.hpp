@@ -40,6 +40,7 @@ private:
     static Ordonnanceur* _instance;
 
     Fifo<frame_t> _fifoFrame;
+    QList<frame_t> _lstFrameToBeEncoded;
     QList<frame_t> _lstFrameEncoded;
     QList<AgentEncoder*> _lstAgent;
     const short _nbThread;
@@ -48,23 +49,20 @@ private:
     QVideoEncoder m_encoder;
     ffmpeg::AVRational m_FrameRateDecodedVideo;
 
-
-    static void Kill();
+    Ordonnanceur(const short nbThread, const QString &filename = "../../videos/test.avi");
+    ~Ordonnanceur();
 
     bool CreateThread();
     int StopThread();
-    bool WriteVideo();
-
-    ~Ordonnanceur();
-//    Ordonnanceur(const short nbThread, const QString &filename = "../../Les_nulss.avi");
-    Ordonnanceur(const short nbThread, const QString &filename = "../../videos/Humour.mp4");
+    static void Kill();
     bool loadVideo(QString fileName);
-    void displayFrame();
     bool checkVideoLoadOk();
+//    bool WriteVideo(frame_t sframe);
+    bool WriteVideo(frame_t sframe, int iFrame);
+    void displayFrame();
     void image2Pixmap(QImage &img,QPixmap &pixmap);
     QList<frame_t> getAllFrames();
     bool nextFrame();
-
 };
 
 #endif // ORDONNANCEUR_H

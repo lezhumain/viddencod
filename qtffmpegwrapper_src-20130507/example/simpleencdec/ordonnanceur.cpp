@@ -36,8 +36,8 @@ bool Ordonnanceur::Start()
     CreateThread();
 
     // get all frames
-    QList<frame_t> frames = getAllFrames();
-    int nbF = frames.length();
+    _lstFrameToBeEncoded = getAllFrames();
+    int nbF = _lstFrameToBeEncoded.length();
 
     if(nbF == 0)
     {
@@ -51,7 +51,7 @@ bool Ordonnanceur::Start()
     // putframes in FIFO
     for(int i = 0; i < nbF; ++i)
     {
-        frame_t tframe = frames.takeFirst();
+        frame_t tframe = _lstFrameToBeEncoded.takeFirst();
         _fifoFrame.PushBack(tframe);
     }
 
@@ -70,16 +70,18 @@ bool Ordonnanceur::CreateThread()
 
         _lstAgent.append(agent);
     }
+    return true;
 }
 
 int Ordonnanceur::StartThread()
 {
     emit ThreadStart();
+    return 0;
 }
 
 int Ordonnanceur::StopThread()
 {
-
+    return 0;
 }
 
 void Ordonnanceur::OnFinished(const short idagent)
@@ -115,9 +117,22 @@ void Ordonnanceur::OnFinished(const short idagent)
         Ordonnanceur::Kill(); // can delete
 }
 
-bool Ordonnanceur::WriteVideo()
+bool Ordonnanceur::WriteVideo(frame_t sframe, int iFrame)
 {
-    return 1;
+    ffmpeg::AVRational toto;
+    m_encoder.GetFramerate(&toto);
+
+    if(iFrame == 0)
+    {
+        QString _filename_output = "test_output.avi";
+        m_encoder.createFile(_filename_output,
+                             sframe.frame.width(),
+                             sframe.frame.height(),
+                             1000000,
+                             1,
+                             toto.num/toto.den);
+    }
+    m_encoder.encodeImage(sframe.frame);
 }
 
 void Ordonnanceur::PushFrameToFifo(frame_t frame)
@@ -166,6 +181,8 @@ void Ordonnanceur::Kill()
 **/
 bool Ordonnanceur::loadVideo(QString fileName)
 {
+    ffmpeg::AVRational frameRateDecodedVideotmp;
+
     m_decoder.openFile(fileName);
     if(m_decoder.isOk()==false)
     {
@@ -178,18 +195,12 @@ bool Ordonnanceur::loadVideo(QString fileName)
 
     // Display a frame
     displayFrame();
-    ffmpeg::AVRational frameRateDecodedVideotmp;
 
-    m_decoder.GetFPS(&frameRateDecodedVideotmp.num,
-                     &frameRateDecodedVideotmp.den);
-    m_FrameRateDecodedVideo.num = frameRateDecodedVideotmp.num;
-    m_FrameRateDecodedVideo.den = frameRateDecodedVideotmp.den;
-
-    // TODO test following
-//    m_decoder.GetFPS(&m_FrameRateDecodedVideo.num,
-//                     &m_FrameRateDecodedVideo.den);
-
+    m_decoder.GetFPS(&frameRateDecodedVideotmp);
+    m_FrameRateDecodedVideo = frameRateDecodedVideotmp;
     m_encoder.SaveTmpFrameRate(&m_FrameRateDecodedVideo);
+
+    return true;
 }
 
 /**
@@ -244,21 +255,29 @@ bool Ordonnanceur::checkVideoLoadOk()
 
 QList<Ordonnanceur::frame_t> Ordonnanceur::getAllFrames()
 {
-    bool loaded = loadVideo(_filename);
+    /*bool loaded = */loadVideo(_filename);
 
-    double lengthMs = m_decoder.getVideoLengthSeconds();
-    double maxFrames = lengthMs * (double)((m_FrameRateDecodedVideo.den
-                                          / m_FrameRateDecodedVideo.num));
+//    ffmpeg::AVRational frameRateDecodedVideotmp;
+//    m_decoder.GetFPS(&frameRateDecodedVideotmp);
+//    m_FrameRateDecodedVideo = frameRateDecodedVideotmp;
+//    m_encoder.SaveTmpFrameRate(&m_FrameRateDecodedVideo);
+
+    //Number of frames per second for the output video
+    double dframeRate = ((double)(m_FrameRateDecodedVideo.num) /
+                       (double)m_FrameRateDecodedVideo.den);
+
     QList<Ordonnanceur::frame_t> listIm;
 
-    qWarning() << "length" << lengthMs ;
-    qWarning() << "maxFrames" << maxFrames ;
+    double dlengthMilliSec = m_decoder.getVideoLengthMilliSeconds();
+    double dLengthSec = dlengthMilliSec/1000;
+    qWarning() << "Longueur de la vidéo : " << dLengthSec << " secondes";
+
+    int maxFrames = dLengthSec  * dframeRate;
+    qWarning() << "Nombre total de frames de la vidéo :" << maxFrames ;
 
     for(double i = 0; i < maxFrames; ++i)
     {
-//        QImage img;
         Ordonnanceur::frame_t sframe;
-//        int eframeNumbern, frameTime;
 
         if(!m_decoder.getFrame(sframe.frame, &sframe.eframeNumbern, &sframe.frameTime))
         {
@@ -270,6 +289,8 @@ QList<Ordonnanceur::frame_t> Ordonnanceur::getAllFrames()
             sframe = listIm.last();
 
         listIm.append(sframe);
+        sframe.frame = sframe.frame.convertToFormat(QImage::Format_RGB32);
+        WriteVideo(sframe, i);
 
         if(!nextFrame())
         {

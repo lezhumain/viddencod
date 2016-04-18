@@ -58,7 +58,7 @@ class QVideoDecoder
 
       // Seek
       virtual bool decodeSeekFrame(int after);
-
+z
    public:
       // Public interface
       QVideoDecoder();

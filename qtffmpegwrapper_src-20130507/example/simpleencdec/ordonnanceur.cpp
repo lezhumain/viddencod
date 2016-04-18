@@ -278,8 +278,8 @@ QList<Ordonnanceur::frame_t> Ordonnanceur::getAllFrames()
             listIm.clear();
             return listIm;
         }
-//        if(sframe.frame.format() == QImage::Format_Invalid)
-//            sframe = listIm.last();
+        if(sframe.frame.format() == QImage::Format_Invalid)
+            sframe = listIm.last();
 
         listIm.append(sframe);
         sframe.frame = sframe.frame.convertToFormat(QImage::Format_RGB32);

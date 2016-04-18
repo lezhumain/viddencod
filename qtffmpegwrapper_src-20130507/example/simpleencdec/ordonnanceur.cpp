@@ -178,9 +178,8 @@ bool Ordonnanceur::loadVideo(QString fileName)
     // Display a frame
     displayFrame();
 
-    m_decoder.GetFPS(&m_FrameRateDecodedVideo);
-//    m_FrameRateDecodedVideo = frameRateDecodedVideotmp;
-//    m_encoder.SaveTmpFrameRate(&m_FrameRateDecodedVideo);
+    m_decoder.GetFPS(&m_FrameRateDecodedVideo.num,
+                     &m_FrameRateDecodedVideo.den);
 
     return true;
 }

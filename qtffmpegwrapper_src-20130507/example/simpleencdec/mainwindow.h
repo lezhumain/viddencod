@@ -56,7 +56,7 @@ protected:
      int GenerateEncodedVideo(QString filename, bool vfr = false);
 
 private:
-	 Ui::MainWindow *ui;
+     Ui::MainWindow *ui;
      QList<QImage> getAllFrames();
      ffmpeg::AVRational m_FrameRateDecodedVideo;
      double m_lengthMs;

@@ -404,6 +404,11 @@ int QVideoEncoder::encodeImage_p(const QImage &img,
    return 0;/*pCodecCtxVideoEncoder->frame_bits;*/
 }
 
+void QVideoEncoder::GetAVPacketFrame(ffmpeg::AVPacket *avPkt)
+{
+   *avPkt = pkt;
+}
+
 /**
   Ensures sizes are some reasonable multiples
 **/
@@ -651,4 +656,9 @@ bool QVideoEncoder::convertImage_sws(const QImage &img)
                      ppictureVideoEncoder->linesize);
 
    return true;
+}
+
+void QVideoEncoder::GetFormatCtx(ffmpeg::AVFormatContext *toto)
+{
+    return;
 }

@@ -113,10 +113,19 @@ bool QVideoDecoder::initCodec()
    return true;
 }
 
-void QVideoDecoder::GetFPS(int *num, int *den)
+void QVideoDecoder::GetFPS(ffmpeg::AVRational *rat)
 {
-    *num = pFormatCtxDecoder->streams[0]->time_base.num;
-    *den = pFormatCtxDecoder->streams[0]->time_base.den;
+//    *rat = pFormatCtxDecoder->streams[0]->time_base;
+
+    //    rat->num = pFormatCtxDecoder->streams[0]->nb_frames;
+//    rat->den = pFormatCtxDecoder->streams[0]->duration;
+
+//    if(rat->num / rat->den < 25)
+//    {
+//        *rat = pFormatCtxDecoder->streams[0]->time_base;
+//    }
+
+    *rat = ffmpeg::av_guess_frame_rate(pFormatCtxDecoder, pFormatCtxDecoder->streams[0], pFrame);
 }
 
 long QVideoDecoder::GetNbFrames()
@@ -354,16 +363,6 @@ bool QVideoDecoder::decodeSeekFrame(int after)
                {
                    LastFrameOk = false;
                    qWarning() << "null or invalid frame";
-
-                   QImage *testFrame = new QImage(w,
-                                              h,
-                                              QImage::Format_RGB888);
-                   if(testFrame->isNull() || testFrame->format() == QImage::Format_Invalid)
-                   {;
-                       qWarning() << "null or invalid frame again";
-                   }
-                    delete (testFrame);
-
                    break;
                }
 

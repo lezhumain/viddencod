@@ -180,8 +180,7 @@ bool Ordonnanceur::loadVideo(QString fileName)
     displayFrame();
 
     ffmpeg::AVRational m_FrameRateDecodedVideoField;
-    m_decoder.GetFPS(&m_FrameRateDecodedVideoField.num,
-                     &m_FrameRateDecodedVideoField.den);
+    m_decoder.GetFPS(&m_FrameRateDecodedVideoField);
 
     m_FrameRateDecodedVideo.num = m_FrameRateDecodedVideoField.num;
     m_FrameRateDecodedVideo.den = m_FrameRateDecodedVideoField.den;
@@ -270,30 +269,41 @@ QList<Ordonnanceur::frame_t> Ordonnanceur::getAllFrames()
                << "Nombre total de frames de la vidéo :" << maxFrames << '\n'
                << "FPS :" << dframeRate ;
 
-    for(unsigned i = 0; i < maxFrames; ++i)
+    unsigned i = 0;
+    for(; i < maxFrames; ++i)
     {
         Ordonnanceur::frame_t sframe;
-        if(!m_decoder.getFrame(sframe.frame, &eframeNumbern, &frameTime))
+        QImage img;
+
+        if(!m_decoder.getFrame(img, &eframeNumbern, &frameTime))
         {
             qWarning() << "Error decoding the frame";
             listIm.clear();
             return listIm;
         }
-        if(sframe.frame.format() == QImage::Format_Invalid)
+
+        if(img.format() == QImage::Format_Invalid)
         {
             qWarning() << "Ordonnanceur::getAllFrames Got an invalid frame";
             sframe = listIm.last();
         }
-        listIm.append(sframe);
+
+        qWarning() << "\tsize before" << sizeof(sframe.frame);
         sframe.frame = sframe.frame.convertToFormat(QImage::Format_RGB32);
-        WriteVideo(sframe, i);
+        qWarning() << "\tsize  after" << sizeof(sframe.frame);
+        listIm.append(sframe);
+
+
+        //WriteVideo(sframe, i);
 
         if(!nextFrame())
         {
             qWarning() << "Current frame:" << sframe.eframeNumbern << "[i =" << i << "]";
             break;
-        }
+        }            
     }
+
+    qWarning() << "getAllFrame: i=" << i;
 }
 
 bool Ordonnanceur::WriteVideo(frame_t sframe, int iFrame)

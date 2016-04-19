@@ -402,16 +402,20 @@ void MainWindow::GenerateSyntheticVideo(QString filename, bool vfr)
    encoder.close();
 }
 
-int MainWindow::GenerateEncodedVideo(QString filename, bool vfr)
+int MainWindow::
+
+
+
+GenerateEncodedVideo(QString filename, bool vfr)
 {
     int bitrate       = 1000000;
-    int gop           = 1;
+    int gop           = 10;
     int eframeNumbern = 0;
     int frameTime     = 0;
 
     //Number of frames per second for the output video
-    double dframeRate = ((double)(m_FrameRateDecodedVideo.den) /
-                       (double)m_FrameRateDecodedVideo.num);
+    double dframeRate = ((double)(m_FrameRateDecodedVideo.num) /
+                       (double)m_FrameRateDecodedVideo.den);
 
     int totalFramesVideo = 0;
     bool fileOk = false;

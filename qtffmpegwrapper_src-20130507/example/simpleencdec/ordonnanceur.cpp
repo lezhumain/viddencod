@@ -180,8 +180,7 @@ bool Ordonnanceur::loadVideo(QString fileName)
     displayFrame();
 
     ffmpeg::AVRational m_FrameRateDecodedVideoField;
-    m_decoder.GetFPS(&m_FrameRateDecodedVideoField.num,
-                     &m_FrameRateDecodedVideoField.den);
+    m_decoder.GetFPS(&m_FrameRateDecodedVideoField);
 
     m_FrameRateDecodedVideo.num = m_FrameRateDecodedVideoField.num;
     m_FrameRateDecodedVideo.den = m_FrameRateDecodedVideoField.den;

@@ -113,10 +113,9 @@ bool QVideoDecoder::initCodec()
    return true;
 }
 
-void QVideoDecoder::GetFPS(int *num, int *den)
+void QVideoDecoder::GetFPS(ffmpeg::AVRational *time)
 {
-    *num = pFormatCtxDecoder->streams[0]->time_base.num;
-    *den = pFormatCtxDecoder->streams[0]->time_base.den;
+    *time = ffmpeg::av_guess_frame_rate(pFormatCtxDecoder, pFormatCtxDecoder->streams[0], pFrame);
 }
 
 long QVideoDecoder::GetNbFrames()

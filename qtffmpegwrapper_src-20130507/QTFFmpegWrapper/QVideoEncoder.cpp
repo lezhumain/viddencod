@@ -96,6 +96,7 @@ bool QVideoEncoder::prepare_stream(QString fileName,
     {
        printf("Could not deduce output format from file extension: using MPEG.\n");
        pOutputFormatVideoEncoder = ffmpeg::av_guess_format("mpeg", NULL, NULL);
+       qWarning() << "av_guess_format set to mpeg";
     }
 
     //  Allocate format context

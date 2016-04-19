@@ -49,8 +49,11 @@ private:
     QVideoDecoder m_decoder;
     QVideoEncoder m_encoder;
     ffmpeg::AVRational m_FrameRateDecodedVideo;
+    long m_NbFramesDecodedVideo;
 
     Ordonnanceur(const short nbThread, const QString &filename = "../../videos/test.avi");
+//    Ordonnanceur(const short nbThread, const QString &filename = "../../videos/B99.mp4");
+//    Ordonnanceur(const short nbThread, const QString &filename = "../../videos/Humour.mp4");
     ~Ordonnanceur();
 
     bool CreateThread();

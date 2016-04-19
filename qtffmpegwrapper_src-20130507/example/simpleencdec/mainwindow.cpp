@@ -117,11 +117,12 @@ void MainWindow::loadVideo(QString fileName)
 
    // Display a frame
    displayFrame();
-    ffmpeg::AVRational m_FrameRateDecodedVideotmp;
 
-   m_decoder.GetFPS(&m_FrameRateDecodedVideotmp);
-   m_FrameRateDecodedVideo.num = m_FrameRateDecodedVideotmp.num;
-   m_FrameRateDecodedVideo.den = m_FrameRateDecodedVideotmp.den;
+   ffmpeg::AVRational m_FrameRateDecodedVideoField;
+   m_decoder.GetFPS(&m_FrameRateDecodedVideoField);
+
+   m_FrameRateDecodedVideo.num = m_FrameRateDecodedVideoField.num;
+   m_FrameRateDecodedVideo.den = m_FrameRateDecodedVideoField.den;
 
    m_encoder.SaveTmpFrameRate(&m_FrameRateDecodedVideo);
 }
@@ -167,46 +168,7 @@ void MainWindow::displayFrame()
    ui->labelVideoFrame->setPixmap(p);
 
    // Display the video size
-   ui->labelVideoInfo->setText(QString("Size %2 ms. Display: #%3 @ %4 ms.").arg(m_decoder.getVideoLengthMilliSeconds()).arg(en).arg(et));
-}
-
-QList<QImage> MainWindow::getAllFrames()
-{
-    double lengthMs = m_decoder.getVideoLengthMilliSeconds();
-    double maxFrames = lengthMs * (double)((m_FrameRateDecodedVideo.den
-                                          / m_FrameRateDecodedVideo.num));
-    QList<QImage> listIm;
-
-    qWarning() << "length" << lengthMs ;
-    qWarning() << "maxFrames" << maxFrames ;
-
-    for(int i = 0; i <(int) maxFrames; ++i)
-    {
-        QImage img;
-        int eframeNumbern, frameTime;
-        if(!m_decoder.getFrame(img,&eframeNumbern,&frameTime))
-        {
-           QMessageBox::critical(this,"Error","Error decoding the frame");
-           listIm.clear();
-           return listIm;
-        }
-        listIm.append(img);
-        QPixmap p;
-        QImage frame = img.convertToFormat(QImage::Format_RGB32);
-        //  Paste the decoded frame into the QPixmap for display the data
-        image2Pixmap(frame,p);
-        ui->labelVideoFrame->setPixmap(p);
-
-
-
-        if(!nextFrame())
-        {
-            qWarning() << "Current frame:" << eframeNumbern << "[i =" << i << "]";
-            break;
-        }
-    }
-
-    return listIm;
+   ui->labelVideoInfo->setText(QString("Size %2 ms. Display: #%3 @ %4 ms.").arg(m_decoder.getVideoLengthSeconds()).arg(en).arg(et));
 }
 
 bool MainWindow::nextFrame()
@@ -466,7 +428,7 @@ int MainWindow::GenerateEncodedVideo(QString filename, bool vfr)
     // Display the frame, and processes events to allow for screen redraw
     QPixmap p;
 
-    m_lengthMs = m_decoder.getVideoLengthMilliSeconds();
+    m_lengthMs = m_decoder.getVideoLengthSeconds();
     qWarning() << "Longueur de la vidéo : " << m_lengthMs << " secondes";
 
     //  number of frames : TIME_TOTAL_MSEC * FRAMES_PER_SEC
@@ -515,7 +477,7 @@ int MainWindow::GenerateEncodedVideo(QString filename, bool vfr)
         evt.processEvents();
 
         // Display the video size
-        ui->labelVideoInfo->setText(QString("Size %2 ms. Display: #%3 @ %4 ms.").arg(m_decoder.getVideoLengthMilliSeconds()).arg(eframeNumbern).arg(frameTime));
+        ui->labelVideoInfo->setText(QString("Size %2 ms. Display: #%3 @ %4 ms.").arg(m_decoder.getVideoLengthSeconds()).arg(eframeNumbern).arg(frameTime));
 
         if(!vfr)
           size = m_encoder.encodeImage(frame);                      // Fixed frame rate

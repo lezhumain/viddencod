@@ -113,9 +113,15 @@ bool QVideoDecoder::initCodec()
    return true;
 }
 
-void QVideoDecoder::GetFPS(ffmpeg::AVRational *time)
+void QVideoDecoder::GetFPS(int *num, int *den)
 {
-    *time = pFormatCtxDecoder->streams[0]->avg_frame_rate;
+    *num = pFormatCtxDecoder->streams[0]->time_base.num;
+    *den = pFormatCtxDecoder->streams[0]->time_base.den;
+}
+
+long QVideoDecoder::GetNbFrames()
+{
+    return pFormatCtxDecoder->streams[0]->nb_frames;
 }
 
 bool QVideoDecoder::openFile(QString filename)
@@ -341,7 +347,6 @@ bool QVideoDecoder::decodeSeekFrame(int after)
                                  pFrameRGB->data,
                                  pFrameRGB->linesize);
 
-               // Convert the frame to QImage
                LastFrame = QImage(w,
                                   h,
                                   QImage::Format_RGB888);
@@ -362,6 +367,7 @@ bool QVideoDecoder::decodeSeekFrame(int after)
                    break;
                }
 
+                // Convert the frame to QImage
                for(int y = 0; y < h; y++)
                   memcpy(LastFrame.scanLine(y),
                          pFrameRGB->data[0] + y * pFrameRGB->linesize[0],
@@ -587,7 +593,7 @@ void QVideoDecoder::dumpFormat(ffmpeg::AVFormatContext *ic,
     ffmpeg::av_free(printed);
 }
 
-double QVideoDecoder::getVideoLengthMilliSeconds()
+double QVideoDecoder::getVideoLengthSeconds()
 {
    if(!isOk())
       return -1;
@@ -596,5 +602,5 @@ double QVideoDecoder::getVideoLengthMilliSeconds()
 //              videoStream,
 //              "test video",
 //              0);
-   return (pFormatCtxDecoder->duration / (AV_TIME_BASE/1000));
+   return (pFormatCtxDecoder->duration / AV_TIME_BASE);
 }

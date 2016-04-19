@@ -113,9 +113,19 @@ bool QVideoDecoder::initCodec()
    return true;
 }
 
-void QVideoDecoder::GetFPS(ffmpeg::AVRational *time)
+void QVideoDecoder::GetFPS(ffmpeg::AVRational *rat)
 {
-    *time = ffmpeg::av_guess_frame_rate(pFormatCtxDecoder, pFormatCtxDecoder->streams[0], pFrame);
+//    *rat = pFormatCtxDecoder->streams[0]->time_base;
+
+    //    rat->num = pFormatCtxDecoder->streams[0]->nb_frames;
+//    rat->den = pFormatCtxDecoder->streams[0]->duration;
+
+//    if(rat->num / rat->den < 25)
+//    {
+//        *rat = pFormatCtxDecoder->streams[0]->time_base;
+//    }
+
+    *rat = ffmpeg::av_guess_frame_rate(pFormatCtxDecoder, pFormatCtxDecoder->streams[0], pFrame);
 }
 
 long QVideoDecoder::GetNbFrames()

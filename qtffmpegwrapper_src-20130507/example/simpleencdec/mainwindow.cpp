@@ -25,8 +25,6 @@ THIS SOFTWARE IS PROVIDED BY COPYRIGHT HOLDERS ``AS IS'' AND ANY EXPRESS OR IMPL
 #include "ffmpeg.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "QVideoEncoderTest.hpp"
-#include "QVideoDecoderTest.hpp"
 #include "cio.h"
 #include "logmanager.hpp"
 

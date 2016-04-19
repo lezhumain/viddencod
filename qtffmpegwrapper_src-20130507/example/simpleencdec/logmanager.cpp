@@ -4,6 +4,7 @@
 #include <QMutex>
 #include <QMutexLocker>
 #include <qtextstream.h>
+#include <QDebug>
 #include "logmanager.hpp"
 
 LogManager* LogManager::_instance = NULL;
@@ -30,7 +31,7 @@ LogManager* LogManager::GetInstance()
     return _instance;
 }
 
-bool LogManager::log(int idThread,QString message,QString criticite)
+bool LogManager::log(int idThread,QString message,QString criticite, bool debug)
 {
     QDate date;
     bool isFlush;
@@ -47,24 +48,26 @@ bool LogManager::log(int idThread,QString message,QString criticite)
         _logFile->write(messageLog.toUtf8());
         _logFile->close();
 
+        if(debug)
+            qWarning() << messageLog;
     } // ici locker est detruit, donc le mutex est release
 
     return isFlush;
 }
-bool LogManager::LogInfo(int idThread,QString message)
+bool LogManager::LogInfo(int idThread,QString message, bool debug)
 {
     QString criticite ="[INFO]";
-    return this->log(idThread,message,criticite);
+    return this->log(idThread,message,criticite, debug);
 }
-bool LogManager::LogWarning(int idThread,QString message)
+bool LogManager::LogWarning(int idThread,QString message, bool debug)
 {
     QString criticite ="[WARNING]";
-    return this->log(idThread,message,criticite);
+    return this->log(idThread,message,criticite, debug);
 }
-bool LogManager::LogError(int idThread,QString message)
+bool LogManager::LogError(int idThread,QString message, bool debug)
 {
     QString criticite ="[ERROR]";
-    return this->log(idThread,message,criticite);
+    return this->log(idThread,message,criticite, debug);
 }
 void LogManager::Kill()
 {

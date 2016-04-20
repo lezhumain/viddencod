@@ -283,15 +283,22 @@ QList<Ordonnanceur::frame_t> Ordonnanceur::getAllFrames()
             return listIm;
         }
 
-        if(img.format() == QImage::Format_Invalid)
+        switch(img.format())
         {
-            qWarning() << "Ordonnanceur::getAllFrames Got an invalid frame";
-            sframe = listIm.last();
+            case QImage::Format_Invalid:
+                qWarning() << "Ordonnanceur::getAllFrames Got an invalid frame";
+                sframe = listIm.last();
+                break;
+            case QImage::Format_RGB32:
+                break;
+            default:
+//                img = img.convertToFormat(QImage::Format_RGB32);
+                break;
         }
 
-        qWarning() << "\tsize before" << sizeof(sframe.frame);
-        sframe.frame = sframe.frame.convertToFormat(QImage::Format_RGB32);
-        qWarning() << "\tsize  after" << sizeof(sframe.frame);
+
+//        sframe.frame = sframe.frame.convertToFormat(QImage::Format_RGB32);
+        sframe.frame = img;
         listIm.append(sframe);
 
 
@@ -299,7 +306,7 @@ QList<Ordonnanceur::frame_t> Ordonnanceur::getAllFrames()
 
         if(!nextFrame())
         {
-            qWarning() << "Current frame:" << sframe.eframeNumbern << "[i =" << i << "]";
+            qWarning() << "nextFrame() failed at frame:" << sframe.eframeNumbern << "[i =" << i << "]";
             break;
         }            
     }

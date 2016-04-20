@@ -42,7 +42,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 #endif
   printf("Starting up\n");
-  loadVideo("../../test_light.avi");
+  loadVideo("../../videos/test-mp4.avi");
 }
 
 MainWindow::~MainWindow()
@@ -518,7 +518,7 @@ int MainWindow::GenerateEncodedVideo(QString filename, bool vfr)
         }                                                                         // and correct the bitrate according to the expected average frame rate (fps)
 
         // handle
-//        frame = frame.convertToFormat(QImage::Format_RGB32);
+        frame = frame.convertToFormat(QImage::Format_RGB32);
         //  Paste the decoded frame into the QPixmap for display the data
         image2Pixmap(frame,p);
         ui->labelVideoFrame->setPixmap(p);

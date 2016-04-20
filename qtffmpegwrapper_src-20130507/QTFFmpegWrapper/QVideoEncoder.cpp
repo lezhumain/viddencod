@@ -95,7 +95,7 @@ bool QVideoEncoder::prepare_stream(QString fileName,
     if (!pOutputFormatVideoEncoder)
     {
        printf("Could not deduce output format from file extension: using MPEG.\n");
-       pOutputFormatVideoEncoder = ffmpeg::av_guess_format("mpeg", NULL, NULL);
+       pOutputFormatVideoEncoder = ffmpeg::av_guess_format("h264", NULL, NULL);
     }
 
     //  Allocate format context
@@ -137,9 +137,9 @@ bool QVideoEncoder::prepare_stream(QString fileName,
 
     //  Setting picture format
     pCodecCtxVideoEncoder->pix_fmt               = ffmpeg::AV_PIX_FMT_YUV420P;
-    pCodecCtxVideoEncoder->sample_fmt            = ffmpeg::AV_SAMPLE_FMT_S16;
+    pCodecCtxVideoEncoder->sample_fmt            = ffmpeg::AV_SAMPLE_FMT_S32;
     pCodecCtxVideoEncoder->thread_count          = 1;
-    pCodecCtxVideoEncoder->bit_rate              = 64000;
+//    pCodecCtxVideoEncoder->bit_rate              = 64000;
     pCodecCtxVideoEncoder->sample_rate           = 44100;
     pCodecCtxVideoEncoder->channels              = 2;
 
@@ -158,7 +158,7 @@ bool QVideoEncoder::prepare_stream(QString fileName,
 
     //  Select a predefined h264 video preset
     if (pCodecCtxVideoEncoder->codec_id == ffmpeg::AV_CODEC_ID_H264)
-      ffmpeg::av_opt_set(pCodecCtxVideoEncoder->priv_data, "preset", "veryfast", 0);
+      ffmpeg::av_opt_set(pCodecCtxVideoEncoder->priv_data, "preset", "veryslow", 0);
 
     // find the video encoder
     pCodecVideoEncoder = avcodec_find_encoder(pCodecCtxVideoEncoder->codec_id);
@@ -177,8 +177,8 @@ bool QVideoEncoder::prepare_stream(QString fileName,
        ffmpeg::av_log_set_level(AV_LOG_ERROR);
        char bugf[256];
        ffmpeg::av_strerror(iret, bugf, sizeof(bugf));
-       printf("avcodec_open2 error : %s, ret = %d\n", bugf, iret);
-       printf("could not open codec\n");
+       qWarning() << "avcodec_open2 error : " << bugf << "ret = " << iret;
+       qWarning() << "could not open codec";
        return false;
     }
 

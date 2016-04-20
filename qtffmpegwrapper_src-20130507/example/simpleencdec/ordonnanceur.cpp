@@ -325,7 +325,7 @@ QList<Ordonnanceur::frame_t> Ordonnanceur::getAllFrames()
     double maxFrames = lengthMs * (double)((m_FrameRateDecodedVideo.den
                                           / m_FrameRateDecodedVideo.num));
     //    maxFrames = maxFrames < 0 ? 50000 : maxFrames;
-    QList<QImage> listIm;
+    QList<Ordonnanceur::frame_t> listIm;
 
     qWarning() << "length" << lengthMs ;
     qWarning() << "maxframes" << maxFrames ;
@@ -333,6 +333,7 @@ QList<Ordonnanceur::frame_t> Ordonnanceur::getAllFrames()
     for(int i = 0; i <(int) maxFrames; ++i)
     {
         QImage img;
+        Ordonnanceur::frame_t sframe;
         int eframeNumbern, frameTime;
         if(!m_decoder.getFrame(img,&eframeNumbern,&frameTime))
         {
@@ -340,7 +341,12 @@ QList<Ordonnanceur::frame_t> Ordonnanceur::getAllFrames()
            listIm.clear();
            return listIm;
         }
-        listIm.append(img);
+
+        sframe.frame = img;
+        sframe.eframeNumbern = eframeNumbern;
+        sframe.frameTime = frameTime;
+
+        listIm.append(sframe);
 
         if(!nextFrame() || i == 1000000)
         {

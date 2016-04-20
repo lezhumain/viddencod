@@ -63,11 +63,12 @@ MainWindow::MainWindow(QWidget *parent) :
     printf("Starting up\n");
 
     qWarning() << "\tCurrent dir: " << GetCurrentDirectory();
-    loadVideo("../../videos/toto.avi");
+    loadVideo("../../videos/test-mp4.avi");
 }
 
 MainWindow::~MainWindow()
 {
+    Ordonnanceur::Kill();
     delete ui;
 }
 

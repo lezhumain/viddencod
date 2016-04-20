@@ -2,6 +2,7 @@
 #include <QDebug>
 #include <QPixmap>
 #include <QPainter>
+#include "logmanager.hpp"
 
 #include "fifo.h"
 
@@ -227,9 +228,10 @@ Ordonnanceur* Ordonnanceur::GetInstance(const short nbThread)
 
 void Ordonnanceur::Kill()
 {
-    if(_instance != NULL)
-        delete(_instance);
+    if(_instance == NULL)
+        return;
 
+    delete(_instance);
     _instance = NULL;
 }
 
@@ -242,15 +244,57 @@ void Ordonnanceur::Kill()
 **/
 bool Ordonnanceur::loadVideo(QString fileName)
 {
+    m_decoder.openFile(fileName);
+    if(m_decoder.isOk()==false)
+    {
+       LogManager::GetInstance()->LogError(0, "Error loading the video", true);
+       return false;
+    }
 
+    // Get a new frame
+    nextFrame();
+
+    // Display a frame
+    displayFrame();
+     ffmpeg::AVRational m_FrameRateDecodedVideotmp;
+
+    m_decoder.GetFPS(&m_FrameRateDecodedVideotmp.num,
+                     &m_FrameRateDecodedVideotmp.den);
+    m_FrameRateDecodedVideo.num = m_FrameRateDecodedVideotmp.num;
+    m_FrameRateDecodedVideo.den = m_FrameRateDecodedVideotmp.den;
+
+    m_encoder.SaveTmpFrameRate(&m_FrameRateDecodedVideo);
 }
 
 /**
-  Decode and display a frame
+  Decode a frame
 **/
-void Ordonnanceur::displayFrame()
+bool Ordonnanceur::displayFrame()
 {
+    QImage img;
+    QPixmap p;
+    int et,en;
 
+    // Check we've loaded a video successfully
+   if(!checkVideoLoadOk())
+      return false;
+
+   // Decode a frame
+   if(!m_decoder.getFrame(img,&en,&et))
+   {
+      LogManager::GetInstance()->LogError(0, "Error decoding the frame", true);
+      return false;
+   }
+
+   return true;
+   // Convert the QImage to a QPixmap for display
+//   image2Pixmap(img,p);
+
+   // Display the QPixmap
+//   ui->labelVideoFrame->setPixmap(p);
+
+   // Display the video size
+//   ui->labelVideoInfo->setText(QString("Size %2 ms. Display: #%3 @ %4 ms.").arg(m_decoder.getVideoLengthSeconds()).arg(en).arg(et));
 }
 
 void Ordonnanceur::image2Pixmap(QImage &img,QPixmap &pixmap)
@@ -267,12 +311,45 @@ void Ordonnanceur::image2Pixmap(QImage &img,QPixmap &pixmap)
 
 bool Ordonnanceur::checkVideoLoadOk()
 {
-
+    if(m_decoder.isOk()==false)
+    {
+       LogManager::GetInstance()->LogInfo(0, "Video is not loaded.", true);
+       return false;
+    }
+    return true;
 }
 
 QList<Ordonnanceur::frame_t> Ordonnanceur::getAllFrames()
 {
+    double lengthMs = m_decoder.getVideoLengthSeconds();
+    double maxFrames = lengthMs * (double)((m_FrameRateDecodedVideo.den
+                                          / m_FrameRateDecodedVideo.num));
+    //    maxFrames = maxFrames < 0 ? 50000 : maxFrames;
+    QList<QImage> listIm;
 
+    qWarning() << "length" << lengthMs ;
+    qWarning() << "maxframes" << maxFrames ;
+
+    for(int i = 0; i <(int) maxFrames; ++i)
+    {
+        QImage img;
+        int eframeNumbern, frameTime;
+        if(!m_decoder.getFrame(img,&eframeNumbern,&frameTime))
+        {
+           LogManager::GetInstance()->LogError(0, "Error decoding the frame", true);
+           listIm.clear();
+           return listIm;
+        }
+        listIm.append(img);
+
+        if(!nextFrame() || i == 1000000)
+        {
+            qWarning() << "Current frame:" << eframeNumbern << "[i =" << i << "]";
+            break;
+        }
+    }
+
+    return listIm;
 }
 
 bool Ordonnanceur::WriteVideo(frame_t sframe, int iFrame)

@@ -22,6 +22,8 @@ public:
     };
 
     static Ordonnanceur* GetInstance(const short nbThread = 0);
+    static void Kill();
+
 
     void PushFrameToFifo(frame_t frame);
     frame_t PopFrame();
@@ -58,12 +60,11 @@ private:
 
     bool CreateThread();
     int StopThread();
-    static void Kill();
     bool loadVideo(QString fileName);
     bool checkVideoLoadOk();
 //    bool WriteVideo(frame_t sframe);
     bool WriteVideo(frame_t sframe, int iFrame);
-    void displayFrame();
+    bool displayFrame();
     void image2Pixmap(QImage &img,QPixmap &pixmap);
     QList<frame_t> getAllFrames();
     bool loadAllFrames();

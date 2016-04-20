@@ -179,13 +179,14 @@ bool Ordonnanceur::loadVideo(QString fileName)
     // Display a frame
     displayFrame();
 
-    ffmpeg::AVRational m_FrameRateDecodedVideoField;
-    m_decoder.GetFPS(&m_FrameRateDecodedVideoField);
+//    ffmpeg::AVRational m_FrameRateDecodedVideoField;
+//    m_decoder.GetFPS(&m_FrameRateDecodedVideoField.num,
+//                     &m_FrameRateDecodedVideoField.den);
 
-    m_FrameRateDecodedVideo.num = m_FrameRateDecodedVideoField.num;
-    m_FrameRateDecodedVideo.den = m_FrameRateDecodedVideoField.den;
+//    m_FrameRateDecodedVideo.num = m_FrameRateDecodedVideoField.num;
+//    m_FrameRateDecodedVideo.den = m_FrameRateDecodedVideoField.den;
 
-    m_encoder.SaveTmpFrameRate(&m_FrameRateDecodedVideo);
+//    m_encoder.SaveTmpFrameRate(&m_FrameRateDecodedVideo);
 
     return true;
 }
@@ -308,10 +309,10 @@ QList<Ordonnanceur::frame_t> Ordonnanceur::getAllFrames()
 
 bool Ordonnanceur::WriteVideo(frame_t sframe, int iFrame)
 {
-    ffmpeg::AVRational toto;
-    m_encoder.GetFramerate(&toto);
+//    ffmpeg::AVRational toto;
+//    m_encoder.GetFramerate(&toto);
 
-    int result = toto.num / toto.den;
+    int result = 30;/*toto.num / toto.den;*/
 
     if(iFrame == 0)
     {

@@ -80,7 +80,8 @@ class QVideoDecoder
       virtual double getVideoLengthSeconds();
 
 
-      void GetFPS(ffmpeg::AVRational*);
+//      void GetFPS(ffmpeg::AVRational*);
+      void GetFPS(ffmpeg::AVRational *FramRat);
       long GetNbFrames();
 
       virtual bool isOk();

@@ -23,16 +23,13 @@ void AgentEncoder::Run()
 
     if(_ordo == NULL)
     {
-        LogManager::GetInstance()->LogInfo(0, "\t /!\ Ordo was NULL", true);
+        LogManager::GetInstance()->LogInfo(0, "\t /!\\ Ordo was NULL", true);
         _ordo = Ordonnanceur::GetInstance();
     }
     // get frame from fifo
     Ordonnanceur::frame_t frame = _ordo->PopFrame();
     QImage *img = &(frame.frame);
 
-    // encode it
-
-    // put it in encoded list
 
     LogManager::GetInstance()->LogInfo(0, "Agent " + QString::number(_id) + " got: " + (img->isNull() ? "NULL" : "IMG"), true);
     int max = 100000000000, i;

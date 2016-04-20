@@ -52,7 +52,7 @@ QString GetCurrentDirectory()
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    m_lengthMs(0)
+    m_lengthS(0)
 {
     ui->setupUi(this);
 
@@ -147,7 +147,7 @@ void MainWindow::loadVideo(QString fileName)
    m_FrameRateDecodedVideo.num = m_FrameRateDecodedVideotmp.num;
    m_FrameRateDecodedVideo.den = m_FrameRateDecodedVideotmp.den;
 
-   m_encoder.SaveTmpFrameRate(&m_FrameRateDecodedVideo);
+   m_encoder.SetFrameRate(&m_FrameRateDecodedVideo);
 }
 
 void MainWindow::errLoadVideo()
@@ -197,13 +197,13 @@ void MainWindow::displayFrame()
 
 QList<QImage> MainWindow::getAllFrames()
 {
-    double lengthMs = m_decoder.getVideoLengthSeconds();
-    double maxFrames = lengthMs * (double)((m_FrameRateDecodedVideo.den
+    double lengthS = m_decoder.getVideoLengthSeconds();
+    double maxFrames = lengthS * (double)((m_FrameRateDecodedVideo.den
                                           / m_FrameRateDecodedVideo.num));
     //    maxFrames = maxFrames < 0 ? 50000 : maxFrames;
     QList<QImage> listIm;
 
-    qWarning() << "length" << lengthMs ;
+    qWarning() << "length" << lengthS ;
     qWarning() << "maxframes" << maxFrames ;
 
     for(int i = 0; i <(int) maxFrames; ++i)
@@ -507,11 +507,11 @@ int MainWindow::GenerateEncodedVideo(QString filename, bool vfr)
     // Display the frame, and processes events to allow for screen redraw
     QPixmap p;
 
-    m_lengthMs = m_decoder.getVideoLengthSeconds();
-    qWarning() << "Longueur de la vidéo : " << m_lengthMs << " secondes";
+    m_lengthS = m_decoder.getVideoLengthSeconds();
+    qWarning() << "Longueur de la vidéo : " << m_lengthS << " secondes";
 
     //  number of frames : TIME_TOTAL_MSEC * FRAMES_PER_SEC
-    totalFramesVideo = (int)((m_lengthMs  * dframeRate) / 1000);
+    totalFramesVideo = (int)((m_lengthS  * dframeRate) / 1000);
     qWarning() << "Nombre total de frames de la vidéo :" << totalFramesVideo ;
 
     for(i = 0; i < totalFramesVideo; ++i)

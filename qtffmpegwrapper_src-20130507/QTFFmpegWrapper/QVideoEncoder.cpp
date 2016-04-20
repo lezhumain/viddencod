@@ -67,7 +67,7 @@ void QVideoEncoder::GetFramerate(ffmpeg::AVRational *FramRat)
     *FramRat = Frame_Rate;
 }
 
-void QVideoEncoder::SaveTmpFrameRate(ffmpeg::AVRational *FramRat)
+void QVideoEncoder::SetFrameRate(ffmpeg::AVRational *FramRat)
 {
     Frame_Rate = *FramRat;
 }

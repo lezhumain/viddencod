@@ -340,7 +340,11 @@ bool Ordonnanceur::loadVideo(QString fileName)
     m_FrameRateDecodedVideo.num = m_FrameRateDecodedVideotmp.num;
     m_FrameRateDecodedVideo.den = m_FrameRateDecodedVideotmp.den;
 
-    m_encoder.SaveTmpFrameRate(&m_FrameRateDecodedVideo);
+    m_encoder.SetFrameRate(&m_FrameRateDecodedVideo);
+
+
+
+//    m_FpsDecoded =
 
     LogManager::GetInstance()->LogInfo(0, "Video loaded", true);
     return true;
@@ -401,14 +405,16 @@ bool Ordonnanceur::checkVideoLoadOk()
 
 QList<Ordonnanceur::frame_t> Ordonnanceur::getAllFrames()
 {
-    double lengthMs = m_decoder.getVideoLengthSeconds();
-    double maxFrames = lengthMs * (double)(m_FrameRateDecodedVideo.den
-                                          / m_FrameRateDecodedVideo.num) / 1000;
+    double lengthMs = m_decoder.getVideoLengthMiliSeconds();
+//    double maxFrames = lengthMs * (double)(m_FrameRateDecodedVideo.num
+//                                          / m_FrameRateDecodedVideo.den) / 1000;
+    double maxFrames = m_decoder.GetNbFrames();
+
     //    maxFrames = maxFrames < 0 ? 50000 : maxFrames;
     QList<Ordonnanceur::frame_t> listIm;
 
-    qWarning() << "length" << QString::number(lengthMs) + "ms" ;
-    qWarning() << "maxframes" << maxFrames ;
+    qWarning() << "Ordonnanceur::getAllFrames() \t length" << QString::number(lengthMs) + "ms" ;
+    qWarning() << "Ordonnanceur::getAllFrames() \t maxframes" << maxFrames ;
 
     for(int i = 0; i <(int) maxFrames; ++i)
     {
@@ -476,8 +482,9 @@ int Ordonnanceur::GenerateEncodedVideo(QString filename, bool vfr)
     int frameTime     = 0;
 
     //Number of frames per second for the output video
-    double dframeRate = ((double)(m_FrameRateDecodedVideo.den) /
-                       (double)m_FrameRateDecodedVideo.num);
+    double dframeRate = (double)m_FrameRateDecodedVideo.num /
+                       (double)m_FrameRateDecodedVideo.den;
+//    double dframeRate = m_decoder.GetNbFrames() * 1000 / m_decoder.getVideoLengthMiliSeconds();
 
     int totalFramesVideo = 0;
     bool fileOk = false;
@@ -489,7 +496,7 @@ int Ordonnanceur::GenerateEncodedVideo(QString filename, bool vfr)
 //    QEventLoop evt;
 
     int i;
-    double m_lengthMs;
+    double m_lengthS;
 
     // The image on which we draw the frames
     QImage frame;
@@ -498,18 +505,19 @@ int Ordonnanceur::GenerateEncodedVideo(QString filename, bool vfr)
     // Display the frame, and processes events to allow for screen redraw
     QPixmap p;
 
-    m_lengthMs = m_decoder.getVideoLengthSeconds();
-    qWarning() << "Longueur de la vidéo : " << QString::number(m_lengthMs) + "ms";
+    m_lengthS = m_decoder.getVideoLengthSeconds();
+    qWarning() << "Longueur de la vidéo : " << QString::number(m_lengthS) + "s";
 
     //  number of frames : TIME_TOTAL_MSEC * FRAMES_PER_SEC
-    totalFramesVideo = (int)((m_lengthMs  * dframeRate) / 1000);
-    qWarning() << "Nombre total de frames de la vidéo :" << totalFramesVideo ;
+    totalFramesVideo = (int)(m_lengthS  * dframeRate);
+    qWarning() << "Nombre total de "
+                  "frames de la vidéo :" << totalFramesVideo ;
     qWarning() << "FPS :" << dframeRate ;
 
-    qWarning() << "Retrieving all frames...";
-    frames = getAllFrames();
+//    qWarning() << "Retrieving all frames...";
+//    frames = getAllFrames();
 
-    qWarning() << "Frames received:" << frames.length();
+//    qWarning() << "Frames received:" << frames.length();
 
 
 

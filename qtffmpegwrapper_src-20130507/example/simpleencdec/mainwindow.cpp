@@ -686,7 +686,8 @@ void MainWindow::on_actionTest_triggered()
 //    }
     Ordonnanceur::frame_t sframe;
     sframe.frame = imgTest;
-    sframe.index = 0;
+    sframe.eframeNumbern = 0;
+    sframe.frameTime = 0;
     michel->PushFrameToFifo(sframe);
     qWarning() << "FIFO length:" << michel->GetFifoLength();
 

@@ -3,7 +3,7 @@
 #include <QPixmap>
 #include <QPainter>
 
-#include "fifo.hpp"
+#include "fifo.h"
 
 
 Ordonnanceur* Ordonnanceur::_instance = NULL;
@@ -11,9 +11,12 @@ Ordonnanceur* Ordonnanceur::_instance = NULL;
 Ordonnanceur::Ordonnanceur(const short nbThread, const QString& filename) :
     QObject(),
     _nbThread(nbThread),
-    _filename(filename)
+    _filename(filename),
+    m_NbFramesDecodedVideo(-1)
 {
 //    CreateThread();
+    m_FrameRateDecodedVideo.num = -1;
+    m_FrameRateDecodedVideo.den = -1;
     qWarning() << "Ordonnanceur created.";
 }
 
@@ -29,13 +32,86 @@ Ordonnanceur::~Ordonnanceur()
     qWarning() << "Ordonnanceur destroyed";
 }
 
+bool Ordonnanceur::loadAllFrames()
+{
+    bool loaded;
+//    int eframeNumbern = 0;
+//    int frameTime = 0;
+    double dLengthSec = -1;
+    unsigned int maxFrames = -1;
+//    QList<Ordonnanceur::frame_t> listIm;
+    //Number of frames per second for the output video
+    double dframeRate;
+
+    loaded = loadVideo(_filename);
+
+    if(!loaded)
+    {
+        qWarning() << "Could not open video.";
+//        return listIm;
+        return false;
+    }
+
+
+    dframeRate = (float)m_FrameRateDecodedVideo.num / m_FrameRateDecodedVideo.den;
+    dLengthSec = m_decoder.getVideoLengthSeconds();
+    maxFrames = (int)(dLengthSec  * dframeRate);
+
+    qWarning() << "Longueur de la vidéo : " << dLengthSec << " secondes\n"
+               << "Nombre total de frames de la vidéo :" << maxFrames << '\n'
+               << "FPS :" << dframeRate ;
+
+    unsigned i = 0;
+    for(; i < maxFrames; ++i)
+    {
+        Ordonnanceur::frame_t sframe;
+//        QImage img;
+
+        if(!m_decoder.getFrame(sframe.frame, &sframe.eframeNumbern, &sframe.frameTime))
+        {
+            qWarning() << "Error decoding the frame";
+//            listIm.clear();
+//            _fifoFrame.
+//            return listIm;
+            return false;
+        }
+
+        if(sframe.frame.isNull() || sframe.frame.format() == QImage::Format_Invalid)
+        {
+            qWarning() << "Ordonnanceur::getAllFrames Got a null invalid frame";
+            return false;
+//            sframe = listIm.last();
+        }
+//        else
+//            sframe.frame = img;
+//        qWarning() << "\tsize before" << sizeof(sframe.frame);
+//        sframe.frame = sframe.frame.convertToFormat(QImage::Format_RGB32);
+//        qWarning() << "\tsize  after" << sizeof(sframe.frame);
+//        listIm.append(sframe);
+        _fifoFrame.PushBack(sframe);
+
+        //WriteVideo(sframe, i);
+
+        if(!nextFrame())
+        {
+            qWarning() << "Current frame:" << sframe.eframeNumbern << "[i =" << i << "]";
+            break;
+        }
+    }
+
+    qWarning() << "getAllFrame: i=" << i;
+    return true;
+}
+
 bool Ordonnanceur::Start()
 {
     CreateThread();
 
     // get all frames
-    QList<QImage> frames = getAllFrames();
-    int nbF = frames.length();
+//    _lstFrameToBeEncoded = getAllFrames();
+//    int nbF = _lstFrameToBeEncoded.length();
+    bool ret = loadAllFrames();
+    int nbF = _lstFrameToBeEncoded.length();
 
     if(nbF == 0)
     {
@@ -43,20 +119,19 @@ bool Ordonnanceur::Start()
         Ordonnanceur::Kill();
         return false;
     }
+    qWarning() << "getAllFrames() return" << ret;
+
+    qWarning() << "ORdo got" << nbF << "frames from GetAllFrames";
 
     // putframes in FIFO
-    for(int i = 0; i < nbF; ++i)
-    {
-        QImage img = frames.takeFirst();
-
-        frame_t tframe;
-        tframe.frame = img;
-        tframe.index = i;
-
-        _fifoFrame.PushBack(tframe);
-    }
+//    for(int i = 0; i < nbF; ++i)
+//    {
+//        frame_t tframe = _lstFrameToBeEncoded.takeFirst();
+//        _fifoFrame.PushBack(tframe);
+//    }
 
     StartThread();
+    return true;
 }
 
 bool Ordonnanceur::CreateThread()
@@ -70,16 +145,18 @@ bool Ordonnanceur::CreateThread()
 
         _lstAgent.append(agent);
     }
+    return true;
 }
 
 int Ordonnanceur::StartThread()
 {
     emit ThreadStart();
+    return 0;
 }
 
 int Ordonnanceur::StopThread()
 {
-
+    return 0;
 }
 
 void Ordonnanceur::OnFinished(const short idagent)
@@ -115,11 +192,6 @@ void Ordonnanceur::OnFinished(const short idagent)
         Ordonnanceur::Kill(); // can delete
 }
 
-bool Ordonnanceur::WriteVideo()
-{
-    return 1;
-}
-
 void Ordonnanceur::PushFrameToFifo(frame_t frame)
 {
     this->_fifoFrame.PushBack(frame);
@@ -132,7 +204,7 @@ Ordonnanceur::frame_t Ordonnanceur::PopFrame()
 
 void Ordonnanceur::ClearFifo()
 {
-
+    return;
 }
 
 unsigned int Ordonnanceur::GetFifoLength() const
@@ -161,25 +233,16 @@ void Ordonnanceur::Kill()
     _instance = NULL;
 }
 
+
+
+// VIDEO REGION
+
 /**
   Prompts the user for the video to load, and display the first frame
 **/
 bool Ordonnanceur::loadVideo(QString fileName)
 {
-   m_decoder.openFile(fileName);
-   if(m_decoder.isOk()==false)
-   {
-//      QMessageBox::critical(this,"Error","Error loading the video");
-        qWarning() << "Error loading the video";
-        return false;
-   }
 
-   // Get first frame
-//   nextFrame();
-   // Display a frame
-//   displayFrame();
-
-   return true;
 }
 
 /**
@@ -187,103 +250,53 @@ bool Ordonnanceur::loadVideo(QString fileName)
 **/
 void Ordonnanceur::displayFrame()
 {
-    QImage img;
-    QPixmap p;
-    int et,en;
-
-    // Check we've loaded a video successfully
-   if(!checkVideoLoadOk())
-      return;
-
-   // Decode a frame
-   if(!m_decoder.getFrame(img,&en,&et))
-   {
-//      QMessageBox::critical(this,"Error","Error decoding the frame");
-        qWarning() << "Error decoding the frame";
-        return;
-   }
-
-   // Convert the QImage to a QPixmap for display
-   image2Pixmap(img,p);
-
-   // Display the QPixmap
-//   ui->labelVideoFrame->setPixmap(p);
-
-   // Display the video size
-//   ui->labelVideoInfo->setText(QString("Size %2 ms. Display: #%3 @ %4 ms.").arg(m_decoder.getVideoLengthSeconds()).arg(en).arg(et));
 
 }
 
 void Ordonnanceur::image2Pixmap(QImage &img,QPixmap &pixmap)
 {
-   // Convert the QImage to a QPixmap for display
-   pixmap = QPixmap(img.size());
-   QPainter painter;
-   painter.begin(&pixmap);
-   painter.drawImage(0,0,img);
-   painter.end();
+
+    // Convert the QImage to a QPixmap for display
+//    pixmap = QPixmap(img.size());
+//    QPainter painter;
+//    painter.begin(&pixmap);
+//    painter.drawImage(0,0,img);
+//    painter.end();
+    pixmap = QPixmap::fromImage(img);
 }
 
 bool Ordonnanceur::checkVideoLoadOk()
 {
-   if(m_decoder.isOk()==false)
-   {
-//      errLoadVideo();
-        qWarning() << "Error loading the video";
-        return false;
-   }
-   return true;
+
 }
 
-QList<QImage> Ordonnanceur::getAllFrames()
+QList<Ordonnanceur::frame_t> Ordonnanceur::getAllFrames()
 {
-    short frameRate = 25;
-    int lengthMs, maxFrames;
 
-    bool loaded = loadVideo(_filename);
-    QList<QImage> listIm;
+}
 
-    if(loaded)
-    {
-        lengthMs = m_decoder.getVideoLengthSeconds(); // open video first
-        qWarning() << "length" << QString::number(lengthMs) + "ms";
+bool Ordonnanceur::WriteVideo(frame_t sframe, int iFrame)
+{
+//    ffmpeg::AVRational toto;
+//    m_encoder.GetFramerate(&toto);
 
-        maxFrames = lengthMs * frameRate / 1000; // not working
-        maxFrames = maxFrames < 0 ? 50000 : maxFrames;
-        qWarning() << "maxframes" << maxFrames ;
+//    int result = toto.num / toto.den;
 
-        for(int i = 0; i < maxFrames; ++i)
-        {
-            QImage img;
-            int eframeNumbern, frameTime;
-            if(!m_decoder.getFrame(img,&eframeNumbern,&frameTime))
-            {
-    //           QMessageBox::critical(this,"Error","Error decoding the frame");
-                qWarning() << "Error decoding the frame";
-               listIm.clear();
-               return listIm;
-            }
-            listIm.append(img);
-
-            if(!nextFrame() || i == 1000000)
-            {
-                qWarning() << "Current frame:" << eframeNumbern << "[i =" << i << "]";
-                break;
-            }
-        }
-    }
-
-    return listIm;
+//    if(iFrame == 0)
+//    {
+//        QString _filename_output = "test_output.avi";
+//        m_encoder.createFile(_filename_output,
+//                             sframe.frame.width(),
+//                             sframe.frame.height(),
+//                             1000000,
+//                             1,
+//                             result);
+//    }
+//    m_encoder.encodeImage(sframe.frame);
+//    return 0;
 }
 
 bool Ordonnanceur::nextFrame()
 {
-   if(!m_decoder.seekNextFrame())
-   {
-//      QMessageBox::critical(this,"Error","seekNextFrame failed");
-       qWarning() << "seekNextFrame failed";
-       return false;
-   }
 
-   return true;
 }

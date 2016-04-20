@@ -12,3 +12,4 @@ qtffmpegwrapper_src-20130507/example/simpleencdec/simpleencdec.pro.*
 *.avi
 *.orig
 *.mp4
+*.zip

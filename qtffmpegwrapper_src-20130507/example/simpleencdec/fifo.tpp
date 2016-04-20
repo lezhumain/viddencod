@@ -1,4 +1,4 @@
-#include "fifo.hpp"
+#include "fifo.h"
 
 template <class T>
 Fifo<T>::Fifo() :

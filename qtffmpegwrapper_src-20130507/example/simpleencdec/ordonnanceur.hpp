@@ -4,8 +4,8 @@
 #include <QImage>
 #include <QObject>
 #include <QList>
-#include "fifo.hpp"
-#include "agentEncoder.hpp"
+#include "fifo.h"
+#include "agentencoder.hpp"
 
 #include "../../QTFFmpegWrapper/headers/QVideoEncoder.h"
 #include "../../QTFFmpegWrapper/headers/QVideoDecoder.h"
@@ -17,7 +17,8 @@ class Ordonnanceur : public QObject
 public:
     struct frame_t {
         QImage frame;
-        int index;
+        int eframeNumbern;
+        int frameTime;
     };
 
     static Ordonnanceur* GetInstance(const short nbThread = 0);
@@ -28,9 +29,10 @@ public:
     unsigned int GetFifoLength() const;
     int StartThread();
     bool Start();
+    bool EncodeVideo(QString filename);
 
 signals:
-    ThreadStart();
+    int ThreadStart();
 
 private slots:
     //Stop agent,supprimer liste,regarder thread si dans liste et si tout finit
@@ -39,29 +41,33 @@ private:
     static Ordonnanceur* _instance;
 
     Fifo<frame_t> _fifoFrame;
+    QList<frame_t> _lstFrameToBeEncoded;
     QList<frame_t> _lstFrameEncoded;
     QList<AgentEncoder*> _lstAgent;
     const short _nbThread;
     QString _filename;
     QVideoDecoder m_decoder;
     QVideoEncoder m_encoder;
+    ffmpeg::AVRational m_FrameRateDecodedVideo;
+    long m_NbFramesDecodedVideo;
 
-    static void Kill();
+    Ordonnanceur(const short nbThread, const QString &filename = "../../videos/short_video.mp4");
+//    Ordonnanceur(const short nbThread, const QString &filename = "../../videos/B99.mp4");
+//    Ordonnanceur(const short nbThread, const QString &filename = "../../videos/Humour.mp4");
+    ~Ordonnanceur();
 
     bool CreateThread();
     int StopThread();
-    bool WriteVideo();
-
-    ~Ordonnanceur();
-//    Ordonnanceur(const short nbThread, const QString &filename = "../../Les_nulss.avi");
-    Ordonnanceur(const short nbThread, const QString &filename = "D:\\Downloads\\Series\\Brooklyn Nine Nine\\Brooklyn.Nine-Nine.S03E11.HDTV.x264-FUM[ettv]\\Brooklyn.Nine-Nine.S03E11.HDTV.x264-FUM[ettv].mp4");
+    static void Kill();
     bool loadVideo(QString fileName);
-    void displayFrame();
     bool checkVideoLoadOk();
+//    bool WriteVideo(frame_t sframe);
+    bool WriteVideo(frame_t sframe, int iFrame);
+    void displayFrame();
     void image2Pixmap(QImage &img,QPixmap &pixmap);
-    QList<QImage> getAllFrames();
+    QList<frame_t> getAllFrames();
+    bool loadAllFrames();
     bool nextFrame();
-
 };
 
 #endif // ORDONNANCEUR_H

@@ -362,7 +362,7 @@ void MainWindow::on_actionEncode_video_triggered()
 //    QString fileName = QFileDialog::getSaveFileName(this, title,QString(),"Video (*.avi *.asf *.mpg)");
 //    if(!fileName.isNull())
 //        nbFrames = GenerateEncodedVideo(fileName.toStdString().c_str(), false);
-    QString fileName = "output.avi";
+    QString fileName = "../../videos/output.avi";
     nbFrames = GenerateEncodedVideo(fileName.toStdString().c_str(), false);
     if(nbFrames == -1)
     {
@@ -540,7 +540,8 @@ int MainWindow::GenerateEncodedVideo(QString filename, bool vfr)
         }                                                                         // and correct the bitrate according to the expected average frame rate (fps)
 
         // handle
-//        frame = frame.convertToFormat(QImage::Format_RGB32);
+        if(frame.format() != QImage::Format_RGB32)
+            frame = frame.convertToFormat(QImage::Format_RGB32);
         //  Paste the decoded frame into the QPixmap for display the data
         image2Pixmap(frame,p);
         ui->labelVideoFrame->setPixmap(p);

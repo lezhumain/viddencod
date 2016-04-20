@@ -3,6 +3,7 @@
 #include <QPixmap>
 #include <QPainter>
 #include "logmanager.hpp"
+#include <math.h>
 
 #include "fifo.h"
 
@@ -264,6 +265,9 @@ bool Ordonnanceur::loadVideo(QString fileName)
     m_FrameRateDecodedVideo.den = m_FrameRateDecodedVideotmp.den;
 
     m_encoder.SaveTmpFrameRate(&m_FrameRateDecodedVideo);
+
+    LogManager::GetInstance()->LogInfo(0, "Video loaded", true);
+    return true;
 }
 
 /**
@@ -381,5 +385,136 @@ bool Ordonnanceur::WriteVideo(frame_t sframe, int iFrame)
 
 bool Ordonnanceur::nextFrame()
 {
+    bool bret = false;
+    if(!m_decoder.seekNextFrame())   qWarning() << "seekNextFrame failed";
+    else                             bret = true;
 
+    return bret;
+}
+
+int Ordonnanceur::GenerateEncodedVideo(QString filename, bool vfr)
+{
+    int bitrate       = 1000000;
+    int gop           = 1;
+    int eframeNumbern = 0;
+    int frameTime     = 0;
+
+    //Number of frames per second for the output video
+    double dframeRate = ((double)(m_FrameRateDecodedVideo.den) /
+                       (double)m_FrameRateDecodedVideo.num);
+
+    int totalFramesVideo = 0;
+    bool fileOk = false;
+
+    // Generate a few hundred frames
+    int size = 0;
+
+    // we use an event loop to allow for paint events to show on-screen the generated video
+//    QEventLoop evt;
+
+    int i;
+    double m_lengthMs;
+
+    // The image on which we draw the frames
+    QImage frame;
+
+    // Display the frame, and processes events to allow for screen redraw
+    QPixmap p;
+
+    m_lengthMs = m_decoder.getVideoLengthSeconds();
+    qWarning() << "Longueur de la vidéo : " << m_lengthMs << " secondes";
+
+    //  number of frames : TIME_TOTAL_MSEC * FRAMES_PER_SEC
+    totalFramesVideo = (int)((m_lengthMs  * dframeRate) / 1000);
+    qWarning() << "Nombre total de frames de la vidéo :" << totalFramesVideo ;
+
+    for(i = 0; i < totalFramesVideo; ++i)
+    {
+        //  Decoding the frames one by one
+        if(!m_decoder.getFrame(frame,&eframeNumbern,&frameTime))
+        {
+           LogManager::GetInstance()->LogError(0, "Error decoding the frame", true);
+           return -1;
+        }
+
+        //  If we are with the first frame,
+        //  we create the output file
+        if(i == 0)
+        {
+             if(!vfr)
+                fileOk = m_encoder.createFile(filename,
+                                   frame.width(),
+                                   frame.height(),
+                                   bitrate,
+                                   gop,
+                                   (int)dframeRate);        // Fixed frame rate
+             else
+                fileOk = m_encoder.createFile(filename,
+                                   frame.width(),
+                                   frame.height(),
+                                   bitrate * 1000 / (int)dframeRate,
+                                   gop,
+                                   1000);  // For variable frame rates: set the time base to e.g. 1ms (1000fps),
+
+            if(!fileOk)
+                break;
+        }                                                                         // and correct the bitrate according to the expected average frame rate (fps)
+
+        // handle
+        if(frame.format() != QImage::Format_RGB32)
+            frame = frame.convertToFormat(QImage::Format_RGB32);
+        //  Paste the decoded frame into the QPixmap for display the data
+//        image2Pixmap(frame,p);
+//        ui->labelVideoFrame->setPixmap(p);
+
+        //  Force to paint the QPixmap with the new decoded frame
+//        evt.processEvents();
+
+        // Display the video size
+//        ui->labelVideoInfo->setText(QString("Size %2 ms. Display: #%3 @ %4 ms.").arg(m_decoder.getVideoLengthSeconds()).arg(eframeNumbern).arg(frameTime));
+
+        //ffmpeg::av_usleep(50000);
+
+        if(!vfr)
+          size = m_encoder.encodeImage(frame);                      // Fixed frame rate
+        else
+        {
+          //  Timestamp for the encoded video
+          unsigned pts = 0;
+
+          // Variable frame rate: the pts of the first frame is 0,
+          // subsequent frames slow down
+          pts += ffmpeg::sqrt(i);
+
+          if(!i)
+            size = m_encoder.encodeImagePts(frame,0);
+          else
+          {
+            size = m_encoder.encodeImagePts(frame, pts);
+          }
+        }
+
+//        qWarning() << "Actual frame is " << eframeNumbern << " / " << totalFramesVideo ;
+//        printf("Encoded: %d bytes \n",size);
+
+        if(!nextFrame())
+        {
+            qWarning() << "Finished reading the video to be encoded" ;
+            qWarning() << "Last frame is frame:" << eframeNumbern << "[i =" << i << "]";
+            break;
+        }
+    }
+
+    if(fileOk)
+    {
+        m_encoder.close();
+        qWarning() << "Done encoding.";
+    }
+    else
+    {
+        qWarning() << "Couldn't encode.";
+        i = -1;
+    }
+
+    return i;
 }

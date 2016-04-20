@@ -56,6 +56,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    Ordonnanceur *michel = Ordonnanceur::GetInstance(2);
+
 #ifdef WIN32
     ConsoleInit();
 
@@ -63,7 +65,8 @@ MainWindow::MainWindow(QWidget *parent) :
     printf("Starting up\n");
 
     qWarning() << "\tCurrent dir: " << GetCurrentDirectory();
-    loadVideo("../../videos/test-mp4.avi");
+//    loadVideo("../../videos/test-mp4.avi");
+    michel->loadVideo("../../videos/test-mp4.avi");
 }
 
 MainWindow::~MainWindow()
@@ -338,14 +341,15 @@ void MainWindow::on_actionSave_synthetic_variable_frame_rate_video_triggered()
 
 void MainWindow::on_actionEncode_video_triggered()
 {
+    Ordonnanceur *ordo = Ordonnanceur::GetInstance();
     int secElapsed;
     QTime start;
     QDateTime test;
 
-    if(!checkVideoLoadOk())
+    if(!ordo->checkVideoLoadOk())
     {
        on_actionLoad_video_triggered();
-       if(!checkVideoLoadOk())
+       if(!ordo->checkVideoLoadOk())
          return;
     }
 
@@ -364,7 +368,8 @@ void MainWindow::on_actionEncode_video_triggered()
 //    if(!fileName.isNull())
 //        nbFrames = GenerateEncodedVideo(fileName.toStdString().c_str(), false);
     QString fileName = "../../videos/output.avi";
-    nbFrames = GenerateEncodedVideo(fileName.toStdString().c_str(), false);
+//    nbFrames = GenerateEncodedVideo(fileName.toStdString().c_str(), false);
+    nbFrames = ordo->GenerateEncodedVideo(fileName.toStdString().c_str(), false);
     if(nbFrames == -1)
     {
         printf("An error happened...");

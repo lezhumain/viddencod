@@ -32,6 +32,9 @@ public:
     int StartThread();
     bool Start();
     bool EncodeVideo(QString filename);
+    bool loadVideo(QString fileName);
+    bool checkVideoLoadOk();
+    int GenerateEncodedVideo(QString filename, bool vfr);
 
 signals:
     int ThreadStart();
@@ -60,8 +63,6 @@ private:
 
     bool CreateThread();
     int StopThread();
-    bool loadVideo(QString fileName);
-    bool checkVideoLoadOk();
 //    bool WriteVideo(frame_t sframe);
     bool WriteVideo(frame_t sframe, int iFrame);
     bool displayFrame();

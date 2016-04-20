@@ -30,7 +30,7 @@ public:
     void ClearFifo();
     unsigned int GetFifoLength() const;
     int StartThread();
-    bool Start();
+    short Start();
     bool EncodeVideo(QString filename);
     bool loadVideo(QString fileName);
     bool checkVideoLoadOk();

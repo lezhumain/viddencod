@@ -105,36 +105,112 @@ bool Ordonnanceur::loadAllFrames()
     return true;
 }
 
-bool Ordonnanceur::Start()
+short Ordonnanceur::Start()
 {
-    CreateThread();
+    short nbFrames = 0;
+    QString oFileName = "../../videos/output1.avi";
 
-    // get all frames
-//    _lstFrameToBeEncoded = getAllFrames();
-//    int nbF = _lstFrameToBeEncoded.length();
-    bool ret = loadAllFrames();
-    int nbF = _lstFrameToBeEncoded.length();
-
-    if(nbF == 0)
+    if(!checkVideoLoadOk())
     {
-        qWarning() << "Didn't get any frame.";
-        Ordonnanceur::Kill();
-        return false;
+//       on_actionLoad_video_triggered();
+        loadVideo(_filename);
+       if(!checkVideoLoadOk())
+       {
+            LogManager::GetInstance()->LogWarning(0, "could not open video....", true);
+            return -1;
+       }
     }
-    qWarning() << "getAllFrames() return" << ret;
 
-    qWarning() << "ORdo got" << nbF << "frames from GetAllFrames";
 
-    // putframes in FIFO
-//    for(int i = 0; i < nbF; ++i)
+//    QList<QImage> listImg = getAllFrames();
+
+//    QString title("Save an encoded video ");
+//    QString fileName = QFileDialog::getSaveFileName(this, title,QString(),"Video (*.avi *.mp4 *.mpg)");
+//    if(!fileName.isNull())
+//      nbFrames = GenerateEncodedVideo(fileName.toStdString().c_str(), false);
+
+//    QString title("Save an encoded video ");
+//    QString fileName = QFileDialog::getSaveFileName(this, title,QString(),"Video (*.avi *.asf *.mpg)");
+//    if(!fileName.isNull())
+//        nbFrames = GenerateEncodedVideo(fileName.toStdString().c_str(), false);
+
+//    nbFrames = GenerateEncodedVideo(fileName.toStdString().c_str(), false);
+    nbFrames = GenerateEncodedVideo(oFileName.toStdString().c_str(), false);
+    if(nbFrames == -1)
+    {
+        printf("An error happened...");
+//        QMessageBox::information(this,"Info","Couldn't encode video");
+        LogManager::GetInstance()->LogError(0, "Couldn't encode video");
+        return -1;
+    }
+
+
+//    QString msg = "Encoded "
+//            + QString::number(nbFrames)
+//            + " frames at "
+//            + QString::number(nbFrames / secElapsed)
+//            + "f/s (Total Time: "
+//            + test.toString("hh:mm:ss")
+//            + ").";
+
+//    printf("%s\n", msg.toStdString().c_str());
+//    qWarning() << msg;
+
+    return nbFrames;
+}
+
+//bool Ordonnanceur::Start()
+//{
+//    bool ret;
+//    int nbF, nbFrames;
+
+// //    CreateThread();
+
+//    if(!checkVideoLoadOk())
 //    {
-//        frame_t tframe = _lstFrameToBeEncoded.takeFirst();
-//        _fifoFrame.PushBack(tframe);
+//        loadVideo(_filename);
+//        if(!checkVideoLoadOk())
+//            return false;
 //    }
 
-    StartThread();
-    return true;
-}
+//    // get all frames
+//    _lstFrameToBeEncoded = getAllFrames();
+// //    ret = loadAllFrames();
+//    nbF = _lstFrameToBeEncoded.length();
+
+//    if(nbF == 0)
+//    {
+//        qWarning() << "Didn't get any frame.";
+//        Ordonnanceur::Kill();
+//        return false;
+//    }
+// //    qWarning() << "getAllFrames() return" << ret;
+
+//    qWarning() << "ORdo got" << nbF << "frames from GetAllFrames";
+
+//    // putframes in FIFO
+// //    for(int i = 0; i < nbF; ++i)
+// //    {
+// //        frame_t tframe = _lstFrameToBeEncoded.takeFirst();
+// //        _fifoFrame.PushBack(tframe);
+// //    }
+
+
+//    QString oFileName = "../../videos/output.avi";
+// //    nbFrames = GenerateEncodedVideo(fileName.toStdString().c_str(), false);
+//    nbFrames = GenerateEncodedVideo(oFileName.toStdString().c_str(), false);
+//    if(nbFrames == -1)
+//    {
+//        printf("An error happened...");
+//        LogManager::GetInstance()->LogWarning(0, "Couldn't encode video", true);
+//        LogManager::GetInstance()->LogError(0, "Couldn't encode video");
+//        return false;
+//    }
+
+
+// //    StartThread();
+//    return true;
+//}
 
 bool Ordonnanceur::CreateThread()
 {
@@ -422,11 +498,12 @@ int Ordonnanceur::GenerateEncodedVideo(QString filename, bool vfr)
     QPixmap p;
 
     m_lengthMs = m_decoder.getVideoLengthSeconds();
-    qWarning() << "Longueur de la vidéo : " << m_lengthMs << " secondes";
+    qWarning() << "Longueur de la vidéo : " << QString::number(m_lengthMs) + "ms";
 
     //  number of frames : TIME_TOTAL_MSEC * FRAMES_PER_SEC
     totalFramesVideo = (int)((m_lengthMs  * dframeRate) / 1000);
     qWarning() << "Nombre total de frames de la vidéo :" << totalFramesVideo ;
+    qWarning() << "FPS :" << dframeRate ;
 
     for(i = 0; i < totalFramesVideo; ++i)
     {

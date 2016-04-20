@@ -346,12 +346,12 @@ void MainWindow::on_actionEncode_video_triggered()
     QTime start;
     QDateTime test;
 
-    if(!ordo->checkVideoLoadOk())
-    {
-       on_actionLoad_video_triggered();
-       if(!ordo->checkVideoLoadOk())
-         return;
-    }
+//    if(!ordo->checkVideoLoadOk())
+//    {
+//       on_actionLoad_video_triggered();
+//       if(!ordo->checkVideoLoadOk())
+//         return;
+//    }
 
     start = QTime::currentTime();
     start.start();
@@ -367,16 +367,17 @@ void MainWindow::on_actionEncode_video_triggered()
 //    QString fileName = QFileDialog::getSaveFileName(this, title,QString(),"Video (*.avi *.asf *.mpg)");
 //    if(!fileName.isNull())
 //        nbFrames = GenerateEncodedVideo(fileName.toStdString().c_str(), false);
-    QString fileName = "../../videos/output.avi";
-//    nbFrames = GenerateEncodedVideo(fileName.toStdString().c_str(), false);
-    nbFrames = ordo->GenerateEncodedVideo(fileName.toStdString().c_str(), false);
-    if(nbFrames == -1)
-    {
-        printf("An error happened...");
-        QMessageBox::information(this,"Info","Couldn't encode video");
-        LogManager::GetInstance()->LogError(0, "Couldn't encode video");
-        return;
-    }
+//    QString fileName = "../../videos/output.avi";
+// //    nbFrames = GenerateEncodedVideo(fileName.toStdString().c_str(), false);
+//    nbFrames = ordo->GenerateEncodedVideo(fileName.toStdString().c_str(), false);
+//    if(nbFrames == -1)
+//    {
+//        printf("An error happened...");
+//        QMessageBox::information(this,"Info","Couldn't encode video");
+//        LogManager::GetInstance()->LogError(0, "Couldn't encode video");
+//        return;
+//    }
+    nbFrames = ordo->Start();
 
     secElapsed = start.elapsed() / 1000.;
     test = QDateTime::fromTime_t(secElapsed).toUTC();

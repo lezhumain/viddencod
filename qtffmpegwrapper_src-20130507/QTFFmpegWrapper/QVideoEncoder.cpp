@@ -56,10 +56,10 @@ void QVideoEncoder::SetFramerateForFormatContext()
 
 void QVideoEncoder::SetFramerateForCodecContext()
 {
-    pCodecCtxVideoEncoder->framerate.den = Frame_Rate.den;
-    pCodecCtxVideoEncoder->time_base.den = Frame_Rate.den;
-    pCodecCtxVideoEncoder->framerate.num = Frame_Rate.num;
-    pCodecCtxVideoEncoder->time_base.num = Frame_Rate.num;
+    pCodecCtxVideoEncoder->framerate.den = Frame_Rate.num;
+    pCodecCtxVideoEncoder->time_base.den = Frame_Rate.num;
+    pCodecCtxVideoEncoder->framerate.num = Frame_Rate.den;
+    pCodecCtxVideoEncoder->time_base.num = Frame_Rate.den;
 }
 
 void QVideoEncoder::GetFramerate(ffmpeg::AVRational *FramRat)
@@ -67,9 +67,11 @@ void QVideoEncoder::GetFramerate(ffmpeg::AVRational *FramRat)
     *FramRat = Frame_Rate;
 }
 
-void QVideoEncoder::SetFrameRate(ffmpeg::AVRational *FramRat)
+void QVideoEncoder::SetFrameRate(const ffmpeg::AVRational *FramRat)
 {
-    Frame_Rate = *FramRat;
+    Frame_Rate.num = FramRat->den;
+    Frame_Rate.den = FramRat->num;
+    qWarning() << "encoder Frame_Rate =" << (double)Frame_Rate.den / Frame_Rate.num;
 }
 
 bool QVideoEncoder::prepare_stream(QString fileName,

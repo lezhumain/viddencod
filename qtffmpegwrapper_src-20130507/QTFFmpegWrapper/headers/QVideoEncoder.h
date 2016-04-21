@@ -103,10 +103,9 @@ class QVideoEncoder
       virtual int encodeImage(const QImage &);
       virtual int encodeImagePts(const QImage &,unsigned pts);
       virtual bool isOk();  
-      void SaveTmpFrameRate(ffmpeg::AVRational *FramRat);
-      void GetAVPacketFrame(ffmpeg::AVPacket *avPkt);
-      ffmpeg::AVRational Frame_Rate;
+      void SetFrameRate(const ffmpeg::AVRational *FramRat);
 
+      ffmpeg::AVRational Frame_Rate;
 };
 
 #endif // QVideoEncoder_H

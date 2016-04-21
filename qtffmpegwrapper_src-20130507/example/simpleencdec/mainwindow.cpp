@@ -29,6 +29,27 @@ THIS SOFTWARE IS PROVIDED BY COPYRIGHT HOLDERS ``AS IS'' AND ANY EXPRESS OR IMPL
 #include "QVideoDecoderTest.hpp"
 #include "cio.h"
 #include "logmanager.hpp"
+#include "ordonnanceur.hpp"
+
+#include <stdio.h>  /* defines FILENAME_MAX */
+#ifdef WINDOWS
+    #include <direct.h>
+    #define GetCurrentDir _getcwd
+#else
+    #include <unistd.h>
+    #define GetCurrentDir getcwd
+ #endif
+
+QString GetCurrentDirectory()
+{
+    char cCurrentPath[FILENAME_MAX];
+
+     if (!GetCurrentDir(cCurrentPath, sizeof(cCurrentPath)))
+         return "";
+
+    cCurrentPath[sizeof(cCurrentPath) - 1] = '\0'; /* not really required */
+    return QString(cCurrentPath);
+}
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -41,8 +62,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ConsoleInit();
 
 #endif
-  printf("Starting up\n");
-  loadVideo("../../videos/test-mp4.avi");
+    printf("Starting up\n");
+
+    qWarning() << "\tCurrent dir: " << GetCurrentDirectory();
+    loadVideo("../../videos/toto.avi");
 }
 
 MainWindow::~MainWindow()
@@ -336,7 +359,12 @@ void MainWindow::on_actionEncode_video_triggered()
 //    QString fileName = QFileDialog::getSaveFileName(this, title,QString(),"Video (*.avi *.mp4 *.mpg)");
 //    if(!fileName.isNull())
 //      nbFrames = GenerateEncodedVideo(fileName.toStdString().c_str(), false);
-    QString fileName = "output.avi";
+
+//    QString title("Save an encoded video ");
+//    QString fileName = QFileDialog::getSaveFileName(this, title,QString(),"Video (*.avi *.asf *.mpg)");
+//    if(!fileName.isNull())
+//        nbFrames = GenerateEncodedVideo(fileName.toStdString().c_str(), false);
+    QString fileName = "../../videos/output.avi";
     nbFrames = GenerateEncodedVideo(fileName.toStdString().c_str(), false);
 
     if(nbFrames == -1)
@@ -518,7 +546,8 @@ int MainWindow::GenerateEncodedVideo(QString filename, bool vfr)
         }                                                                         // and correct the bitrate according to the expected average frame rate (fps)
 
         // handle
-        frame = frame.convertToFormat(QImage::Format_RGB32);
+        if(frame.format() != QImage::Format_RGB32)
+            frame = frame.convertToFormat(QImage::Format_RGB32);
         //  Paste the decoded frame into the QPixmap for display the data
         image2Pixmap(frame,p);
         ui->labelVideoFrame->setPixmap(p);
@@ -650,3 +679,28 @@ void MainWindow::GenerateEncodedVideo(QList<QImage> &images, QString filename,bo
 
 }
 
+void MainWindow::on_actionTest_triggered()
+{
+    Ordonnanceur *michel = Ordonnanceur::GetInstance(2);
+    QImage imgTest(QSize(720, 480), QImage::Format_RGB32);
+    imgTest.fill(Qt::darkGray);
+//    QList<QImage> frames = getAllFrames(); // TODO check all frames are here
+//    int length = frames.length();
+
+//    for(int i = 0; i < length; ++i)
+//    {
+//        QImage img = frames.takeFirst();
+//        michel->PushFrameToFifo( img );
+//    }
+    Ordonnanceur::frame_t sframe;
+    sframe.frame = imgTest;
+    sframe.index = 0;
+    michel->PushFrameToFifo(sframe);
+    qWarning() << "FIFO length:" << michel->GetFifoLength();
+
+//    michel->StartThread();
+    if( michel->Start() == false)
+        qWarning() << "Error at some point.";
+
+    qWarning() << "DONE";
+}

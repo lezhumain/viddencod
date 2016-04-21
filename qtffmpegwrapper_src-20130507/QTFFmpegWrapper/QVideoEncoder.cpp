@@ -168,6 +168,7 @@ bool QVideoEncoder::prepare_stream(QString fileName,
        return false;
     }
 
+<<<<<<< HEAD
     // open the codec
     int iret = avcodec_open2(pCodecCtxVideoEncoder,
                              pCodecVideoEncoder,
@@ -181,6 +182,22 @@ bool QVideoEncoder::prepare_stream(QString fileName,
        qWarning() << "could not open codec";
        return false;
     }
+=======
+   // open the codec
+   int iret = ffmpeg::avcodec_open2(pCodecCtxVideoEncoder, pCodecVideoEncoder, NULL);
+   if ( iret < 0)
+   {
+        char error[1024];
+        int ret = 1;
+
+        ffmpeg::av_strerror(ret, error, sizeof(error));
+        qWarning() << "\t" << ret;
+        qWarning() << "\t" << error;
+
+        printf("could not open codec\n");
+        return false;
+   }
+>>>>>>> 6024c492bba021590a720327f5d50105127a4e9a
 
     // Allocate memory for output
     if(!initOutputBuf())
@@ -409,9 +426,9 @@ int QVideoEncoder::encodeImage_p(const QImage &img,
 **/
 bool QVideoEncoder::isSizeValid()
 {
-    if(getWidth()%8)
+    if(getWidth()%2)
        return false;
-    if(getHeight()%8)
+    if(getHeight()%2)
        return false;
     return true;
 }

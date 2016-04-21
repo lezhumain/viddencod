@@ -80,8 +80,10 @@ class QVideoDecoder
       //virtual int64_t getVideoLengthSeconds();
       virtual double getVideoLengthSeconds();
 
-//      ffmpeg::AVFormatContext *GetContext(void);
-      void GetFPS(int *numerateur, int *denominateur);
+
+//      void GetFPS(ffmpeg::AVRational*);
+      void GetFPS(ffmpeg::AVRational *FramRat);
+      long GetNbFrames();
 
       virtual bool isOk();
 };

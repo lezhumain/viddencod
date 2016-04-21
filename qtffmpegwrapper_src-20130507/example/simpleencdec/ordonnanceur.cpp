@@ -42,8 +42,6 @@ bool Ordonnanceur::loadAllFrames()
     double dLengthSec = -1;
     unsigned int maxFrames = -1;
 //    QList<Ordonnanceur::frame_t> listIm;
-    //Number of frames per second for the output video
-    double dframeRate;
 
     loaded = loadVideo(_filename);
 
@@ -54,10 +52,16 @@ bool Ordonnanceur::loadAllFrames()
         return false;
     }
 
+    //  Framerate of output video file
+    double dframeRate = (((double)(m_FrameRateDecodedVideo.num) /
+                           (double)m_FrameRateDecodedVideo.den));
 
-    dframeRate = (float)m_FrameRateDecodedVideo.num / m_FrameRateDecodedVideo.den;
     dLengthSec = m_decoder.getVideoLengthSeconds();
-    maxFrames = (int)(dLengthSec  * dframeRate);
+    qWarning() << "Longueur de la vidéo : " << dLengthSec << " secondes";
+
+    //Number of frames per second for the output video
+    maxFrames = m_decoder.GetNbFrames();
+    qWarning() << "Nombre total de frames de la vidéo :" << maxFrames ;
 
     qWarning() << "Longueur de la vidéo : " << dLengthSec << " secondes\n"
                << "Nombre total de frames de la vidéo :" << maxFrames << '\n'
@@ -259,8 +263,7 @@ bool Ordonnanceur::loadVideo(QString fileName)
     displayFrame();
      ffmpeg::AVRational m_FrameRateDecodedVideotmp;
 
-    m_decoder.GetFPS(&m_FrameRateDecodedVideotmp.num,
-                     &m_FrameRateDecodedVideotmp.den);
+    m_decoder.GetFPS(&m_FrameRateDecodedVideotmp);
     m_FrameRateDecodedVideo.num = m_FrameRateDecodedVideotmp.num;
     m_FrameRateDecodedVideo.den = m_FrameRateDecodedVideotmp.den;
 

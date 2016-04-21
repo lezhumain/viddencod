@@ -56,10 +56,10 @@ void QVideoEncoder::SetFramerateForFormatContext()
 
 void QVideoEncoder::SetFramerateForCodecContext()
 {
-    pCodecCtxVideoEncoder->framerate.den = Frame_Rate.den;
-    pCodecCtxVideoEncoder->time_base.den = Frame_Rate.den;
-    pCodecCtxVideoEncoder->framerate.num = Frame_Rate.num;
-    pCodecCtxVideoEncoder->time_base.num = Frame_Rate.num;
+    pCodecCtxVideoEncoder->framerate.den = Frame_Rate.num;
+    pCodecCtxVideoEncoder->time_base.den = Frame_Rate.num;
+    pCodecCtxVideoEncoder->framerate.num = Frame_Rate.den;
+    pCodecCtxVideoEncoder->time_base.num = Frame_Rate.den;
 }
 
 void QVideoEncoder::GetFramerate(ffmpeg::AVRational *FramRat)
@@ -121,13 +121,13 @@ bool QVideoEncoder::prepare_stream(QString fileName,
     }
 
     //  Set Framerate for format context
-    SetFramerateForFormatContext();
+//    SetFramerateForFormatContext();
 
     //  Setting encoder type
     pCodecCtxVideoEncoder                        = pStreamEncoder->codec;
     pCodecCtxVideoEncoder->codec_id              = pOutputFormatVideoEncoder->video_codec;
     pCodecCtxVideoEncoder->codec_type            = ffmpeg::AVMEDIA_TYPE_VIDEO;
-    pCodecCtxVideoEncoder->compression_level     = 2;
+//    pCodecCtxVideoEncoder->compression_level     = 2;
 
     //  Setting size and format
     pCodecCtxVideoEncoder->bit_rate              = Bitrate;
@@ -158,7 +158,7 @@ bool QVideoEncoder::prepare_stream(QString fileName,
 
     //  Select a predefined h264 video preset
     if (pCodecCtxVideoEncoder->codec_id == ffmpeg::AV_CODEC_ID_H264)
-      ffmpeg::av_opt_set(pCodecCtxVideoEncoder->priv_data, "preset", "veryfast", 0);
+      ffmpeg::av_opt_set(pCodecCtxVideoEncoder->priv_data, "preset", "veryslow", 0);
 
     // find the video encoder
     pCodecVideoEncoder = avcodec_find_encoder(pCodecCtxVideoEncoder->codec_id);
@@ -168,20 +168,19 @@ bool QVideoEncoder::prepare_stream(QString fileName,
        return false;
     }
 
-   // open the codec
-   int iret = ffmpeg::avcodec_open2(pCodecCtxVideoEncoder, pCodecVideoEncoder, NULL);
-   if ( iret < 0)
-   {
-        char error[1024];
-        int ret = 1;
-
-        ffmpeg::av_strerror(ret, error, sizeof(error));
-        qWarning() << "\t" << ret;
-        qWarning() << "\t" << error;
-
-        printf("could not open codec\n");
-        return false;
-   }
+    // open the codec
+    int iret = avcodec_open2(pCodecCtxVideoEncoder,
+                             pCodecVideoEncoder,
+                             NULL);
+    if ( iret < 0)
+    {
+       ffmpeg::av_log_set_level(AV_LOG_ERROR);
+       char bugf[256];
+       ffmpeg::av_strerror(iret, bugf, sizeof(bugf));
+       qWarning() << "avcodec_open2 error : " << bugf << "ret = " << iret;
+       qWarning() << "could not open codec";
+       return false;
+    }
 
     // Allocate memory for output
     if(!initOutputBuf())
@@ -378,17 +377,17 @@ int QVideoEncoder::encodeImage_p(const QImage &img,
     delete(timeEncodeImage);
 //    qWarning() << "\tConversion took " + QString::number(ms) + "ms";
 
-//   if(custompts)                        // Handle custom pts (must set it again for the rest of the processing)
-//     pCodecCtxVideoEncoder->coded_frame->pts = pts; // Set the time stamp
+   if(custompts)                        // Handle custom pts (must set it again for the rest of the processing)
+     pCodecCtxVideoEncoder->coded_frame->pts = pts; // Set the time stamp
 
    if (isEncodedFrameNotEmpty)
    {
-//      if (pCodecCtxVideoEncoder->coded_frame->pts != AV_NOPTS_VALUE)
-//         pkt.pts= av_rescale_q(pCodecCtxVideoEncoder->coded_frame->pts,
-//                               pCodecCtxVideoEncoder->time_base,
-//                               pStreamEncoder->time_base);
+      if (pCodecCtxVideoEncoder->coded_frame->pts != AV_NOPTS_VALUE)
+         pkt.pts= av_rescale_q(pCodecCtxVideoEncoder->coded_frame->pts,
+                               pCodecCtxVideoEncoder->time_base,
+                               pStreamEncoder->time_base);
 
-//      if(pCodecCtxVideoEncoder->coded_frame->key_frame)
+      if(pCodecCtxVideoEncoder->coded_frame->key_frame)
          pkt.flags |= AV_PKT_FLAG_KEY;
 
       pkt.stream_index= pStreamEncoder->index;
@@ -402,7 +401,12 @@ int QVideoEncoder::encodeImage_p(const QImage &img,
       if(ret<0)
          return -1;
    }
-   return 0;/*pCodecCtxVideoEncoder->frame_bits;*/
+   return isEncodedFrameNotEmpty;
+}
+
+void QVideoEncoder::GetAVPacketFrame(ffmpeg::AVPacket *avPkt)
+{
+   *avPkt = pkt;
 }
 
 /**

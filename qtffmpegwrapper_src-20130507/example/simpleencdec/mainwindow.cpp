@@ -119,7 +119,7 @@ void MainWindow::on_actionLoad_video_triggered()
    QString fileName = QFileDialog::getOpenFileName(this, "Load Video",QString(),"Video (*.avi *.mp4 *.asf *.mpg *.wmv)");
    if(!fileName.isNull())
    {
-      loadVideo(fileName);
+      michel->loadVideo(fileName);
    }
 }
 
@@ -140,13 +140,9 @@ void MainWindow::loadVideo(QString fileName)
 
    // Display a frame
    displayFrame();
-    ffmpeg::AVRational m_FrameRateDecodedVideotmp;
 
-   m_decoder.GetFPS(&m_FrameRateDecodedVideotmp.num,
-                    &m_FrameRateDecodedVideotmp.den);
-   m_FrameRateDecodedVideo.num = m_FrameRateDecodedVideotmp.num;
-   m_FrameRateDecodedVideo.den = m_FrameRateDecodedVideotmp.den;
-
+   m_decoder.GetFPS(&m_FrameRateDecodedVideo);
+   qWarning() << "Number de frames : " << m_decoder.GetNbFrames();
    m_encoder.SaveTmpFrameRate(&m_FrameRateDecodedVideo);
 }
 
@@ -345,6 +341,8 @@ void MainWindow::on_actionEncode_video_triggered()
     int secElapsed;
     QTime start;
     QDateTime test;
+    short nbFrames = 0;
+    QString fileName = "output.avi";
 
     if(!ordo->checkVideoLoadOk())
     {
@@ -355,7 +353,6 @@ void MainWindow::on_actionEncode_video_triggered()
 
     start = QTime::currentTime();
     start.start();
-    short nbFrames = 0;
 //    QList<QImage> listImg = getAllFrames();
 
 //    QString title("Save an encoded video ");
@@ -367,7 +364,6 @@ void MainWindow::on_actionEncode_video_triggered()
 //    QString fileName = QFileDialog::getSaveFileName(this, title,QString(),"Video (*.avi *.asf *.mpg)");
 //    if(!fileName.isNull())
 //        nbFrames = GenerateEncodedVideo(fileName.toStdString().c_str(), false);
-    QString fileName = "../../videos/output.avi";
 //    nbFrames = GenerateEncodedVideo(fileName.toStdString().c_str(), false);
     nbFrames = ordo->GenerateEncodedVideo(fileName.toStdString().c_str(), false);
     if(nbFrames == -1)
@@ -484,16 +480,11 @@ int MainWindow::GenerateEncodedVideo(QString filename, bool vfr)
     int gop           = 1;
     int eframeNumbern = 0;
     int frameTime     = 0;
-
-    //Number of frames per second for the output video
-    double dframeRate = ((double)(m_FrameRateDecodedVideo.den) /
-                       (double)m_FrameRateDecodedVideo.num);
-
     int totalFramesVideo = 0;
     bool fileOk = false;
 
     // Generate a few hundred frames
-    int size = 0;
+    int isEncodedFrameOk = -1;
 
     // we use an event loop to allow for paint events to show on-screen the generated video
     QEventLoop evt;
@@ -506,11 +497,16 @@ int MainWindow::GenerateEncodedVideo(QString filename, bool vfr)
     // Display the frame, and processes events to allow for screen redraw
     QPixmap p;
 
+    //  Framerate of output video file
+    double dframeRate = /*1 / */(((double)(m_FrameRateDecodedVideo.num) /
+                           (double)m_FrameRateDecodedVideo.den));
+
     m_lengthMs = m_decoder.getVideoLengthSeconds();
     qWarning() << "Longueur de la vidéo : " << m_lengthMs << " secondes";
 
     //  number of frames : TIME_TOTAL_MSEC * FRAMES_PER_SEC
-    totalFramesVideo = (int)((m_lengthMs  * dframeRate) / 1000);
+    //totalFramesVideo = (int)((m_lengthMs  * m_decoder.GetNbFrames()));
+    totalFramesVideo = m_decoder.GetNbFrames();
     qWarning() << "Nombre total de frames de la vidéo :" << totalFramesVideo ;
 
     for(i = 0; i < totalFramesVideo; ++i)
@@ -532,7 +528,7 @@ int MainWindow::GenerateEncodedVideo(QString filename, bool vfr)
                                    frame.height(),
                                    bitrate,
                                    gop,
-                                   (int)dframeRate);        // Fixed frame rate
+                                   /*(int)dframeRate*/25);        // Fixed frame rate
              else
                 fileOk = m_encoder.createFile(filename,
                                    frame.width(),
@@ -558,10 +554,8 @@ int MainWindow::GenerateEncodedVideo(QString filename, bool vfr)
         // Display the video size
         ui->labelVideoInfo->setText(QString("Size %2 ms. Display: #%3 @ %4 ms.").arg(m_decoder.getVideoLengthSeconds()).arg(eframeNumbern).arg(frameTime));
 
-        //ffmpeg::av_usleep(50000);
-
         if(!vfr)
-          size = m_encoder.encodeImage(frame);                      // Fixed frame rate
+          isEncodedFrameOk = m_encoder.encodeImage(frame);                      // Fixed frame rate
         else
         {
           //  Timestamp for the encoded video
@@ -572,10 +566,10 @@ int MainWindow::GenerateEncodedVideo(QString filename, bool vfr)
           pts += sqrt(i);
 
           if(!i)
-            size = m_encoder.encodeImagePts(frame,0);
+            isEncodedFrameOk = m_encoder.encodeImagePts(frame,0);
           else
           {
-            size = m_encoder.encodeImagePts(frame, pts);
+            isEncodedFrameOk = m_encoder.encodeImagePts(frame, pts);
           }
         }
 

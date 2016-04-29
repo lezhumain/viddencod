@@ -69,8 +69,8 @@ void QVideoEncoder::GetFramerate(ffmpeg::AVRational *FramRat)
 
 void QVideoEncoder::SetFrameRate(const ffmpeg::AVRational *FramRat)
 {
-    Frame_Rate.num = FramRat->den;
-    Frame_Rate.den = FramRat->num;
+    Frame_Rate.num = FramRat->num;
+    Frame_Rate.den = FramRat->den;
     qWarning() << "encoder Frame_Rate =" << (double)Frame_Rate.den / Frame_Rate.num;
 }
 
@@ -406,10 +406,10 @@ int QVideoEncoder::encodeImage_p(const QImage &img,
    return isEncodedFrameNotEmpty;
 }
 
-void QVideoEncoder::GetAVPacketFrame(ffmpeg::AVPacket *avPkt)
-{
-   *avPkt = pkt;
-}
+//void QVideoEncoder::GetAVPacketFrame(ffmpeg::AVPacket *avPkt)
+//{
+//   *avPkt = pkt;
+//}
 
 /**
   Ensures sizes are some reasonable multiples
